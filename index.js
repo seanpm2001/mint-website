@@ -2734,7 +2734,17 @@ class $Install extends React.PureComponent {
   }
 
   get content() {
-    return (this.loading ? React.createElement("div", {}, [`Loading versions...`]) : React.createElement("ul", {}, [this.files]))
+    return (this.loading ? React.createElement("ul", {
+      className: `install-files`,
+      style: {
+
+      }
+    }, [React.createElement("li", {}, [`Loading versions...`])]) : React.createElement("ul", {
+      className: `install-files`,
+      style: {
+
+      }
+    }, [this.files]))
   }
 
   get files() {
@@ -2758,17 +2768,52 @@ class $Install extends React.PureComponent {
   }
 
   render() {
-    return React.createElement($Page, {  }, [React.createElement($Title, {  }, [`Download`]), React.createElement($SubTitle, {  }, [`You can download the latest binaries here.`]), this.content, React.createElement("hr", {
+    return React.createElement($Page, {  }, [React.createElement($Title, {  }, [`Install`]), React.createElement($SubTitle, {  }, [`Follow the directions below to install Mint:`]), React.createElement("ol", {
+      className: `install-list`,
+      style: {
+
+      }
+    }, [React.createElement("li", {}, [`Download the binary for your operating system: `, this.content]), React.createElement("li", {}, [`Move the binary to the: `, React.createElement("code", {
+      className: `install-code`,
+      style: {
+
+      }
+    }, [`/usr/local/bin`]), ` directory`]), React.createElement("li", {}, [`You invoke the CLI in your terminal by just typing `, React.createElement("code", {
+      className: `install-code`,
+      style: {
+
+      }
+    }, [`mint`])])]), React.createElement("hr", {
       className: `install-hr`,
       style: {
 
       }
-    }), React.createElement($Title, {  }, [`Install`]), React.createElement($SubTitle, {  }, [`Follow the directions below to install Mint.`]), React.createElement("ul", {}, [React.createElement("li", {}, [`Download the binary and copy it into: `, React.createElement("code", {}, [`/usr/local/bin`]), ` directory`]), React.createElement("li", {}, [`You invoke the CLI in your terminal by just typing `, React.createElement("code", {}, [`mint`])])]), React.createElement("hr", {
-      className: `install-hr`,
+    }), React.createElement($Title, {  }, [`Install from Source`]), React.createElement($SubTitle, {  }, [`Follow the directions below to install Mint from source:`]), React.createElement("ol", {
+      className: `install-list`,
       style: {
 
       }
-    }), React.createElement($Title, {  }, [`Install from Source`]), React.createElement($SubTitle, {  }, [`Follow the directions below to install Mint from source.`]), React.createElement("ul", {}, [React.createElement("li", {}, [`Install the crystal programming language`]), React.createElement("li", {}, [`Download and extract the source files from Github:`]), React.createElement("li", {}, [`In your terminal enter the folder you extracted the source code.`]), React.createElement("li", {}, [`Install dependencies:`, React.createElement("pre", {}, [`crystal deps`])]), React.createElement("li", {}, [`Build the binary (might need to use sudo):`, React.createElement("pre", {}, [`crystal build src/mint.cr -o /usr/local/bin/mint -p --release`])]), React.createElement("li", {}, [`You invoke the CLI in your terminal by just typing `, React.createElement("code", {}, [`mint`])])])])
+    }, [React.createElement("li", {}, [`Install the `, React.createElement($Ui_Link, { href: `https://crystal-lang.org/docs/installation/`, label: `Crystal programming language`, target: `_blank` })]), React.createElement("li", {}, [`Download and extract the source files from Github:`, React.createElement("br", {}), React.createElement($Ui_Link, { label: `https://github.com/mint-lang/mint`, href: `https://github.com/mint-lang/mint`, target: `_blank` })]), React.createElement("li", {}, [`In your terminal enter the folder you extracted the source code:`, React.createElement("pre", {
+      className: `install-code`,
+      style: {
+
+      }
+    }, [`cd /path/to/source`])]), React.createElement("li", {}, [`Install dependencies:`, React.createElement("pre", {
+      className: `install-code`,
+      style: {
+
+      }
+    }, [`crystal deps`])]), React.createElement("li", {}, [`Build the binary (might need to use sudo):`, React.createElement("pre", {
+      className: `install-code`,
+      style: {
+
+      }
+    }, [`crystal build src/mint.cr -o /usr/local/bin/mint -p --release`])]), React.createElement("li", {}, [`You invoke the CLI in your terminal by just typing `, React.createElement("code", {
+      className: `install-code`,
+      style: {
+
+      }
+    }, [`mint`])])])])
   }
 }
 
@@ -6467,7 +6512,6 @@ Mint.insertStyles(`
 
   .sub-title-base {
     margin: 10px 0;
-    color: #666;
   }
 
   .user-form-title {
@@ -6488,9 +6532,32 @@ Mint.insertStyles(`
   }
 
   .install-hr {
-    margin: 30px 0;
+    margin: 40px 0;
     border: 0;
     border-top: 1px solid #EEE;
+  }
+
+  .install-code {
+    border: 1px solid #DDD;
+    background: #f7f7f7;
+    font-size: inherit;
+    padding: 5px;
+  }
+
+  .install-list {
+
+  }
+
+  .install-list li {
+    margin-top: 15px;
+  }
+
+  .install-files {
+
+  }
+
+  .install-files li {
+    margin-top: 10px;
   }
 
   .home-hero {
@@ -6696,6 +6763,7 @@ Mint.insertStyles(`
     max-width: 1040px;
     margin: 0 auto;
     width: 100%;
+    color: #444;
     padding: 50px 20px;
     padding-bottom: 100px;
   }
