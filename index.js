@@ -2264,13 +2264,13 @@ const $Counter_Store = new (class extends Store {
 
   increment() {
     return new Promise((_resolve) => {
-      this.setState(Mint.update(this.state, { counter: this.state.counter + 1 }), _resolve)
+      this.setState(Mint.update(this.state, { counter: this.counter + 1 }), _resolve)
     })
   }
 
   decrement() {
     return new Promise((_resolve) => {
-      this.setState(Mint.update(this.state, { counter: this.state.counter - 1 }), _resolve)
+      this.setState(Mint.update(this.state, { counter: this.counter - 1 }), _resolve)
     })
   }
 })
@@ -2604,7 +2604,7 @@ class $Layout extends React.PureComponent {
       style: {
 
       }
-    }, [React.createElement($Ui_Toolbar_Title, { href: `/` }, [React.createElement($Logo, { fill: this.theme.colors.primary.background, textFill: `#FFF`, height: 20, width: 82 })]), React.createElement($Ui_Toolbar_Spacer, {  }), React.createElement($Ui_Link, { href: `/install`, label: `Install` }), React.createElement($Ui_Toolbar_Separator, {  }), React.createElement($Ui_Link, { href: `https://gdotdesign.gitbooks.io/mint/content/`, target: `_blank`, label: `Guide` }), React.createElement($Ui_Toolbar_Separator, {  }), React.createElement($Ui_Link, { href: `/examples`, label: `Examples` }), React.createElement($Ui_Toolbar_Separator, {  }), React.createElement($Ui_Link, { href: `/roadmap`, label: `Roadmap` }), React.createElement($Ui_Toolbar_Separator, {  }), React.createElement($Ui_Link, { href: `/blog`, label: `Blog` })])]), this.children, React.createElement($Footer, {  })])
+    }, [React.createElement($Ui_Toolbar_Title, { href: `/` }, [React.createElement($Logo, { fill: this.theme.colors.primary.background, textFill: `#FFF`, height: 20, width: 82 })]), React.createElement($Ui_Toolbar_Spacer, {  }), React.createElement($Ui_Link, { href: `/install`, label: `Install` }), React.createElement($Ui_Toolbar_Separator, {  }), React.createElement($Ui_Link, { href: `https://guide.mint-lang.com`, target: `_blank`, label: `Guide` }), React.createElement($Ui_Toolbar_Separator, {  }), React.createElement($Ui_Link, { href: `/examples`, label: `Examples` }), React.createElement($Ui_Toolbar_Separator, {  }), React.createElement($Ui_Link, { href: `/roadmap`, label: `Roadmap` }), React.createElement($Ui_Toolbar_Separator, {  }), React.createElement($Ui_Link, { href: `/blog`, label: `Blog` })])]), this.children, React.createElement($Footer, {  })])
   }
 }
 
@@ -2840,12 +2840,12 @@ class $Install extends React.PureComponent {
       style: {
 
       }
-    }, [React.createElement("li", {}, [`Download the binary for your operating system: `, this.content]), React.createElement("li", {}, [`Move the binary to the: `, React.createElement("code", {
+    }, [React.createElement("li", {}, [`Download the binary for your operating system: `, this.content]), React.createElement("li", {}, [`Move the binary to (as): `, React.createElement("code", {
       className: `install-code`,
       style: {
 
       }
-    }, [`/usr/local/bin`]), ` directory`]), React.createElement("li", {}, [`You invoke the CLI in your terminal by just typing `, React.createElement("code", {
+    }, [`/usr/local/bin/mint`])]), React.createElement("li", {}, [`You invoke the CLI in your terminal by just typing `, React.createElement("code", {
       className: `install-code`,
       style: {
 
@@ -2875,12 +2875,22 @@ class $Install extends React.PureComponent {
       style: {
 
       }
-    }, [`crystal build src/mint.cr -o /usr/local/bin/mint -p --release`])]), React.createElement("li", {}, [`You invoke the CLI in your terminal by just typing `, React.createElement("code", {
+    }, [`crystal build src/mint.cr -o /usr/local/bin/mint -p --release --no-debug`])]), React.createElement("li", {}, [`You invoke the CLI in your terminal by just typing `, React.createElement("code", {
       className: `install-code`,
       style: {
 
       }
-    }, [`mint`])])])])
+    }, [`mint`])])]), React.createElement("hr", {
+      className: `install-hr`,
+      style: {
+
+      }
+    }), React.createElement($Title, {  }, [`Daily Binaries`]), React.createElement($SubTitle, {  }, [React.createElement("p", {}, [`A fresh binary is created and uploaded to S3 when something changes in the master branch.`]), React.createElement("p", {}, [`You can download those binaries here:`]), React.createElement("ul", {
+      className: `install-files`,
+      style: {
+
+      }
+    }, [React.createElement("li", {}, [React.createElement($Ui_Link, { href: `https://s3-eu-west-1.amazonaws.com/mint-lang/mint-latest-linux`, label: `mint-latest-linux` })]), React.createElement("li", {}, [React.createElement($Ui_Link, { href: `https://s3-eu-west-1.amazonaws.com/mint-lang/mint-latest-osx`, label: `mint-latest-osx` })])])])])
   }
 }
 
@@ -2993,7 +3003,7 @@ $Roadmap_Version.defaultProps = {
 
 class $Roadmap extends React.PureComponent {
   render() {
-    return React.createElement($Page, {  }, [React.createElement($Title, {  }, [`Roadmap`]), React.createElement($SubTitle, {  }, [`This page contains planned and shipped high level features up to the stable release (1.0.0).`]), React.createElement($Roadmap_Version, { version: `Planned Features` }, [React.createElement($Roadmap_Feature, { name: `CSS Type Checking`, icon: `🞛`, description: `Check the values of known CSS properties and warn the developer if it's not matches the available values.` }), React.createElement($Roadmap_Feature, { name: `HTML Attribute Checking`, icon: `🞛`, description: `Check the values of HTML attributes based on the tag they belong to (for example check alt attributes for <img> tags).` }), React.createElement($Roadmap_Feature, { name: `Progressive Web Application Support`, icon: `🞛`, description: `Automatically generate files for basic PWA features (service-worker, manifest, icons).` }), React.createElement($Roadmap_Feature, { name: `Devtools`, icon: `🞛`, description: `A package for monitoring the state of the application.` }), React.createElement($Roadmap_Feature, { name: `Documentation Generator`, icon: `🞛`, description: `Generate beatuifl documentation for your project, including dependencies.` }), React.createElement($Roadmap_Feature, { name: `Optimize Compilation`, icon: `🞛`, description: `Only compile the entities that are being used.` }), React.createElement($Roadmap_Feature, { name: `Testing`, icon: `🞛`, description: `Language feature for easily testing components or the whole application.` }), React.createElement($Roadmap_Feature, { name: `Language Server Protocol`, icon: `🞛`, description: `Implement a language server to expose the AST for code editors.` }), React.createElement($Roadmap_Feature, { name: `Website for Packages`, icon: `🞛`, description: `A website to browse, find and rate community packages.` }), React.createElement($Roadmap_Feature, { name: `Image Optimization`, icon: `🞛`, description: `During the build process optimize images automatically.` })]), React.createElement($Roadmap_Version, { version: `0.1` }, [React.createElement($Roadmap_Feature, { description: `The language itself.`, name: `Language Basics`, icon: `🞛` }, [React.createElement($Roadmap_Feature, { name: `Parser`, description: `Converts source code to an AST.` }), React.createElement($Roadmap_Feature, { name: `Formatter`, description: `Reproduces source code from an AST.` }), React.createElement($Roadmap_Feature, { name: `Type Checker`, description: `Walks the AST and type checks the application.` }), React.createElement($Roadmap_Feature, { name: `Compiler`, description: `Compiles an application to JavaScript.` })]), React.createElement($Roadmap_Feature, { description: `The features of the language.`, name: `Language Features`, icon: `🞛` }, [React.createElement($Roadmap_Feature, { name: `Components`, description: `Define components with type checked properties and state.` }), React.createElement($Roadmap_Feature, { name: `Styling`, description: `Styling HTML tags in a dynamic way without conflicts.` }), React.createElement($Roadmap_Feature, { name: `Routing`, description: `Define routes in a declarative way.` }), React.createElement($Roadmap_Feature, { name: `Computations`, description: `Handle synchronous (JSON decoding) and asynchronous (HTTP Request) computations that might fail.` }), React.createElement($Roadmap_Feature, { name: `State`, description: `Manage global state with Stores.` }), React.createElement($Roadmap_Feature, { name: `Subscriptions`, description: `Subscribe to global events (mouse, window) using providers.` })]), React.createElement($Roadmap_Feature, { name: `Production Builder`, icon: `🞛`, description: `The process of building the production version of the application.` }, [React.createElement($Roadmap_Feature, { name: `Icon Generator`, description: `Generate icons for most common use cases (favicon, application icons).` }), React.createElement($Roadmap_Feature, { name: `Bundling and Minification`, description: `Compile and minify the application into a single JavaScript file.` })]), React.createElement($Roadmap_Feature, { name: `Development Server`, icon: `🞛`, description: `A server that automatically formats code and reloads the application when any of the source files change.` }), React.createElement($Roadmap_Feature, { name: `Package Manager`, icon: `🞛`, description: `Install external sources (packages) directly from Git repositories.` }), React.createElement($Roadmap_Feature, { name: `Command Line Interface`, icon: `🞛`, description: `A binary that allows to access the features of the language.` })])])
+    return React.createElement($Page, {  }, [React.createElement($Title, {  }, [`Roadmap`]), React.createElement($SubTitle, {  }, [`This page contains planned and shipped high level features up to the stable release (1.0.0).`]), React.createElement($Roadmap_Version, { version: `Planned Features` }, [React.createElement($Roadmap_Feature, { name: `CSS Type Checking`, icon: `🞛`, description: `Check the values of known CSS properties and warn the developer if it's not matches the available values.` }), React.createElement($Roadmap_Feature, { name: `HTML Attribute Checking`, icon: `🞛`, description: `Check the values of HTML attributes based on the tag they belong to (for example check alt attributes for <img> tags).` }), React.createElement($Roadmap_Feature, { name: `Progressive Web Application Support`, icon: `🞛`, description: `Automatically generate files for basic PWA features (service-worker, manifest, icons).` }), React.createElement($Roadmap_Feature, { name: `Devtools`, icon: `🞛`, description: `A package for monitoring the state of the application.` }), React.createElement($Roadmap_Feature, { name: `Documentation Generator`, icon: `🞛`, description: `Generate beatuifl documentation for your project, including dependencies.` }), React.createElement($Roadmap_Feature, { name: `Compiler Optimalization`, icon: `🞛`, description: `Only compile the entities that are being used.` }), React.createElement($Roadmap_Feature, { name: `Testing`, icon: `🞛`, description: `Language feature for easily testing components or the whole application.` }), React.createElement($Roadmap_Feature, { name: `Language Server Protocol`, icon: `🞛`, description: `Implement a language server to expose the AST for code editors.` }), React.createElement($Roadmap_Feature, { name: `Website for Packages`, icon: `🞛`, description: `A website to browse, find and rate community packages.` }), React.createElement($Roadmap_Feature, { name: `Image Optimization`, icon: `🞛`, description: `During the build process optimize images automatically.` }), React.createElement($Roadmap_Feature, { name: `Application Structure Diagram`, icon: `🞛`, description: `Construct an interactive diagram of application structure containing routes, stores, providers and components. ` })]), React.createElement($Roadmap_Version, { version: `0.1` }, [React.createElement($Roadmap_Feature, { description: `The language itself.`, name: `Language Basics`, icon: `🞛` }, [React.createElement($Roadmap_Feature, { name: `Parser`, description: `Converts source code to an AST.` }), React.createElement($Roadmap_Feature, { name: `Formatter`, description: `Reproduces source code from an AST.` }), React.createElement($Roadmap_Feature, { name: `Type Checker`, description: `Walks the AST and type checks the application.` }), React.createElement($Roadmap_Feature, { name: `Compiler`, description: `Compiles an application to JavaScript.` })]), React.createElement($Roadmap_Feature, { description: `The features of the language.`, name: `Language Features`, icon: `🞛` }, [React.createElement($Roadmap_Feature, { name: `Components`, description: `Define components with type checked properties and state.` }), React.createElement($Roadmap_Feature, { name: `Styling`, description: `Styling HTML tags in a dynamic way without conflicts.` }), React.createElement($Roadmap_Feature, { name: `Routing`, description: `Define routes in a declarative way.` }), React.createElement($Roadmap_Feature, { name: `Computations`, description: `Handle synchronous (JSON decoding) and asynchronous (HTTP Request) computations that might fail.` }), React.createElement($Roadmap_Feature, { name: `State`, description: `Manage global state with Stores.` }), React.createElement($Roadmap_Feature, { name: `Subscriptions`, description: `Subscribe to global events (mouse, window) using providers.` }), React.createElement($Roadmap_Feature, { name: `JavaScript Interopability`, description: `Simply call out the JavaScript when you need to.` })]), React.createElement($Roadmap_Feature, { name: `Production Builder`, icon: `🞛`, description: `The process of building the production version of the application.` }, [React.createElement($Roadmap_Feature, { name: `Icon Generator`, description: `Generate icons for most common use cases (favicon, application icons).` }), React.createElement($Roadmap_Feature, { name: `Bundling and Minification`, description: `Compile and minify the application into a single JavaScript file.` })]), React.createElement($Roadmap_Feature, { name: `Development Server`, icon: `🞛`, description: `A server that automatically formats code and reloads the application when any of the source files change.` }), React.createElement($Roadmap_Feature, { name: `Package Manager`, icon: `🞛`, description: `Install external sources (packages) directly from Git repositories.` }), React.createElement($Roadmap_Feature, { name: `Command Line Interface`, icon: `🞛`, description: `A binary that allows to access the features of the language.` })])])
   }
 }
 
@@ -3029,7 +3039,7 @@ class $Home extends React.PureComponent {
       style: {
 
       }
-    }, [React.createElement($Ui_Link, { href: `/install` }, [React.createElement($Ui_Button, { size: 22, label: `Install` })]), React.createElement($Ui_Link, { href: `https://gdotdesign.gitbooks.io/mint/content/`, target: `_blank` }, [React.createElement($Ui_Button, { size: 22, type: `secondary`, label: `Learn` })])])]), React.createElement($Showcase, {  }), React.createElement($CallToAction, { text: `Got your attention?` }, [React.createElement($Ui_Button, { onClick: ((event) => {
+    }, [React.createElement($Ui_Link, { href: `/install` }, [React.createElement($Ui_Button, { size: 22, label: `Install` })]), React.createElement($Ui_Link, { href: `https://guide.mint-lang.com`, target: `_blank` }, [React.createElement($Ui_Button, { size: 22, type: `secondary`, label: `Learn` })])])]), React.createElement($Showcase, {  }), React.createElement($CallToAction, { text: `Got your attention?` }, [React.createElement($Ui_Button, { onClick: ((event) => {
     return $Navigation.navigate(`/install`)
     }), label: `Install Mint`, type: `secondary`, size: 20 })])])
   }
@@ -3215,12 +3225,12 @@ class $Showcase extends React.PureComponent {
       style: {
 
       }
-    }), React.createElement($Showcase_HighlightBlock, { line: `fun increment : Void`, name: `function` }, [React.createElement($Showcase_Highlight, { text: `next { state | counter = state.counter + 1 }`, name: `next` })]), React.createElement("div", {
+    }), React.createElement($Showcase_HighlightBlock, { line: `fun increment : Void`, name: `function` }, [React.createElement($Showcase_Highlight, { text: `next { state | counter = counter + 1 }`, name: `next` })]), React.createElement("div", {
       className: `showcase-spacer`,
       style: {
 
       }
-    }), React.createElement($Showcase_Block, { line: `fun decrement : Void` }, [`next { state | counter = state.counter - 1 }`])]), React.createElement("div", {
+    }), React.createElement($Showcase_Block, { line: `fun decrement : Void` }, [`next { state | counter = counter - 1 }`])]), React.createElement("div", {
       className: `showcase-spacer`,
       style: {
 
