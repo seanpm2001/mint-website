@@ -2594,17 +2594,7 @@ class $Layout extends React.PureComponent {
       style: {
 
       }
-    }, [React.createElement("div", {
-      className: `layout-header`,
-      style: {
-
-      }
-    }, [React.createElement("div", {
-      className: `layout-header-wrapper`,
-      style: {
-
-      }
-    }, [React.createElement($Ui_Toolbar_Title, { href: `/` }, [React.createElement($Logo, { fill: this.theme.colors.primary.background, textFill: `#FFF`, height: 20, width: 82 })]), React.createElement($Ui_Toolbar_Spacer, {  }), React.createElement($Ui_Link, { href: `/install`, label: `Install` }), React.createElement($Ui_Toolbar_Separator, {  }), React.createElement($Ui_Link, { href: `https://guide.mint-lang.com`, target: `_blank`, label: `Learn` }), React.createElement($Ui_Toolbar_Separator, {  }), React.createElement($Ui_Link, { href: `/examples`, label: `Examples` }), React.createElement($Ui_Toolbar_Separator, {  }), React.createElement($Ui_Link, { href: `/roadmap`, label: `Roadmap` })])]), this.children, React.createElement($Footer, {  })])
+    }, [React.createElement($Header, {  }), this.children, React.createElement($Footer, {  })])
   }
 }
 
@@ -2623,7 +2613,7 @@ class $SubTitle extends React.PureComponent {
 
   render() {
     return React.createElement("div", {
-      className: `sub-title-base`,
+      className: `sub-title-base-media-0 sub-title-base`,
       style: {
 
       }
@@ -2836,7 +2826,7 @@ class $Install extends React.PureComponent {
 
   render() {
     return React.createElement($Page, {  }, [React.createElement($Title, {  }, [`Install`]), React.createElement($SubTitle, {  }, [`Follow the directions below to install Mint:`]), React.createElement("ol", {
-      className: `install-list`,
+      className: `install-list-media-0 install-list`,
       style: {
 
       }
@@ -2845,7 +2835,7 @@ class $Install extends React.PureComponent {
       style: {
 
       }
-    }, [`/usr/local/bin/mint`]), ` :`, React.createElement("pre", {
+    }, [`/usr/local/bin/mint`]), React.createElement("pre", {
       className: `install-code`,
       style: {
 
@@ -2861,7 +2851,7 @@ class $Install extends React.PureComponent {
 
       }
     }), React.createElement($Title, {  }, [`Install from Source`]), React.createElement($SubTitle, {  }, [`Follow the directions below to install Mint from source:`]), React.createElement("ol", {
-      className: `install-list`,
+      className: `install-list-media-0 install-list`,
       style: {
 
       }
@@ -2908,17 +2898,17 @@ class $Roadmap_Feature extends React.PureComponent {
     }
   }
 
-  get description () {
-    if (this.props.description != undefined) {
-      return this.props.description
-    } else {
-      return ``
-    }
-  }
-
   get icon () {
     if (this.props.icon != undefined) {
       return this.props.icon
+    } else {
+      return $Html.empty()
+    }
+  }
+
+  get description () {
+    if (this.props.description != undefined) {
+      return this.props.description
     } else {
       return ``
     }
@@ -2938,12 +2928,12 @@ class $Roadmap_Feature extends React.PureComponent {
       style: {
 
       }
-    }, [($String.isEmpty(this.icon) ? $Html.empty() : React.createElement("div", {
+    }, [React.createElement("div", {
       className: `roadmap-feature-icon`,
       style: {
 
       }
-    }, [this.icon])), React.createElement("div", {}, [React.createElement("div", {
+    }, [this.icon]), React.createElement("div", {}, [React.createElement("div", {
       className: `roadmap-feature-title`,
       style: {
 
@@ -2965,7 +2955,7 @@ class $Roadmap_Feature extends React.PureComponent {
 $Roadmap_Feature.displayName = "Roadmap.Feature"
 
 $Roadmap_Feature.defaultProps = {
-  children: [],description: ``,icon: ``,name: ``
+  children: [],icon: $Html.empty(),description: ``,name: ``
 }
 
 class $Roadmap_Version extends React.PureComponent {
@@ -3007,8 +2997,32 @@ $Roadmap_Version.defaultProps = {
 }
 
 class $Roadmap extends React.PureComponent {
+  get checkmark() {
+    return React.createElement("svg", {
+      xmlns: `http://www.w3.org/2000/svg`,
+      width: `24`,
+      height: `24`,
+      viewBox: `0 0 24 24`
+    }, [React.createElement("path", {
+      d: `M20.285 2l-11.285 11.567-5.286-5.011-3.714 3.716 9 8.728 15-15.285z`
+    })])
+  }
+
+  get diamond() {
+    return React.createElement("svg", {
+      xmlns: `http://www.w3.org/2000/svg`,
+      viewBox: `0 0 24 24`,
+      fillRule: `evenodd`,
+      clipRule: `evenodd`,
+      height: `24`,
+      width: `24`
+    }, [React.createElement("path", {
+      d: `M12 0l-12 12.001 12 11.999 12.001-11.999-12.001-12.001zm-9.171 12.001l9.171-9.172 9.172 9.172-9.172 9.172-9.171-9.172z`
+    })])
+  }
+
   render() {
-    return React.createElement($Page, {  }, [React.createElement($Title, {  }, [`Roadmap`]), React.createElement($SubTitle, {  }, [`This page contains planned and shipped high level features up to the stable release (1.0.0).`]), React.createElement($Roadmap_Version, { version: `Planned Features` }, [React.createElement($Roadmap_Feature, { name: `CSS Type Checking`, icon: `🞛`, description: `Check the values of known CSS properties and warn the developer if it's not matches the available values.` }), React.createElement($Roadmap_Feature, { name: `HTML Attribute Checking`, icon: `🞛`, description: `Check the values of HTML attributes based on the tag they belong to (for example check alt attributes for <img> tags).` }), React.createElement($Roadmap_Feature, { name: `Progressive Web Application Support`, icon: `🞛`, description: `Automatically generate files for basic PWA features (service-worker, manifest, icons).` }), React.createElement($Roadmap_Feature, { name: `Devtools`, icon: `🞛`, description: `A package for monitoring the state of the application.` }), React.createElement($Roadmap_Feature, { name: `Documentation Generator`, icon: `🞛`, description: `Generate beatuifl documentation for your project, including dependencies.` }), React.createElement($Roadmap_Feature, { name: `Compiler Optimalization`, icon: `🞛`, description: `Only compile the entities that are being used.` }), React.createElement($Roadmap_Feature, { name: `Testing`, icon: `🞛`, description: `Language feature for easily testing components or the whole application.` }), React.createElement($Roadmap_Feature, { name: `Language Server Protocol`, icon: `🞛`, description: `Implement a language server to expose the AST for code editors.` }), React.createElement($Roadmap_Feature, { name: `Website for Packages`, icon: `🞛`, description: `A website to browse, find and rate community packages.` }), React.createElement($Roadmap_Feature, { name: `Image Optimization`, icon: `🞛`, description: `During the build process optimize images automatically.` }), React.createElement($Roadmap_Feature, { name: `Application Structure Diagram`, icon: `🞛`, description: `Construct an interactive diagram of application structure containing routes, stores, providers and components. ` })]), React.createElement($Roadmap_Version, { version: `0.1` }, [React.createElement($Roadmap_Feature, { description: `The language itself.`, name: `Language Basics`, icon: `🞛` }, [React.createElement($Roadmap_Feature, { name: `Parser`, description: `Converts source code to an AST.` }), React.createElement($Roadmap_Feature, { name: `Formatter`, description: `Reproduces source code from an AST.` }), React.createElement($Roadmap_Feature, { name: `Type Checker`, description: `Walks the AST and type checks the application.` }), React.createElement($Roadmap_Feature, { name: `Compiler`, description: `Compiles an application to JavaScript.` })]), React.createElement($Roadmap_Feature, { description: `The features of the language.`, name: `Language Features`, icon: `🞛` }, [React.createElement($Roadmap_Feature, { name: `Components`, description: `Define components with type checked properties and state.` }), React.createElement($Roadmap_Feature, { name: `Styling`, description: `Styling HTML tags in a dynamic way without conflicts.` }), React.createElement($Roadmap_Feature, { name: `Routing`, description: `Define routes in a declarative way.` }), React.createElement($Roadmap_Feature, { name: `Computations`, description: `Handle synchronous (JSON decoding) and asynchronous (HTTP Request) computations that might fail.` }), React.createElement($Roadmap_Feature, { name: `State`, description: `Manage global state with Stores.` }), React.createElement($Roadmap_Feature, { name: `Subscriptions`, description: `Subscribe to global events (mouse, window) using providers.` }), React.createElement($Roadmap_Feature, { name: `JavaScript Interopability`, description: `Simply call out the JavaScript when you need to.` })]), React.createElement($Roadmap_Feature, { name: `Production Builder`, icon: `🞛`, description: `The process of building the production version of the application.` }, [React.createElement($Roadmap_Feature, { name: `Icon Generator`, description: `Generate icons for most common use cases (favicon, application icons).` }), React.createElement($Roadmap_Feature, { name: `Bundling and Minification`, description: `Compile and minify the application into a single JavaScript file.` })]), React.createElement($Roadmap_Feature, { name: `Development Server`, icon: `🞛`, description: `A server that automatically formats code and reloads the application when any of the source files change.` }), React.createElement($Roadmap_Feature, { name: `Package Manager`, icon: `🞛`, description: `Install external sources (packages) directly from Git repositories.` }), React.createElement($Roadmap_Feature, { name: `Command Line Interface`, icon: `🞛`, description: `A binary that allows to access the features of the language.` })])])
+    return React.createElement($Page, {  }, [React.createElement($Title, {  }, [`Roadmap`]), React.createElement($SubTitle, {  }, [`This page contains planned and shipped high level features up to the stable release (1.0.0).`]), React.createElement($Roadmap_Version, { version: `Planned Features` }, [React.createElement($Roadmap_Feature, { name: `CSS Type Checking`, icon: this.diamond, description: `Check the values of known CSS properties and warn the developer if it's not matches the available values.` }), React.createElement($Roadmap_Feature, { name: `HTML Attribute Checking`, icon: this.diamond, description: `Check the values of HTML attributes based on the tag they belong to (for example check alt attributes for <img> tags).` }), React.createElement($Roadmap_Feature, { name: `Progressive Web Application Support`, icon: this.diamond, description: `Automatically generate files for basic PWA features (service-worker, manifest, icons).` }), React.createElement($Roadmap_Feature, { description: `A package for monitoring the state of the application.`, name: `Devtools`, icon: this.diamond }), React.createElement($Roadmap_Feature, { name: `Documentation Generator`, icon: this.diamond, description: `Generate beatuifl documentation for your project, including dependencies.` }), React.createElement($Roadmap_Feature, { name: `Selective Compilation`, icon: this.diamond, description: `Only compile the entities that are being used.` }), React.createElement($Roadmap_Feature, { name: `Hot Reloading`, icon: this.diamond, description: `In development mode replace entities that changed without losing state. ` }), React.createElement($Roadmap_Feature, { name: `Testing`, icon: this.diamond, description: `Language feature for easily testing components or the whole application.` }), React.createElement($Roadmap_Feature, { name: `Language Server Protocol`, icon: this.diamond, description: `Implement a language server to expose the AST for code editors.` }), React.createElement($Roadmap_Feature, { name: `Website for Packages`, icon: this.diamond, description: `A website to browse, find and rate community packages.` }), React.createElement($Roadmap_Feature, { name: `Image Optimization`, icon: this.diamond, description: `During the build process optimize images automatically.` }), React.createElement($Roadmap_Feature, { name: `Application Structure Diagram`, icon: this.diamond, description: `Construct an interactive diagram of application structure containing routes, stores, providers and components. ` })]), React.createElement($Roadmap_Version, { version: `0.1` }, [React.createElement($Roadmap_Feature, { description: `The language itself.`, name: `Language Basics`, icon: this.checkmark }, [React.createElement($Roadmap_Feature, { name: `Parser`, description: `Converts source code to an AST.` }), React.createElement($Roadmap_Feature, { name: `Formatter`, description: `Reproduces source code from an AST.` }), React.createElement($Roadmap_Feature, { name: `Type Checker`, description: `Walks the AST and type checks the application.` }), React.createElement($Roadmap_Feature, { name: `Compiler`, description: `Compiles an application to JavaScript.` })]), React.createElement($Roadmap_Feature, { description: `The features of the language.`, name: `Language Features`, icon: this.checkmark }, [React.createElement($Roadmap_Feature, { name: `Components`, description: `Define components with type checked properties and state.` }), React.createElement($Roadmap_Feature, { name: `Styling`, description: `Styling HTML tags in a dynamic way without conflicts.` }), React.createElement($Roadmap_Feature, { name: `Routing`, description: `Define routes in a declarative way.` }), React.createElement($Roadmap_Feature, { name: `Computations`, description: `Handle synchronous (JSON decoding) and asynchronous (HTTP Request) computations that might fail.` }), React.createElement($Roadmap_Feature, { name: `State`, description: `Manage global state with Stores.` }), React.createElement($Roadmap_Feature, { name: `Subscriptions`, description: `Subscribe to global events (mouse, window) using providers.` }), React.createElement($Roadmap_Feature, { name: `JavaScript Interopability`, description: `Simply call out the JavaScript when you need to.` })]), React.createElement($Roadmap_Feature, { name: `Production Builder`, icon: this.checkmark, description: `The process of building the production version of the application.` }, [React.createElement($Roadmap_Feature, { name: `Icon Generator`, description: `Generate icons for most common use cases (favicon, application icons).` }), React.createElement($Roadmap_Feature, { name: `Bundling and Minification`, description: `Compile and minify the application into a single JavaScript file.` })]), React.createElement($Roadmap_Feature, { name: `Development Server`, icon: this.checkmark, description: `A server that automatically formats code and reloads the application when any of the source files change.` }), React.createElement($Roadmap_Feature, { name: `Package Manager`, icon: this.checkmark, description: `Install external sources (packages) directly from Git repositories.` }), React.createElement($Roadmap_Feature, { name: `Command Line Interface`, icon: this.checkmark, description: `A binary that allows to access the features of the language.` })])])
   }
 }
 
@@ -3030,12 +3044,12 @@ class $Home extends React.PureComponent {
 
       }
     }, [React.createElement("div", {
-      className: `home-hero`,
+      className: `home-hero-media-0 home-hero`,
       style: {
 
       }
-    }, [React.createElement($Logo, { fill: this.theme.colors.primary.background, textFill: `#222` }), React.createElement("h2", {
-      className: `home-slogan`,
+    }, [React.createElement($Logo, { fill: this.theme.colors.primary.background, mobileHeight: 60, mobileWidth: 250, textFill: `#222` }), React.createElement("h2", {
+      className: `home-slogan-media-0 home-slogan`,
       style: {
 
       }
@@ -3204,7 +3218,7 @@ class $Showcase extends React.PureComponent {
 
       }
     }, [React.createElement("div", {
-      className: `showcase-base`,
+      className: `showcase-base-media-0 showcase-base`,
       style: {
 
       }
@@ -3219,12 +3233,12 @@ class $Showcase extends React.PureComponent {
 
       }
     }, [`Click on the parts to learn more.`]), React.createElement("div", {
-      className: `showcase-wrapper`,
+      className: `showcase-wrapper-media-0 showcase-wrapper`,
       style: {
 
       }
     }, [React.createElement("pre", {
-      className: `showcase-code`,
+      className: `showcase-code-media-0 showcase-code`,
       style: {
 
       }
@@ -3294,12 +3308,12 @@ class $Showcase extends React.PureComponent {
 
       }
     }), React.createElement($Showcase_HighlightBlock, { line: `component Main`, name: `main`, padding: `5px 10px` }, [React.createElement($Showcase_Block, { line: `fun render : Html` }, [React.createElement($Showcase_Highlight, { text: `<Counter disabled={false}/>`, name: `html-component` })])])]), React.createElement("div", {
-      className: `showcase-description`,
+      className: `showcase-description-media-0 showcase-description`,
       style: {
 
       }
     }, [React.createElement("div", {
-      className: `showcase-section-title`,
+      className: `showcase-section-title-media-0 showcase-section-title`,
       style: {
 
       }
@@ -3564,7 +3578,7 @@ class $Showcase_HighlightBlock extends React.PureComponent {
       onMouseLeave: this.handleMouseLeave.bind(this),
       onMouseOver: this.handleMouseEnter.bind(this),
       onClick: this.handleClick.bind(this),
-      className: `showcase-highlight-block-base`,
+      className: `showcase-highlight-block-base-media-0 showcase-highlight-block-base`,
       style: {
         [`--showcase-highlight-block-base-background`]: this.background,
         [`--showcase-highlight-block-base-padding`]: this.padding,
@@ -3619,15 +3633,33 @@ class $Logo extends React.PureComponent {
     }
   }
 
+  get mobileHeight () {
+    if (this.props.mobileHeight != undefined) {
+      return this.props.mobileHeight
+    } else {
+      return 90
+    }
+  }
+
+  get mobileWidth () {
+    if (this.props.mobileWidth != undefined) {
+      return this.props.mobileWidth
+    } else {
+      return 370
+    }
+  }
+
   render() {
     return React.createElement("svg", {
       viewBox: `0 0 370 90`,
       height: `90`,
       width: `370`,
-      className: `logo-base`,
+      className: `logo-base-media-0 logo-base`,
       style: {
         [`--logo-base-height`]: this.height + `px`,
-        [`--logo-base-width`]: this.width + `px`
+        [`--logo-base-width`]: this.width + `px`,
+        [`--logo-base-media-0-height`]: this.mobileHeight + `px`,
+        [`--logo-base-media-0-width`]: this.mobileWidth + `px`
       }
     }, [React.createElement("path", {
       d: `M84.082 87.484C78.584 68.76 61.48 49.421 41.624 42.668c19.855 6.446 33.906 16.269 43.375 35.914C85.304 15.348 27.268 31.617 1.304 0-10.304 80.424 58.73 97.307 84.082 87.484z`,
@@ -3640,7 +3672,7 @@ class $Logo extends React.PureComponent {
 }
 
 $Logo.defaultProps = {
-  textFill: `#000`,fill: `#000`,height: 90,width: 370
+  textFill: `#000`,fill: `#000`,height: 90,width: 370,mobileHeight: 90,mobileWidth: 370
 }
 
 class $Examples_Example extends React.PureComponent {
@@ -3724,7 +3756,7 @@ class $Title extends React.PureComponent {
 
   render() {
     return React.createElement("div", {
-      className: `title-base`,
+      className: `title-base-media-0 title-base`,
       style: {
 
       }
@@ -3812,7 +3844,7 @@ class $Page extends React.PureComponent {
 
   render() {
     return React.createElement("div", {
-      className: `page-base`,
+      className: `page-base-media-0 page-base`,
       style: {
 
       }
@@ -3917,6 +3949,37 @@ class $Users_Table extends React.PureComponent {
 }
 
 $Users_Table.displayName = "Users.Table"
+
+class $Header extends React.PureComponent {
+  get theme () { return $Ui.theme }
+
+  componentWillUnmount () {
+    $Ui._unsubscribe(this)
+  }
+
+  componentDidMount () {
+    $Ui._subscribe(this)
+  }
+
+  render() {
+    return React.createElement("div", {
+      className: `header-base`,
+      style: {
+
+      }
+    }, [React.createElement("div", {
+      className: `header-wrapper`,
+      style: {
+
+      }
+    }, [React.createElement($Ui_Toolbar_Title, { href: `/` }, [React.createElement($Logo, { fill: this.theme.colors.primary.background, mobileHeight: 20, mobileWidth: 82, textFill: `#FFF`, height: 20, width: 82 })]), React.createElement($Ui_Toolbar_Spacer, {  }), React.createElement("div", {
+      className: `header-desktop-media-0 header-desktop`,
+      style: {
+
+      }
+    }, [React.createElement($Ui_Link, { href: `/install`, label: `Install` }), React.createElement($Ui_Toolbar_Separator, {  }), React.createElement($Ui_Link, { href: `https://guide.mint-lang.com`, target: `_blank`, label: `Learn` }), React.createElement($Ui_Toolbar_Separator, {  }), React.createElement($Ui_Link, { href: `/examples`, label: `Examples` }), React.createElement($Ui_Toolbar_Separator, {  }), React.createElement($Ui_Link, { href: `/roadmap`, label: `Roadmap` })])])])
+  }
+}
 
 class $Footer extends React.PureComponent {
   render() {
@@ -6684,35 +6747,6 @@ Mint.insertStyles(`
     fill: white;
   }
 
-  .layout-header {
-    background: #222;
-    color: #EEE;
-  }
-
-  .layout-header-wrapper {
-    align-items: center;
-    max-width: 1040px;
-    padding: 0 20px;
-    margin: 0 auto;
-    display: flex;
-    height: 50px;
-  }
-
-  .layout-header-wrapper > a {
-    text-transform: uppercase;
-    font-weight: bold;
-    font-size: 14px;
-    color: inherit;
-  }
-
-  .layout-header-wrapper > a:focus {
-    color: inherit;
-  }
-
-  .layout-header-wrapper > a:hover {
-    color: inherit;
-  }
-
   .sub-title-base {
     margin: 10px 0;
   }
@@ -6771,6 +6805,15 @@ Mint.insertStyles(`
   .roadmap-feature-icon {
     margin-right: 10px;
     opacity: 0.3;
+  }
+
+  .roadmap-feature-icon:empty {
+    display: none;
+  }
+
+  .roadmap-feature-icon > svg {
+    height: 12px;
+    width: 12px;
   }
 
   .roadmap-feature-title {
@@ -6899,8 +6942,8 @@ Mint.insertStyles(`
     border: 1px solid #E6E6E6;
     background: #F6F6F6;
     border-radius: 3px;
+    font-size: 0.88em;
     padding: 1px 5px;
-    font-size: 16px;
   }
 
   .showcase-description p {
@@ -6948,6 +6991,9 @@ Mint.insertStyles(`
   }
 
   .showcase-highlight-base {
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
     background: var(--showcase-highlight-base-background);
     border-radius: 2px;
     border: var(--showcase-highlight-base-border);
@@ -6986,6 +7032,7 @@ Mint.insertStyles(`
   }
 
   .showcase-highlight-block-base {
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
     background: var(--showcase-highlight-block-base-background);
     padding: var(--showcase-highlight-block-base-padding);
     border-radius: 2px;
@@ -7116,22 +7163,57 @@ Mint.insertStyles(`
     display: flex;
   }
 
+  .header-base {
+    background: #222;
+    color: #EEE;
+  }
+
+  .header-wrapper {
+    align-items: center;
+    max-width: 1040px;
+    padding: 0 20px;
+    margin: 0 auto;
+    display: flex;
+    height: 50px;
+  }
+
+  .header-desktop {
+    align-items: center;
+    display: none;
+  }
+
+  .header-desktop > a {
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: 14px;
+    color: inherit;
+  }
+
+  .header-desktop > a:focus {
+    color: inherit;
+  }
+
+  .header-desktop > a:hover {
+    color: inherit;
+  }
+
   .footer-base {
+    min-height: 200px;
     background: #222;
     margin-top: auto;
-    height: 200px;
     color: #BBB;
   }
 
   .footer-wrapper {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-gap: 20px 50px;
+    display: grid;
     padding: 30px 20px;
     max-width: 1040px;
     margin: 0 auto;
-    display: flex;
   }
 
   .footer-column {
-    margin-right: 50px;
     width: 200px;
   }
 
@@ -7820,5 +7902,71 @@ Mint.insertStyles(`
 
   .ui-form-field-base > *:last-child {
     margin-bottom: var(--ui-form-field-base-last-child-margin-bottom);
-  }
+  }  @media (max-width: 600px)  {
+    .sub-title-base-media-0 {
+      font-size: 14px;
+    }
+
+    .install-list-media-0 {
+      padding-left: 15px;
+      font-size: 14px;
+    }
+
+    .home-hero-media-0 {
+      height: 300px;
+    }
+
+    .home-slogan-media-0 {
+      margin-top: 10px;
+      font-size: 13px;
+    }
+
+    .showcase-base-media-0 {
+      padding-bottom: 20px;
+    }
+
+    .showcase-code-media-0 {
+      margin-bottom: 20px;
+    }
+
+    .showcase-description-media-0 {
+      background: rgba(255,255,255,0.92);
+      font-size: 13px;
+      padding: 10px 0;
+      margin-left: 0;
+      bottom: 0;
+    }
+
+    .showcase-wrapper-media-0 {
+      font-size: 12px;
+      display: block;
+    }
+
+    .showcase-section-title-media-0 {
+      font-size: 18px;
+    }
+
+    .showcase-highlight-block-base-media-0 {
+      white-space: pre-wrap;
+    }
+
+    .title-base-media-0 {
+      font-size: 24px;
+    }
+
+    .page-base-media-0 {
+      padding: 20px;
+      padding-top: 25px;
+    }}
+
+  @media (max-width: 500px)  {
+    .logo-base-media-0 {
+      height: var(--logo-base-media-0-height);
+      width: var(--logo-base-media-0-width);
+    }}
+
+  @media (min-width: 600px)  {
+    .header-desktop-media-0 {
+      display: flex;
+    }}
 `)
