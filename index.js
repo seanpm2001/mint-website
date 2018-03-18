@@ -2840,12 +2840,17 @@ class $Install extends React.PureComponent {
       style: {
 
       }
-    }, [React.createElement("li", {}, [`Download the binary for your operating system: `, this.content]), React.createElement("li", {}, [`Move the binary to (as): `, React.createElement("code", {
+    }, [React.createElement("li", {}, [`Download the binary for your operating system: `, this.content]), React.createElement("li", {}, [`Move the binary to `, React.createElement("code", {
       className: `install-code`,
       style: {
 
       }
-    }, [`/usr/local/bin/mint`])]), React.createElement("li", {}, [`You invoke the CLI in your terminal by just typing `, React.createElement("code", {
+    }, [`/usr/local/bin/mint`]), ` :`, React.createElement("pre", {
+      className: `install-code`,
+      style: {
+
+      }
+    }, [`sudo mv /path/to/binary /usr/local/bin/mint`])]), React.createElement("li", {}, [`You invoke the CLI in your terminal by just typing `, React.createElement("code", {
       className: `install-code`,
       style: {
 
