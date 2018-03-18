@@ -2475,7 +2475,15 @@ class $Main extends React.PureComponent {
     return item.name == this.page
     }), this.pages)))
 
-    return [React.createElement($Layout, {  }, [content])]
+    return [React.createElement($Layout, {  }, [content]), React.createElement("noscript", {}, [React.createElement("iframe", {
+      src: `https://www.googletagmanager.com/ns.html?id=GTM-TJJ8DCX`,
+      height: `0`,
+      width: `0`,
+      className: `main-iframe`,
+      style: {
+
+      }
+    })])]
   }
 }
 
@@ -6588,6 +6596,11 @@ $Html_Fragment.defaultProps = {
 }
 
 Mint.insertStyles(`
+  .main-iframe {
+    visibility: hidden;
+    display: none;
+  }
+
   .layout-base {
     font-family: Open Sans;
     flex-direction: column;
