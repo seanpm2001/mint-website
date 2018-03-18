@@ -2408,17 +2408,20 @@ Mint.stores.push($Ui)
 class $Main extends React.PureComponent {
   get pages() {
     return [{
-      name: `examples`,
-      contents: React.createElement($Examples, {  })
-    }, {
-      name: `file-handling`,
-      contents: React.createElement($Examples_FileHandling, {  })
-    }, {
       name: `home`,
       contents: React.createElement($Home, {  })
     }, {
-      name: `index`,
-      contents: React.createElement($Users_Layout, {  }, [React.createElement($Users_Table, {  })])
+      name: `install`,
+      contents: React.createElement($Install, {  })
+    }, {
+      name: `examples`,
+      contents: React.createElement($Examples, {  })
+    }, {
+      name: `roadmap`,
+      contents: React.createElement($Roadmap, {  })
+    }, {
+      name: `file-handling`,
+      contents: React.createElement($Examples_FileHandling, {  })
     }, {
       name: `counter`,
       contents: React.createElement($Counter, {  })
@@ -2426,17 +2429,14 @@ class $Main extends React.PureComponent {
       name: `drag`,
       contents: React.createElement($Drag, {  })
     }, {
+      name: `index`,
+      contents: React.createElement($Users_Layout, {  }, [React.createElement($Users_Table, {  })])
+    }, {
       name: `new`,
       contents: React.createElement($Users_Layout, {  }, [React.createElement($UserForm, { isNew: true })])
     }, {
       name: `user`,
       contents: React.createElement($Users_Layout, {  }, [React.createElement($UserForm, { isNew: false })])
-    }, {
-      name: `install`,
-      contents: React.createElement($Install, {  })
-    }, {
-      name: `roadmap`,
-      contents: React.createElement($Roadmap, {  })
     }, {
       name: `not_found`,
       contents: React.createElement("div", {}, [`404`])
@@ -2475,7 +2475,7 @@ class $Main extends React.PureComponent {
     return item.name == this.page
     }), this.pages)))
 
-    return [React.createElement($Layout, {  }, [content])]
+    return React.createElement($Layout, {  }, [content])
   }
 }
 
@@ -2604,7 +2604,7 @@ class $Layout extends React.PureComponent {
       style: {
 
       }
-    }, [React.createElement($Ui_Toolbar_Title, { href: `/` }, [React.createElement($Logo, { fill: this.theme.colors.primary.background, textFill: `#FFF`, height: 20, width: 82 })]), React.createElement($Ui_Toolbar_Spacer, {  }), React.createElement($Ui_Link, { href: `/install`, label: `Install` }), React.createElement($Ui_Toolbar_Separator, {  }), React.createElement($Ui_Link, { href: `https://guide.mint-lang.com`, target: `_blank`, label: `Guide` }), React.createElement($Ui_Toolbar_Separator, {  }), React.createElement($Ui_Link, { href: `/examples`, label: `Examples` }), React.createElement($Ui_Toolbar_Separator, {  }), React.createElement($Ui_Link, { href: `/roadmap`, label: `Roadmap` }), React.createElement($Ui_Toolbar_Separator, {  }), React.createElement($Ui_Link, { href: `/blog`, label: `Blog` })])]), this.children, React.createElement($Footer, {  })])
+    }, [React.createElement($Ui_Toolbar_Title, { href: `/` }, [React.createElement($Logo, { fill: this.theme.colors.primary.background, textFill: `#FFF`, height: 20, width: 82 })]), React.createElement($Ui_Toolbar_Spacer, {  }), React.createElement($Ui_Link, { href: `/install`, label: `Install` }), React.createElement($Ui_Toolbar_Separator, {  }), React.createElement($Ui_Link, { href: `https://guide.mint-lang.com`, target: `_blank`, label: `Learn` }), React.createElement($Ui_Toolbar_Separator, {  }), React.createElement($Ui_Link, { href: `/examples`, label: `Examples` }), React.createElement($Ui_Toolbar_Separator, {  }), React.createElement($Ui_Link, { href: `/roadmap`, label: `Roadmap` })])]), this.children, React.createElement($Footer, {  })])
   }
 }
 
@@ -3039,9 +3039,7 @@ class $Home extends React.PureComponent {
       style: {
 
       }
-    }, [React.createElement($Ui_Link, { href: `/install` }, [React.createElement($Ui_Button, { size: 22, label: `Install` })]), React.createElement($Ui_Link, { href: `https://guide.mint-lang.com`, target: `_blank` }, [React.createElement($Ui_Button, { size: 22, type: `secondary`, label: `Learn` })])])]), React.createElement($Showcase, {  }), React.createElement($CallToAction, { text: `Got your attention?` }, [React.createElement($Ui_Button, { onClick: ((event) => {
-    return $Navigation.navigate(`/install`)
-    }), label: `Install Mint`, type: `secondary`, size: 20 })])])
+    }, [React.createElement($Ui_Link, { href: `/install` }, [React.createElement($Ui_Button, { size: 22, label: `Install` })]), React.createElement($Ui_Link, { href: `https://guide.mint-lang.com`, target: `_blank` }, [React.createElement($Ui_Button, { size: 22, type: `secondary`, label: `Learn` })])])]), React.createElement($Showcase, {  }), React.createElement($CallToAction, {  })])
   }
 }
 
@@ -3196,6 +3194,11 @@ class $Showcase extends React.PureComponent {
     }), this.data))
 
     return React.createElement("div", {
+      className: `showcase-row`,
+      style: {
+
+      }
+    }, [React.createElement("div", {
       className: `showcase-base`,
       style: {
 
@@ -3295,7 +3298,7 @@ class $Showcase extends React.PureComponent {
       style: {
 
       }
-    }, [selected.title]), selected.description])])])
+    }, [selected.title]), selected.description])])])])
   }
 }
 
@@ -3427,7 +3430,12 @@ class $CallToAction extends React.PureComponent {
       style: {
 
       }
-    }, [this.text]), this.children])
+    }, [`Interested?`]), React.createElement("div", {
+      className: `call-to-action-buttons`,
+      style: {
+
+      }
+    }, [React.createElement($Ui_Link, { href: `/install` }, [React.createElement($Ui_Button, { size: 20, type: `secondary`, label: `Install` })]), React.createElement($Ui_Link, { href: `https://guide.mint-lang.com`, target: `_blank` }, [React.createElement($Ui_Button, { size: 20, type: `secondary`, label: `Learn` })])])])
   }
 }
 
@@ -3630,9 +3638,73 @@ $Logo.defaultProps = {
   textFill: `#000`,fill: `#000`,height: 90,width: 370
 }
 
+class $Examples_Example extends React.PureComponent {
+  get description () {
+    if (this.props.description != undefined) {
+      return this.props.description
+    } else {
+      return ``
+    }
+  }
+
+  get title () {
+    if (this.props.title != undefined) {
+      return this.props.title
+    } else {
+      return ``
+    }
+  }
+
+  get href () {
+    if (this.props.href != undefined) {
+      return this.props.href
+    } else {
+      return ``
+    }
+  }
+
+  render() {
+    return React.createElement("div", {
+      onClick: ((event) => {
+      return $Navigation.navigate(this.href)
+      }),
+      className: `examples-example-base`,
+      style: {
+
+      }
+    }, [React.createElement("div", {
+      className: `examples-example-title`,
+      style: {
+
+      }
+    }, [this.title]), React.createElement("div", {
+      className: `examples-example-description`,
+      style: {
+
+      }
+    }, [this.description])])
+  }
+}
+
+$Examples_Example.displayName = "Examples.Example"
+
+$Examples_Example.defaultProps = {
+  description: ``,title: ``,href: ``
+}
+
 class $Examples extends React.PureComponent {
   render() {
-    return React.createElement($Page, {  }, [React.createElement($Title, {  }, [`Examples`]), React.createElement($SubTitle, {  }, [`Here you can find some examples that showcase the language features.`]), React.createElement($Ui_Link, { href: `/users`, label: `Users` }), React.createElement($Ui_Link, { href: `/drag`, label: `Drag` }), React.createElement($Ui_Link, { href: `/counter`, label: `Counter` }), React.createElement($Ui_Link, { href: `/examples/file-handling`, label: `File Handling` })])
+    return React.createElement($Page, {  }, [React.createElement($Title, {  }, [`Examples`]), React.createElement($SubTitle, {  }, [`Here you can find some examples that showcase the language features.`]), React.createElement("hr", {
+      className: `examples-hr`,
+      style: {
+
+      }
+    }), React.createElement("div", {
+      className: `examples-grid`,
+      style: {
+
+      }
+    }, [React.createElement($Examples_Example, { title: `User Management`, href: `/users`, description: `This example contains an implementation of a table of users with client side pagination and forms for creating new users and editing existsing ones through an HTTP API.` }), React.createElement($Examples_Example, { title: `Drag and Drop`, href: `/drag`, description: `This example shows how to drag and drop an HTML element on the page.` }), React.createElement($Examples_Example, { title: `Counter`, href: `/counter`, description: `This example shows a counter which stored in a store with two buttons one for incrementing th counter and one for decrementing it.` }), React.createElement($Examples_Example, { title: `File Handling`, href: `/examples/file-handling`, description: `This example shows how to implement a component which loads and shows a file from the users computer and then uploads it to a server via HTTP.` }), React.createElement($Ui_Link, { href: `/examples/file-handling`, label: `` })])])
   }
 }
 
@@ -6588,14 +6660,10 @@ $Html_Fragment.defaultProps = {
 }
 
 Mint.insertStyles(`
-  .main-iframe {
-    visibility: hidden;
-    display: none;
-  }
-
   .layout-base {
     font-family: Open Sans;
     flex-direction: column;
+    background: #F9F9F9;
     min-height: 100vh;
     margin: 0 auto;
     display: flex;
@@ -6741,7 +6809,6 @@ Mint.insertStyles(`
   .home-hero {
     justify-content: center;
     flex-direction: column;
-    background: #f7f7f7;
     align-items: center;
     display: flex;
     height: 500px;
@@ -6791,6 +6858,10 @@ Mint.insertStyles(`
 
   .showcase-block-content {
     padding-left: 20px;
+  }
+
+  .showcase-row {
+    background: #FFF;
   }
 
   .showcase-base {
@@ -6885,9 +6956,22 @@ Mint.insertStyles(`
     background-size: 54px 54px;
     flex-direction: column;
     align-items: center;
-    padding: 75px 0;
     display: flex;
     color: #FFF;
+    padding: 75px 0;
+    padding-bottom: 90px;
+  }
+
+  .call-to-action-buttons {
+    display: flex;
+  }
+
+  .call-to-action-buttons > a:hover {
+    text-decoration: none;
+  }
+
+  .call-to-action-buttons > * + * {
+    margin-left: 15px;
   }
 
   .call-to-action-text {
@@ -6911,6 +6995,43 @@ Mint.insertStyles(`
   .logo-base {
     height: var(--logo-base-height);
     width: var(--logo-base-width);
+  }
+
+  .examples-example-base {
+    border: 1px solid #EEE;
+    background: #FFF;
+    cursor: pointer;
+    padding: 20px;
+    color: #444;
+  }
+
+  .examples-example-description {
+    line-height: 1.5;
+    font-size: 14px;
+  }
+
+  .examples-example-title {
+    border-bottom: 1px solid #EEE;
+    padding-bottom: 7px;
+    margin-bottom: 7px;
+    font-weight: bold;
+    font-size: 18px;
+  }
+
+  .examples-example-title > a {
+    color: inherit;
+  }
+
+  .examples-grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-gap: 20px 20px;
+    display: grid;
+  }
+
+  .examples-hr {
+    margin: 20px 0;
+    border: 0;
+    border-top: 1px solid #EEE;
   }
 
   .title-base {
