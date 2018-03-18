@@ -3034,7 +3034,7 @@ class $Home extends React.PureComponent {
       style: {
 
       }
-    }, [`A refreshing language for the font-end web.`]), React.createElement("div", {
+    }, [`A refreshing language for the front-end web.`]), React.createElement("div", {
       className: `home-buttons`,
       style: {
 
@@ -6737,8 +6737,9 @@ Mint.insertStyles(`
 
   .install-code {
     border: 1px solid #DDD;
-    background: #f7f7f7;
+    white-space: pre-wrap;
     font-size: inherit;
+    background: #FFF;
     padding: 5px;
   }
 
@@ -7023,7 +7024,7 @@ Mint.insertStyles(`
   }
 
   .examples-grid {
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     grid-gap: 20px 20px;
     display: grid;
   }
@@ -7068,9 +7069,9 @@ Mint.insertStyles(`
   }
 
   .users-layout-wrapper {
+    max-width: 1040px;
     padding: 0 20px;
     margin: 0 auto;
-    width: 1040px;
   }
 
   .users-layout-content {
@@ -7119,9 +7120,9 @@ Mint.insertStyles(`
 
   .footer-wrapper {
     padding: 30px 20px;
+    max-width: 1040px;
     margin: 0 auto;
     display: flex;
-    width: 1040px;
   }
 
   .footer-column {
