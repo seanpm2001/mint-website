@@ -3935,7 +3935,7 @@ class $Footer extends React.PureComponent {
       style: {
 
       }
-    }, [`Source`]), React.createElement($Ui_Link, { href: `https://github.com/mint-lang/mint`, label: `Github Repository`, target: `_blank` }), React.createElement($Ui_Link, { href: `https://github.com/mint-lang/mint/releases`, label: `Releases / Changelog`, target: `_blank` }), React.createElement($Ui_Link, { href: `https://github.com/mint-lang/mint-examples`, label: `Examples`, target: `_blank` })]), React.createElement("div", {
+    }, [`Source`]), React.createElement($Ui_Link, { href: `https://github.com/mint-lang/mint`, label: `Github Repository`, target: `_blank` }), React.createElement($Ui_Link, { href: `https://github.com/mint-lang/mint/releases`, label: `Releases / Changelog`, target: `_blank` })]), React.createElement("div", {
       className: `footer-column`,
       style: {
 
@@ -3945,7 +3945,7 @@ class $Footer extends React.PureComponent {
       style: {
 
       }
-    }, [`Community`]), React.createElement($Ui_Link, { href: `https://mint-lang.slack.com`, target: `_blank`, label: `Slack` })])])])
+    }, [`Community`]), React.createElement($Ui_Link, { href: `https://gitter.im/mint-lang/Lobby`, target: `_blank`, label: `Gitter` })])])])
   }
 }
 
