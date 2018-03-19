@@ -2153,6 +2153,67 @@ const $Showcase_Store = new (class extends Store {
 $Showcase_Store.__displayName = `Showcase.Store`
 Mint.stores.push($Showcase_Store)
 
+const $Examples_Store = new (class extends Store {
+  get userManagement () {
+    if (this.props.userManagement != undefined) {
+      return this.props.userManagement
+    } else {
+      return {
+      title: `User Management`,
+      href: `/users`,
+      description: `This example contains an implementation of a table of users with client side pagination and forms for creating new users and editing existsing ones through an HTTP API.`
+    }
+    }
+  }
+
+  get drag () {
+    if (this.props.drag != undefined) {
+      return this.props.drag
+    } else {
+      return {
+      title: `Drag and Drop`,
+      href: `/drag`,
+      description: `This example shows how to drag and drop an HTML element on the page.`
+    }
+    }
+  }
+
+  get fileHandling () {
+    if (this.props.fileHandling != undefined) {
+      return this.props.fileHandling
+    } else {
+      return {
+      title: `File Handling`,
+      href: `/examples/file-handling`,
+      description: `This example shows how to implement a component which loads and shows a file from the users computer and then uploads it to a server via HTTP.`
+    }
+    }
+  }
+
+  get counter () {
+    if (this.props.counter != undefined) {
+      return this.props.counter
+    } else {
+      return {
+      title: `Counter`,
+      href: `/counter`,
+      description: `This example shows a counter which stored in a store with two buttons one for incrementing th counter and one for decrementing it.`
+    }
+    }
+  }
+
+  get state () {
+    return {
+    userManagement: this.userManagement,
+    drag: this.drag,
+    fileHandling: this.fileHandling,
+    counter: this.counter
+    }
+  }
+})
+$Examples_Store.__displayName = `Examples.Store`
+Mint.stores.push($Examples_Store)
+
 const $Versions = new (class extends Store {
   get versions () {
     if (this.props.versions != undefined) {
@@ -2421,27 +2482,35 @@ class $Main extends React.PureComponent {
       contents: React.createElement($Roadmap, {  })
     }, {
       name: `file-handling`,
-      contents: React.createElement($Examples_FileHandling, {  })
+      contents: React.createElement($Example, { subTitle: this.fileHandling.description, title: this.fileHandling.title }, [React.createElement($Examples_FileHandling, {  })])
     }, {
       name: `counter`,
-      contents: React.createElement($Counter, {  })
+      contents: React.createElement($Example, { subTitle: this.counter.description, title: this.counter.title }, [React.createElement($Counter, {  })])
     }, {
       name: `drag`,
-      contents: React.createElement($Drag, {  })
+      contents: React.createElement($Example, { subTitle: this.drag.description, title: this.drag.title }, [React.createElement($Drag, {  })])
     }, {
       name: `index`,
-      contents: React.createElement($Users_Layout, {  }, [React.createElement($Users_Table, {  })])
+      contents: React.createElement($Example, { subTitle: this.userManagement.description, title: this.userManagement.title }, [React.createElement($Users_Layout, {  }, [React.createElement($Users_Table, {  })])])
     }, {
       name: `new`,
-      contents: React.createElement($Users_Layout, {  }, [React.createElement($UserForm, { isNew: true })])
+      contents: React.createElement($Example, { subTitle: this.userManagement.description, title: this.userManagement.title }, [React.createElement($Users_Layout, {  }, [React.createElement($UserForm, { isNew: true })])])
     }, {
       name: `user`,
-      contents: React.createElement($Users_Layout, {  }, [React.createElement($UserForm, { isNew: false })])
+      contents: React.createElement($Example, { subTitle: this.userManagement.description, title: this.userManagement.title }, [React.createElement($Users_Layout, {  }, [React.createElement($UserForm, { isNew: false })])])
     }, {
       name: `not_found`,
       contents: React.createElement("div", {}, [`404`])
     }]
   }
+
+  get userManagement () { return $Examples_Store.userManagement }
+
+  get drag () { return $Examples_Store.drag }
+
+  get fileHandling () { return $Examples_Store.fileHandling }
+
+  get counter () { return $Examples_Store.counter }
 
   get page () { return $Application.page }
 
@@ -2450,11 +2519,11 @@ class $Main extends React.PureComponent {
   get theme () { return $Ui.theme }
 
   componentWillUnmount () {
-    $Application._unsubscribe(this);$Ui._unsubscribe(this)
+    $Examples_Store._unsubscribe(this);$Application._unsubscribe(this);$Ui._unsubscribe(this)
   }
 
   componentDidMount() {
-    $Application._subscribe(this);$Ui._subscribe(this)
+    $Examples_Store._subscribe(this);$Application._subscribe(this);$Ui._subscribe(this)
 
     return (async () => {
             try {  await $Ui.setFontFamily(`Open Sans`) }
@@ -3730,6 +3799,22 @@ $Examples_Example.defaultProps = {
 }
 
 class $Examples extends React.PureComponent {
+  get userManagement () { return $Examples_Store.userManagement }
+
+  get drag () { return $Examples_Store.drag }
+
+  get fileHandling () { return $Examples_Store.fileHandling }
+
+  get counter () { return $Examples_Store.counter }
+
+  componentWillUnmount () {
+    $Examples_Store._unsubscribe(this)
+  }
+
+  componentDidMount () {
+    $Examples_Store._subscribe(this)
+  }
+
   render() {
     return React.createElement($Page, {  }, [React.createElement($Title, {  }, [`Examples`]), React.createElement($SubTitle, {  }, [`Here you can find some examples that showcase the language features.`]), React.createElement("hr", {
       className: `examples-hr`,
@@ -3741,7 +3826,7 @@ class $Examples extends React.PureComponent {
       style: {
 
       }
-    }, [React.createElement($Examples_Example, { title: `User Management`, href: `/users`, description: `This example contains an implementation of a table of users with client side pagination and forms for creating new users and editing existsing ones through an HTTP API.` }), React.createElement($Examples_Example, { title: `Drag and Drop`, href: `/drag`, description: `This example shows how to drag and drop an HTML element on the page.` }), React.createElement($Examples_Example, { title: `Counter`, href: `/counter`, description: `This example shows a counter which stored in a store with two buttons one for incrementing th counter and one for decrementing it.` }), React.createElement($Examples_Example, { title: `File Handling`, href: `/examples/file-handling`, description: `This example shows how to implement a component which loads and shows a file from the users computer and then uploads it to a server via HTTP.` }), React.createElement($Ui_Link, { href: `/examples/file-handling`, label: `` })])])
+    }, [React.createElement($Examples_Example, { description: this.userManagement.description, title: this.userManagement.title, href: this.userManagement.href }), React.createElement($Examples_Example, { description: this.drag.description, title: this.drag.title, href: this.drag.href }), React.createElement($Examples_Example, { description: this.counter.description, title: this.counter.title, href: this.counter.href }), React.createElement($Examples_Example, { description: this.fileHandling.description, title: this.fileHandling.title, href: this.fileHandling.href })])])
   }
 }
 
@@ -4015,6 +4100,45 @@ class $Footer extends React.PureComponent {
       }
     }, [`Community`]), React.createElement($Ui_Link, { href: `https://gitter.im/mint-lang/Lobby`, target: `_blank`, label: `Gitter` })])])])
   }
+}
+
+class $Example extends React.PureComponent {
+  get children () {
+    if (this.props.children != undefined) {
+      return this.props.children
+    } else {
+      return []
+    }
+  }
+
+  get subTitle () {
+    if (this.props.subTitle != undefined) {
+      return this.props.subTitle
+    } else {
+      return ``
+    }
+  }
+
+  get title () {
+    if (this.props.title != undefined) {
+      return this.props.title
+    } else {
+      return ``
+    }
+  }
+
+  render() {
+    return React.createElement($Page, {  }, [React.createElement($Title, {  }, [this.title]), React.createElement($SubTitle, {  }, [this.subTitle]), React.createElement("div", {
+      className: `example-frame`,
+      style: {
+
+      }
+    }, [this.children])])
+  }
+}
+
+$Example.defaultProps = {
+  children: [],subTitle: ``,title: ``
 }
 
 class $Counter extends React.PureComponent {
@@ -7238,6 +7362,13 @@ Mint.insertStyles(`
     font-family: Amiko;
     font-weight: 600;
     color: #EEE;
+  }
+
+  .example-frame {
+    border: 1px solid #DDD;
+    min-height: 500px;
+    background: #FFF;
+    margin-top: 20px;
   }
 
   .counter-base {
