@@ -23,7 +23,12 @@ var Mint=function(){"use strict";function e(e,t){return e(t={exports:{}},t.expor
 
   class DoError extends Error {}
 
-  $Storage_Error_SecurityError = Symbol(`Storage_Error_SecurityError`)
+  $Http_Error_NetworkError = Symbol(`Http_Error_NetworkError`)
+$Http_Error_Aborted = Symbol(`Http_Error_Aborted`)
+$Http_Error_Timeout = Symbol(`Http_Error_Timeout`)
+$Http_Error_BadUrl = Symbol(`Http_Error_BadUrl`)
+
+$Storage_Error_SecurityError = Symbol(`Storage_Error_SecurityError`)
 $Storage_Error_QuotaExceeded = Symbol(`Storage_Error_QuotaExceeded`)
 $Storage_Error_Unkown = Symbol(`Storage_Error_Unkown`)
 
@@ -35,86 +40,6 @@ $Object_Error_NotANumber = Symbol(`Object_Error_NotANumber`)
 $Object_Error_NotAString = Symbol(`Object_Error_NotAString`)
 $Object_Error_NotAnArray = Symbol(`Object_Error_NotAnArray`)
 $Object_Error_Unkown = Symbol(`Object_Error_Unkown`)
-
-$Http_Error_NetworkError = Symbol(`Http_Error_NetworkError`)
-$Http_Error_Aborted = Symbol(`Http_Error_Aborted`)
-$Http_Error_Timeout = Symbol(`Http_Error_Timeout`)
-$Http_Error_BadUrl = Symbol(`Http_Error_BadUrl`)
-
-const $Provider_Scroll = new (class extends Provider {
-scrolls(event) {
-  return $Array.do($Array.map(((subscription) => {
-  return subscription(event)
-  }), $Array.map(((subscription) => {
-  return subscription.scrolls
-  }), this._subscriptions)))
-}
-
-attach() {
-  return (() => {
-        const scrolls = this._scrolls || (this._scrolls = this.scrolls.bind(this))
-
-        window.addEventListener("scroll", scrolls)
-      })()
-}
-
-detach() {
-  return (() => {
-        window.removeEventListener("mousemove", this._scrolls)
-      })()
-}
-})
-
-const $Provider_Tick = new (class extends Provider {
-update() {
-  return $Array.do($Array.map(((func) => {
-  return func()
-  }), $Array.map(((item) => {
-  return item.ticks
-  }), this._subscriptions)))
-}
-
-attach() {
-  return (() => {
-        this.detach()
-        this.id = setInterval(this.update.bind(this), 1000)
-      })()
-}
-
-detach() {
-  return clearInterval(this.id)
-}
-})
-
-const $Provider_AnimationFrame = new (class extends Provider {
-update() {
-  return $Array.do($Array.map(((func) => {
-  return func()
-  }), $Array.map(((item) => {
-  return item.frames
-  }), this._subscriptions)))
-}
-
-attach() {
-  return (() => {
-        this.detach()
-        this.id = this.frame()
-      })()
-}
-
-frame() {
-  return (() => {
-        this.id = requestAnimationFrame(() => {
-          this.update()
-          this.frame()
-        })
-      })()
-}
-
-detach() {
-  return cancelAnimationFrame(this.id)
-}
-})
 
 const $Provider_Mouse = new (class extends Provider {
 moves(event) {
@@ -159,6 +84,81 @@ detach() {
         window.removeEventListener("mousemove", this._moves)
         window.removeEventListener("mouseup", this._ups)
       })()
+}
+})
+
+const $Provider_AnimationFrame = new (class extends Provider {
+update() {
+  return $Array.do($Array.map(((func) => {
+  return func()
+  }), $Array.map(((item) => {
+  return item.frames
+  }), this._subscriptions)))
+}
+
+attach() {
+  return (() => {
+        this.detach()
+        this.id = this.frame()
+      })()
+}
+
+frame() {
+  return (() => {
+        this.id = requestAnimationFrame(() => {
+          this.update()
+          this.frame()
+        })
+      })()
+}
+
+detach() {
+  return cancelAnimationFrame(this.id)
+}
+})
+
+const $Provider_Scroll = new (class extends Provider {
+scrolls(event) {
+  return $Array.do($Array.map(((subscription) => {
+  return subscription(event)
+  }), $Array.map(((subscription) => {
+  return subscription.scrolls
+  }), this._subscriptions)))
+}
+
+attach() {
+  return (() => {
+        const scrolls = this._scrolls || (this._scrolls = this.scrolls.bind(this))
+
+        window.addEventListener("scroll", scrolls)
+      })()
+}
+
+detach() {
+  return (() => {
+        window.removeEventListener("mousemove", this._scrolls)
+      })()
+}
+})
+
+const $Provider_Tick = new (class extends Provider {
+update() {
+  return $Array.do($Array.map(((func) => {
+  return func()
+  }), $Array.map(((item) => {
+  return item.ticks
+  }), this._subscriptions)))
+}
+
+attach() {
+  return (() => {
+        this.detach()
+        this.id = setInterval(this.update.bind(this), 1000)
+      })()
+}
+
+detach() {
+  return clearInterval(this.id)
 }
 })
 
@@ -406,80 +406,27 @@ const $Asset = new(class {
   }
 })
 
-const $Dom = new(class {
-  createElement(tag) {
-    return document.createElement(tag)
+const $Promise = new(class {
+  reject(input) {
+    return Promise.reject(input)
   }
 
-  getElementById(id) {
-    return (() => {
-          let element = document.getElementById(id)
-
-          if (element) {
-            return new Just(element)
-          } else {
-            return new Nothing()
-          }
-        })()
+  resolve(input) {
+    return Promise.resolve(input)
   }
 
-  getElementBySelector(selector) {
-    return (() => {
-          try {
-            let element = document.querySelector(selector)
+  wrap(method, input) {
+    return method(input)
+  }
+})
 
-            if (element) {
-              return new Just(element)
-            } else {
-              return new Nothing()
-            }
-          } catch (error) {
-            return new Nothing()
-          }
-        })()
+const $Bool = new(class {
+  not(item) {
+    return !item
   }
 
-  getDimensions(dom) {
-    return (() => {
-          const rect = dom.getBoundingClientRect()
-
-          return new Record({
-            bottom: rect.bottom,
-            height: rect.height,
-            width: rect.width,
-            right: rect.right,
-            left: rect.left,
-            top: rect.top,
-            x: rect.x,
-            y: rect.y
-          })
-        })()
-  }
-
-  getValue(dom) {
-    return (() => {
-          let value = dom.value
-
-          if (typeof value === "string") {
-            return value
-          } else {
-            return ""
-          }
-        })()
-  }
-
-  setValue(value, dom) {
-    return (dom.value = value) && dom
-  }
-
-  matches(selector, dom) {
-    return (() => {
-          try {
-            return dom.matches(selector)
-          } catch (error) {
-            return false
-          }
-        })()
+  toString(item) {
+    return item.toString()
   }
 })
 
@@ -494,361 +441,6 @@ const $Html_Event = new(class {
 
   preventDefault(event) {
     return event.preventDefault()
-  }
-})
-
-const $Storage_Common = new(class {
-  set(storage, key, value) {
-    return (() => {
-          try {
-            storage.setItem(key, value)
-            return new Ok(null)
-          } catch (error) {
-            switch(error.name) {
-              case 'SecurityError':
-                return new Err($Storage_Error_SecurityError)
-              case 'QUOTA_EXCEEDED_ERR':
-                return new Err($Storage_Error_QuotaExceeded)
-              case 'QuotaExceededError':
-                return new Err($Storage_Error_QuotaExceeded)
-              case 'NS_ERROR_DOM_QUOTA_REACHED':
-                return new Err($Storage_Error_QuotaExceeded)
-              default:
-                return new Err($Storage_Error_Unkown)
-            }
-          }
-        })()
-  }
-
-  get(storage, key) {
-    return (() => {
-          try {
-            let value = storage.getItem(key)
-
-            if (typeof value === "string") {
-              return new Ok(new Just(value))
-            } else {
-              return new Ok(new Nothing())
-            }
-          } catch (error) {
-            switch(error.name) {
-              case 'SecurityError':
-                return new Err($Storage_Error_SecurityError)
-              default:
-                return new Err($Storage_Error_Unkown)
-            }
-          }
-        })()
-  }
-
-  remove(storage, key) {
-    return (() => {
-          try {
-            storage.removeItem(key)
-            return new Ok(null)
-          } catch (error) {
-            switch(error.name) {
-              case 'SecurityError':
-                return new Err($Storage_Error_SecurityError)
-              default:
-                return new Err($Storage_Error_Unkown)
-            }
-          }
-        })()
-  }
-
-  clear(storage) {
-    return (() => {
-          try {
-            storage.clear()
-            return new Ok(null)
-          } catch (error) {
-            switch(error.name) {
-              case 'SecurityError':
-                return new Err($Storage_Error_SecurityError)
-              default:
-                return new Err($Storage_Error_Unkown)
-            }
-          }
-        })()
-  }
-
-  size(storage) {
-    return (() => {
-          try {
-            return new Ok(storage.length)
-          } catch (error) {
-            switch(error.name) {
-              case 'SecurityError':
-                return new Err($Storage_Error_SecurityError)
-              default:
-                return new Err($Storage_Error_Unkown)
-            }
-          }
-        })()
-  }
-
-  keys(storage) {
-    return (() => {
-          try {
-            return new Ok(Object.keys(storage).sort())
-          } catch (error) {
-            switch(error.name) {
-              case 'SecurityError':
-                return new Err($Storage_Error_SecurityError)
-              default:
-                return new Err($Storage_Error_Unkown)
-            }
-          }
-        })()
-  }
-})
-
-const $Storage_Session = new(class {
-  set(key, value) {
-    return $Storage_Common.set(sessionStorage, key, value)
-  }
-
-  get(key) {
-    return $Storage_Common.get(sessionStorage, key)
-  }
-
-  remove(key) {
-    return $Storage_Common.remove(sessionStorage, key)
-  }
-
-  clear() {
-    return $Storage_Common.clear(sessionStorage)
-  }
-
-  size() {
-    return $Storage_Common.size(sessionStorage)
-  }
-
-  keys() {
-    return $Storage_Common.keys(sessionStorage)
-  }
-})
-
-const $Storage_Local = new(class {
-  set(key, value) {
-    return $Storage_Common.set(localStorage, key, value)
-  }
-
-  get(key) {
-    return $Storage_Common.get(localStorage, key)
-  }
-
-  remove(key) {
-    return $Storage_Common.remove(localStorage, key)
-  }
-
-  clear() {
-    return $Storage_Common.clear(localStorage)
-  }
-
-  size() {
-    return $Storage_Common.size(localStorage)
-  }
-
-  keys() {
-    return $Storage_Common.keys(localStorage)
-  }
-})
-
-const $Number = new(class {
-  isOdd(input) {
-    return input % 2 === 1
-  }
-
-  isEven(input) {
-    return Math.abs(input % 2) === 0
-  }
-
-  isNaN(input) {
-    return isNaN(input)
-  }
-
-  toString(input) {
-    return input.toString()
-  }
-
-  toFixed(decimalPlaces, input) {
-    return input.toFixed(decimalPlaces)
-  }
-
-  fromString(input) {
-    return (() => {
-          let value = parseFloat(input)
-          if (isNaN(value)) {
-            return new Nothing()
-          } else {
-            return new Just(value)
-          }
-        })()
-  }
-})
-
-const $FormData = new(class {
-  empty() {
-    return new FormData
-  }
-
-  keys(formData) {
-    return Array.from(formData.keys())
-  }
-
-  addString(key, value, formData) {
-    return (() => {
-         	formData.append(key, value)
-         	return formData
-        })()
-  }
-
-  addFile(key, value, formData) {
-    return (() => {
-         	formData.append(key, value)
-         	return formData
-        })()
-  }
-})
-
-const $Uid = new(class {
-  generate() {
-    return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11)
-          .replace(/[018]/g, c =>
-            (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4)
-              .toString(16))
-  }
-})
-
-const $Array = new(class {
-  first(array) {
-    return (() => {
-          let first = array[0]
-          if (first !== undefined) {
-            return new Just(first)
-          } else {
-            return new Nothing()
-          }
-        })()
-  }
-
-  firstWithDefault(item, array) {
-    return $Maybe.withDefault(item, $Array.first(array))
-  }
-
-  last(array) {
-    return (() => {
-          let last = array[array.length - 1]
-          if (last !== undefined) {
-            return new Just(last)
-          } else {
-            return new Nothing()
-          }
-        })()
-  }
-
-  lastWithDefault(item, array) {
-    return $Maybe.withDefault(item, $Array.last(array))
-  }
-
-  size(array) {
-    return array.length
-  }
-
-  push(item, array) {
-    return [...array, item]
-  }
-
-  reverse(array) {
-    return array.reverse()
-  }
-
-  map(func, array) {
-    return array.map(func)
-  }
-
-  mapWithIndex(func, array) {
-    return array.map(func)
-  }
-
-  select(func, array) {
-    return array.filter(func)
-  }
-
-  reject(func, array) {
-    return array.filter((item) => !func(item))
-  }
-
-  find(func, array) {
-    return (() => {
-          let item = array.find(func)
-          if (item != undefined) {
-            return new Just(item)
-          } else {
-            return new Nothing()
-          }
-        })()
-  }
-
-  any(func, array) {
-    return !!array.find(func)
-  }
-
-  sort(func, array) {
-    return array.sort(func)
-  }
-
-  sortBy(func, array) {
-    return (() => {
-          return array.sort((a, b) => {
-            let aVal = func(a)
-            let bVal = func(b)
-
-            if (aVal < bVal) {
-              return -1
-            }
-
-            if (aVal > bVal) {
-              return 1
-            }
-
-            return 0
-          })
-        })()
-  }
-
-  slice(from, to, array) {
-    return array.slice(from, to)
-  }
-
-  isEmpty(array) {
-    return _compare($Array.size(array), 0)
-  }
-
-  intersperse(item, array) {
-    return array.reduce((a,v)=>[...a,v,item],[]).slice(0,-1)
-  }
-
-  contains(other, array) {
-    return array.includes(other)
-  }
-
-  range(from, to) {
-    return Array.from({ length: (to + 1) - from }).map((v, i) => i + from)
-  }
-
-  do(array) {
-    return null
-  }
-
-  delete(what, array) {
-    return array.filter((item) => item !== what)
-  }
-
-  max(array) {
-    return Math.max(...array)
   }
 })
 
@@ -909,428 +501,221 @@ const $Regexp = new(class {
   }
 })
 
-const $Bool = new(class {
-  not(item) {
-    return !item
-  }
-
-  toString(item) {
-    return item.toString()
-  }
-})
-
-const $Result = new(class {
-  error(input) {
-    return new Err(input)
-  }
-
-  ok(input) {
-    return new Ok(input)
-  }
-
-  withDefault(value, input) {
-    return input instanceof Ok ? input.value : value
-  }
-
-  withError(value, input) {
-    return input instanceof Err ? input.value : value
-  }
-
-  map(func, input) {
-    return input instanceof Ok ? new Ok(func(input.value)) : input
-  }
-
-  mapError(func, input) {
-    return input instanceof Err ? new Err(func(input.value)) : input
-  }
-
-  isOk(input) {
-    return input instanceof Ok
-  }
-
-  isError(input) {
-    return input instanceof Err
-  }
-})
-
-const $Object_Encode = new(class {
-  string(input) {
-    return input
-  }
-
-  boolean(input) {
-    return input
-  }
-
-  number(input) {
-    return input
-  }
-
-  time(input) {
-    return input.toISOString()
-  }
-
-  array(input) {
-    return input
-  }
-
-  field(name, value) {
-    return { name: name, value: value }
-  }
-
-  object(fields) {
+const $Url = new(class {
+  parse(url) {
     return (() => {
-          let result = {}
-
-          for (let item of fields) {
-            result[item.name] = item.value
+          if (!this._a) {
+            this._a = document.createElement('a')
           }
 
-          return result
+          this._a.href = url
+
+          return {
+            hostname: this._a.hostname,
+            protocol: this._a.protocol,
+            origin: this._a.origin,
+            path: this._a.pathname,
+            search: this._a.search,
+            hash: this._a.hash,
+            host: this._a.host,
+            port: this._a.port
+          }
         })()
   }
 })
 
-const $Object_Decode = new(class {
-  field(key, decoder, input) {
-    return (() => {
-          if (input == null ||
-              input == undefined ||
-              typeof input !== "object" ||
-              Array.isArray(input)) {
-            return new Err($Object_Error_NotAnObject)
-          } else {
-            const actual = input[key]
-            if (typeof actual === "undefined") {
-              return new Err($Object_Error_MissingObjectKey)
-            }
-            return decoder(actual)
-          }
-        })()
-  }
-
-  string(input) {
-    return (() => {
-          if(typeof input != "string") {
-            return new Err($Object_Error_NotAString)
-          } else {
-            return new Ok(input)
-          }
-        })()
-  }
-
-  time(input) {
-    return (() => {
-          const parsed = Date.parse(input)
-
-          if (Number.isNaN(parsed)) {
-            return new Err($Object_Error_NotAValidTime)
-          } else {
-            return new Ok(new Date(parsed))
-          }
-        })()
-  }
-
-  number(input) {
-    return (() => {
-          if(typeof input != "number") {
-            let value = parseFloat(input)
-
-            if (isNaN(value)) {
-              return new Err($Object_Error_NotANumber)
-            } else {
-              return new Ok(value)
-            }
-          } else {
-            return new Ok(input)
-          }
-        })()
-  }
-
-  boolean(input) {
-    return (() => {
-          if(typeof input != "boolean") {
-            return new Err($Object_Error_NotABoolean)
-          } else {
-            return new Ok(input)
-          }
-        })()
-  }
-
-  array(decoder, input) {
-    return (() => {
-          if (!Array.isArray(input)) {
-            return new Err($Object_Error_NotAnArray)
-          }
-
-          let results = []
-
-          for (let item of input) {
-            let result = decoder(item)
-
-            if (result instanceof Err) {
-              return result
-            } else {
-              results.push(result.value)
-            }
-          }
-
-          return new Ok(results)
-        })()
+const $Uid = new(class {
+  generate() {
+    return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11)
+          .replace(/[018]/g, c =>
+            (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4)
+              .toString(16))
   }
 })
 
-const $Window = new(class {
-  navigate(url) {
-    return _navigate(url)
-  }
-
-  title() {
-    return document.title
-  }
-
-  setTitle(title) {
-    return document.title = title
-  }
-
-  url() {
-    return $Url.parse($Window.href())
-  }
-
-  href() {
-    return window.location.href
-  }
-
-  width() {
-    return window.innerWidth
-  }
-
-  height() {
-    return window.innerHeight
-  }
-
-  scrollHeight() {
-    return document.body.scrollHeight
-  }
-
-  scrollWidth() {
-    return document.body.scrollWidth
-  }
-
-  scrollLeft() {
-    return document.body.scrollLeft
-  }
-
-  scrollTop() {
-    return document.body.scrollTop
-  }
-
-  setScrollTop(position) {
-    return document.body.scrollTop = position
-  }
-
-  setScrollLeft(position) {
-    return document.body.scrollLeft = position
-  }
-})
-
-const $Debug = new(class {
-  log(value) {
+const $Json = new(class {
+  parse(input) {
     return (() => {
-          console.log(value)
-          return value
+         	try {
+         		return new Just(JSON.parse(input))
+         	} catch (error) {
+         		return new Nothing()
+        	}
         })()
   }
+
+  stringify(input) {
+    return JSON.stringify(input)
+  }
 })
 
-const $Dom_Dimensions = new(class {
+const $Html = new(class {
   empty() {
-    return new Record({
-      bottom: 0,
-      height: 0,
-      width: 0,
-      right: 0,
-      left: 0,
-      top: 0,
-      x: 0,
-      y: 0
-    })
+    return false
   }
 })
 
-const $Test_Context = new(class {
-  of(a) {
-    return new TestContext(a)
+const $String = new(class {
+  toLowerCase(string) {
+    return string.toLowerCase()
   }
 
-  then(proc, context) {
-    return context.step((subject)=> {
-          return proc(subject)
-        })
+  toUpperCase(string) {
+    return string.toUpperCase()
   }
 
-  timeout(duration, context) {
-    return $Test_Context.then(((subject) => {
-    return $Timer.timeout(duration, subject)
-    }), context)
+  reverse(string) {
+    return [...string].reverse().join('')
   }
 
-  assertEqual(a, context) {
-    return context.step((subject)=> {
-          let result = _compare(a, subject)
-
-          if (result) {
-            return subject
-          } else {
-            throw `Assertion failed ${a} === ${subject}`
-          }
-        })
-  }
-})
-
-const $Test_Window = new(class {
-  setScrollLeft(to, context) {
-    return $Test_Context.then(((subject) => {
-    return (() => {  $Window.setScrollLeft(100)
-
-    return $Promise.resolve(subject) })()
-    }), context)
+  isEmpty(string) {
+    return _compare(string, ``)
   }
 
-  setScrollTop(to, context) {
-    return $Test_Context.then(((subject) => {
-    return (() => {  $Window.setScrollTop(100)
-
-    return $Promise.resolve(subject) })()
-    }), context)
+  match(pattern, string) {
+    return string.indexOf(pattern) != -1
   }
-})
 
-const $Test_Html = new(class {
-  start(node) {
+  split(separator, string) {
+    return string.split(separator)
+  }
+
+  size(string) {
+    return string.length
+  }
+
+  capitalize(string) {
+    return string.replace(/\b[a-z]/g, char => char.toUpperCase())
+  }
+
+  repeat(count, string) {
+    return string.repeat(count)
+  }
+
+  join(separator, array) {
+    return array.join(separator)
+  }
+
+  concat(array) {
+    return $String.join(``, array)
+  }
+
+  isAnagarm(string1, string2) {
     return (() => {
-          let root = document.createElement('div')
-          document.body.appendChild(root)
-          ReactDOM.render(node, root)
-          return new TestContext(root, () => {
-            ReactDOM.unmountComponentAtNode(root)
-            document.body.removeChild(root)
-          })
+          const normalize = string =>
+            string
+              .toLowerCase()
+              .replace(/[^a-z0-9]/gi, '')
+              .split('')
+              .sort()
+              .join('');
+
+          return normalize(string1) === normalize(string2);
+        })()
+  }
+})
+
+const $Time = new(class {
+  fromIso(raw) {
+    return (() => {
+          try {
+            return new Just(new Date(raw))
+          } catch (error) {
+            return new Nothing()
+          }
         })()
   }
 
-  triggerClick(selector, context) {
-    return context.step((element) => {
-          element.querySelector(selector).click()
-          return element
-        })
+  toIso(date) {
+    return date.toISOString()
   }
 
-  triggerMouseDown(selector, context) {
-    return context.step((element) => {
-          let event = document.createEvent ('MouseEvents')
-          event.initEvent ("mousedown", true, true)
-          element.querySelector(selector).dispatchEvent(event)
-          return element
-        })
+  now() {
+    return new Date()
   }
 
-  triggerMouseMove(selector, context) {
-    return context.step((element) => {
-          let event = document.createEvent ('MouseEvents')
-          event.initEvent ("mousemove", true, true)
-          element.querySelector(selector).dispatchEvent(event)
-          return element
-        })
+  today() {
+    return (() => {
+          const date = new Date()
+
+          return new Date(Date.UTC(
+            date.getUTCFullYear(),
+            date.getUTCMonth(),
+            date.getUTCDate()
+          ))
+        })()
   }
 
-  triggerMouseUp(selector, context) {
-    return context.step((element) => {
-          let event = document.createEvent ('MouseEvents')
-          event.initEvent ("mouseup", true, true)
-          element.querySelector(selector).dispatchEvent(event)
-          return element
-        })
+  from(year, month, day) {
+    return new Date(Date.UTC(year, month - 1, day))
   }
 
-  assertTextOf(selector, value, context) {
-    return context.step((element) => {
-          let text = "";
+  day(date) {
+    return date.getUTCDate()
+  }
 
-          try {
-            text = element.querySelector(selector).textContent
-          } catch (error) {
-            throw `Could not find element with selector: ${selector}`
+  month(date) {
+    return (date.getUTCMonth() + 1)
+  }
+
+  year(date) {
+    return date.getUTCFullYear()
+  }
+
+  format(pattern, date) {
+    return DateFNS.format(date, pattern)
+  }
+
+  startOf(what, date) {
+    return (() => {
+          switch (what) {
+            case 'month':
+              return DateFNS.startOfMonth(date)
+            case 'week':
+              return DateFNS.startOfWeek(date, { weekStartsOn: 1 })
+            case 'day':
+              return DateFNS.startOfDay(date)
+            default:
+              return date
           }
+        })()
+  }
 
-          if (text == value) {
-            return element
-          } else {
-            throw `"${text}" != "${value}"`
+  endOf(what, date) {
+    return (() => {
+          switch (what) {
+            case 'month':
+              return DateFNS.endOfMonth(date)
+            case 'week':
+              return DateFNS.endOfWeek(date, { weekStartsOn: 1 })
+            case 'day':
+              return DateFNS.endOfDay(date)
+            default:
+              return date
           }
-        })
+        })()
   }
 
-  assertElementExists(selector, context) {
-    return context.step((element) => {
-          let subject = element.querySelector(selector)
-
-          if (subject) {
-            return element
-          } else {
-            throw `Could not find element with selector: ${selector}`
-          }
-        })
+  range(from, to) {
+    return DateFNS.eachDay(from, to)
   }
 
-  assertCSSOf(selector, property, value, context) {
-    return context.step((element) => {
-          let subject = element.querySelector(selector)
-
-          if (subject) {
-            let actual = getComputedStyle(subject)[property]
-
-            if (actual == value) {
-              return element
-            } else {
-              throw `Style did not match`
-            }
-          } else {
-            throw `Could not find element with selector: ${selector}`
-          }
-        })
-  }
-})
-
-const $Timer = new(class {
-  timeout(duration, subject) {
-    return new Promise((resolve) => {
-        	setTimeout(() => {
-            resolve(subject)
-          }, duration)
-        })
+  nextMonth(date) {
+    return (() => {
+          return DateFNS.addMonths(date, 1)
+        })()
   }
 
-  nextFrame(subject) {
-    return new Promise((resolve) => {
-        	requestAnimationFrame(() => {
-            resolve(subject)
-          })
-        })
-  }
-})
-
-const $Promise = new(class {
-  reject(input) {
-    return Promise.reject(input)
+  previousMonth(date) {
+    return (() => {
+          return DateFNS.addMonths(date, -1)
+        })()
   }
 
-  resolve(input) {
-    return Promise.resolve(input)
-  }
-
-  wrap(method, input) {
-    return method(input)
+  relative(other, now) {
+    return (() => {
+          return DateFNS.distanceInWordsStrict(now, other, { addSuffix: true })
+        })()
   }
 })
 
@@ -1423,107 +808,6 @@ const $File = new(class {
             })
             reader.readAsText(file)
           })
-        })()
-  }
-})
-
-const $Maybe = new(class {
-  nothing() {
-    return new Nothing
-  }
-
-  just(value) {
-    return new Just(value)
-  }
-
-  isJust(maybe) {
-    return maybe instanceof Just
-  }
-
-  isNothing(maybe) {
-    return maybe instanceof Nothing
-  }
-
-  map(func, maybe) {
-    return (() => {
-         	if (maybe instanceof Just) {
-         		return new Just(func(maybe.value))
-         	} else {
-         		return maybe
-         	}
-        })()
-  }
-
-  withDefault(value, maybe) {
-    return (() => {
-        	if (maybe instanceof Just) {
-        		return maybe.value
-        	} else {
-        		return value
-        	}
-        })()
-  }
-
-  toResult(error, maybe) {
-    return (() => {
-          if (maybe instanceof Just) {
-            return new Ok(maybe.value)
-          } else {
-            return new Err(error)
-          }
-        })()
-  }
-})
-
-const $Math = new(class {
-  negate(number) {
-    return -number
-  }
-
-  abs(number) {
-    return Math.abs(number)
-  }
-
-  ceil(number) {
-    return Math.ceil(number)
-  }
-
-  floor(number) {
-    return Math.floor(number)
-  }
-
-  round(number) {
-    return Math.round(number)
-  }
-
-  min(number1, number2) {
-    return Math.min(number1, number2)
-  }
-
-  max(number1, number2) {
-    return Math.max(number1, number2)
-  }
-})
-
-const $Url = new(class {
-  parse(url) {
-    return (() => {
-          if (!this._a) {
-            this._a = document.createElement('a')
-          }
-
-          this._a.href = url
-
-          return {
-            hostname: this._a.hostname,
-            protocol: this._a.protocol,
-            origin: this._a.origin,
-            path: this._a.pathname,
-            search: this._a.search,
-            hash: this._a.hash,
-            host: this._a.host,
-            port: this._a.port
-          }
         })()
   }
 })
@@ -1657,225 +941,907 @@ const $Http = new(class {
   }
 })
 
-const $Html = new(class {
-  empty() {
-    return false
+const $Storage_Local = new(class {
+  set(key, value) {
+    return $Storage_Common.set(localStorage, key, value)
+  }
+
+  get(key) {
+    return $Storage_Common.get(localStorage, key)
+  }
+
+  remove(key) {
+    return $Storage_Common.remove(localStorage, key)
+  }
+
+  clear() {
+    return $Storage_Common.clear(localStorage)
+  }
+
+  size() {
+    return $Storage_Common.size(localStorage)
+  }
+
+  keys() {
+    return $Storage_Common.keys(localStorage)
   }
 })
 
-const $String = new(class {
-  toLowerCase(string) {
-    return string.toLowerCase()
+const $Storage_Session = new(class {
+  set(key, value) {
+    return $Storage_Common.set(sessionStorage, key, value)
   }
 
-  toUpperCase(string) {
-    return string.toUpperCase()
+  get(key) {
+    return $Storage_Common.get(sessionStorage, key)
   }
 
-  reverse(string) {
-    return [...string].reverse().join('')
+  remove(key) {
+    return $Storage_Common.remove(sessionStorage, key)
   }
 
-  isEmpty(string) {
-    return _compare(string, ``)
+  clear() {
+    return $Storage_Common.clear(sessionStorage)
   }
 
-  match(pattern, string) {
-    return string.indexOf(pattern) != -1
+  size() {
+    return $Storage_Common.size(sessionStorage)
   }
 
-  split(separator, string) {
-    return string.split(separator)
-  }
-
-  size(string) {
-    return string.length
-  }
-
-  capitalize(string) {
-    return string.replace(/\b[a-z]/g, char => char.toUpperCase())
-  }
-
-  repeat(count, string) {
-    return string.repeat(count)
-  }
-
-  join(separator, array) {
-    return array.join(separator)
-  }
-
-  concat(array) {
-    return $String.join(``, array)
-  }
-
-  isAnagarm(string1, string2) {
-    return (() => {
-          const normalize = string =>
-            string
-              .toLowerCase()
-              .replace(/[^a-z0-9]/gi, '')
-              .split('')
-              .sort()
-              .join('');
-
-          return normalize(string1) === normalize(string2);
-        })()
+  keys() {
+    return $Storage_Common.keys(sessionStorage)
   }
 })
 
-const $Json = new(class {
-  parse(input) {
-    return (() => {
-         	try {
-         		return new Just(JSON.parse(input))
-         	} catch (error) {
-         		return new Nothing()
-        	}
-        })()
-  }
-
-  stringify(input) {
-    return JSON.stringify(input)
-  }
-})
-
-const $Time = new(class {
-  fromIso(raw) {
+const $Storage_Common = new(class {
+  set(storage, key, value) {
     return (() => {
           try {
-            return new Just(new Date(raw))
+            storage.setItem(key, value)
+            return new Ok(null)
+          } catch (error) {
+            switch(error.name) {
+              case 'SecurityError':
+                return new Err($Storage_Error_SecurityError)
+              case 'QUOTA_EXCEEDED_ERR':
+                return new Err($Storage_Error_QuotaExceeded)
+              case 'QuotaExceededError':
+                return new Err($Storage_Error_QuotaExceeded)
+              case 'NS_ERROR_DOM_QUOTA_REACHED':
+                return new Err($Storage_Error_QuotaExceeded)
+              default:
+                return new Err($Storage_Error_Unkown)
+            }
+          }
+        })()
+  }
+
+  get(storage, key) {
+    return (() => {
+          try {
+            let value = storage.getItem(key)
+
+            if (typeof value === "string") {
+              return new Ok(new Just(value))
+            } else {
+              return new Ok(new Nothing())
+            }
+          } catch (error) {
+            switch(error.name) {
+              case 'SecurityError':
+                return new Err($Storage_Error_SecurityError)
+              default:
+                return new Err($Storage_Error_Unkown)
+            }
+          }
+        })()
+  }
+
+  remove(storage, key) {
+    return (() => {
+          try {
+            storage.removeItem(key)
+            return new Ok(null)
+          } catch (error) {
+            switch(error.name) {
+              case 'SecurityError':
+                return new Err($Storage_Error_SecurityError)
+              default:
+                return new Err($Storage_Error_Unkown)
+            }
+          }
+        })()
+  }
+
+  clear(storage) {
+    return (() => {
+          try {
+            storage.clear()
+            return new Ok(null)
+          } catch (error) {
+            switch(error.name) {
+              case 'SecurityError':
+                return new Err($Storage_Error_SecurityError)
+              default:
+                return new Err($Storage_Error_Unkown)
+            }
+          }
+        })()
+  }
+
+  size(storage) {
+    return (() => {
+          try {
+            return new Ok(storage.length)
+          } catch (error) {
+            switch(error.name) {
+              case 'SecurityError':
+                return new Err($Storage_Error_SecurityError)
+              default:
+                return new Err($Storage_Error_Unkown)
+            }
+          }
+        })()
+  }
+
+  keys(storage) {
+    return (() => {
+          try {
+            return new Ok(Object.keys(storage).sort())
+          } catch (error) {
+            switch(error.name) {
+              case 'SecurityError':
+                return new Err($Storage_Error_SecurityError)
+              default:
+                return new Err($Storage_Error_Unkown)
+            }
+          }
+        })()
+  }
+})
+
+const $Result = new(class {
+  error(input) {
+    return new Err(input)
+  }
+
+  ok(input) {
+    return new Ok(input)
+  }
+
+  withDefault(value, input) {
+    return input instanceof Ok ? input.value : value
+  }
+
+  withError(value, input) {
+    return input instanceof Err ? input.value : value
+  }
+
+  map(func, input) {
+    return input instanceof Ok ? new Ok(func(input.value)) : input
+  }
+
+  mapError(func, input) {
+    return input instanceof Err ? new Err(func(input.value)) : input
+  }
+
+  isOk(input) {
+    return input instanceof Ok
+  }
+
+  isError(input) {
+    return input instanceof Err
+  }
+})
+
+const $Dom_Dimensions = new(class {
+  empty() {
+    return new Record({
+      bottom: 0,
+      height: 0,
+      width: 0,
+      right: 0,
+      left: 0,
+      top: 0,
+      x: 0,
+      y: 0
+    })
+  }
+})
+
+const $Window = new(class {
+  navigate(url) {
+    return _navigate(url)
+  }
+
+  title() {
+    return document.title
+  }
+
+  setTitle(title) {
+    return document.title = title
+  }
+
+  url() {
+    return $Url.parse($Window.href())
+  }
+
+  href() {
+    return window.location.href
+  }
+
+  width() {
+    return window.innerWidth
+  }
+
+  height() {
+    return window.innerHeight
+  }
+
+  scrollHeight() {
+    return document.body.scrollHeight
+  }
+
+  scrollWidth() {
+    return document.body.scrollWidth
+  }
+
+  scrollLeft() {
+    return document.body.scrollLeft
+  }
+
+  scrollTop() {
+    return document.body.scrollTop
+  }
+
+  setScrollTop(position) {
+    return window.scrollTo(this.scrollTop(), position)
+  }
+
+  setScrollLeft(position) {
+    return window.scrollTo(position, this.scrollLeft())
+  }
+})
+
+const $Timer = new(class {
+  timeout(duration, subject) {
+    return new Promise((resolve) => {
+        	setTimeout(() => {
+            resolve(subject)
+          }, duration)
+        })
+  }
+
+  nextFrame(subject) {
+    return new Promise((resolve) => {
+        	requestAnimationFrame(() => {
+            resolve(subject)
+          })
+        })
+  }
+})
+
+const $Number = new(class {
+  isOdd(input) {
+    return input % 2 === 1
+  }
+
+  isEven(input) {
+    return Math.abs(input % 2) === 0
+  }
+
+  isNaN(input) {
+    return isNaN(input)
+  }
+
+  toString(input) {
+    return input.toString()
+  }
+
+  toFixed(decimalPlaces, input) {
+    return input.toFixed(decimalPlaces)
+  }
+
+  fromString(input) {
+    return (() => {
+          let value = parseFloat(input)
+          if (isNaN(value)) {
+            return new Nothing()
+          } else {
+            return new Just(value)
+          }
+        })()
+  }
+})
+
+const $Array = new(class {
+  first(array) {
+    return (() => {
+          let first = array[0]
+          if (first !== undefined) {
+            return new Just(first)
+          } else {
+            return new Nothing()
+          }
+        })()
+  }
+
+  firstWithDefault(item, array) {
+    return $Maybe.withDefault(item, $Array.first(array))
+  }
+
+  last(array) {
+    return (() => {
+          let last = array[array.length - 1]
+          if (last !== undefined) {
+            return new Just(last)
+          } else {
+            return new Nothing()
+          }
+        })()
+  }
+
+  lastWithDefault(item, array) {
+    return $Maybe.withDefault(item, $Array.last(array))
+  }
+
+  size(array) {
+    return array.length
+  }
+
+  push(item, array) {
+    return [...array, item]
+  }
+
+  reverse(array) {
+    return array.reverse()
+  }
+
+  map(func, array) {
+    return array.map(func)
+  }
+
+  mapWithIndex(func, array) {
+    return array.map(func)
+  }
+
+  select(func, array) {
+    return array.filter(func)
+  }
+
+  reject(func, array) {
+    return array.filter((item) => !func(item))
+  }
+
+  find(func, array) {
+    return (() => {
+          let item = array.find(func)
+          if (item != undefined) {
+            return new Just(item)
+          } else {
+            return new Nothing()
+          }
+        })()
+  }
+
+  any(func, array) {
+    return !!array.find(func)
+  }
+
+  sort(func, array) {
+    return array.sort(func)
+  }
+
+  sortBy(func, array) {
+    return (() => {
+          return array.sort((a, b) => {
+            let aVal = func(a)
+            let bVal = func(b)
+
+            if (aVal < bVal) {
+              return -1
+            }
+
+            if (aVal > bVal) {
+              return 1
+            }
+
+            return 0
+          })
+        })()
+  }
+
+  slice(from, to, array) {
+    return array.slice(from, to)
+  }
+
+  isEmpty(array) {
+    return _compare($Array.size(array), 0)
+  }
+
+  intersperse(item, array) {
+    return array.reduce((a,v)=>[...a,v,item],[]).slice(0,-1)
+  }
+
+  contains(other, array) {
+    return array.includes(other)
+  }
+
+  range(from, to) {
+    return Array.from({ length: (to + 1) - from }).map((v, i) => i + from)
+  }
+
+  do(array) {
+    return null
+  }
+
+  delete(what, array) {
+    return array.filter((item) => item !== what)
+  }
+
+  max(array) {
+    return Math.max(...array)
+  }
+})
+
+const $Object_Decode = new(class {
+  field(key, decoder, input) {
+    return (() => {
+          if (input == null ||
+              input == undefined ||
+              typeof input !== "object" ||
+              Array.isArray(input)) {
+            return new Err($Object_Error_NotAnObject)
+          } else {
+            const actual = input[key]
+            if (typeof actual === "undefined") {
+              return new Err($Object_Error_MissingObjectKey)
+            }
+            return decoder(actual)
+          }
+        })()
+  }
+
+  string(input) {
+    return (() => {
+          if(typeof input != "string") {
+            return new Err($Object_Error_NotAString)
+          } else {
+            return new Ok(input)
+          }
+        })()
+  }
+
+  time(input) {
+    return (() => {
+          const parsed = Date.parse(input)
+
+          if (Number.isNaN(parsed)) {
+            return new Err($Object_Error_NotAValidTime)
+          } else {
+            return new Ok(new Date(parsed))
+          }
+        })()
+  }
+
+  number(input) {
+    return (() => {
+          if(typeof input != "number") {
+            let value = parseFloat(input)
+
+            if (isNaN(value)) {
+              return new Err($Object_Error_NotANumber)
+            } else {
+              return new Ok(value)
+            }
+          } else {
+            return new Ok(input)
+          }
+        })()
+  }
+
+  boolean(input) {
+    return (() => {
+          if(typeof input != "boolean") {
+            return new Err($Object_Error_NotABoolean)
+          } else {
+            return new Ok(input)
+          }
+        })()
+  }
+
+  array(decoder, input) {
+    return (() => {
+          if (!Array.isArray(input)) {
+            return new Err($Object_Error_NotAnArray)
+          }
+
+          let results = []
+
+          for (let item of input) {
+            let result = decoder(item)
+
+            if (result instanceof Err) {
+              return result
+            } else {
+              results.push(result.value)
+            }
+          }
+
+          return new Ok(results)
+        })()
+  }
+})
+
+const $Object_Encode = new(class {
+  string(input) {
+    return input
+  }
+
+  boolean(input) {
+    return input
+  }
+
+  number(input) {
+    return input
+  }
+
+  time(input) {
+    return input.toISOString()
+  }
+
+  array(input) {
+    return input
+  }
+
+  field(name, value) {
+    return { name: name, value: value }
+  }
+
+  object(fields) {
+    return (() => {
+          let result = {}
+
+          for (let item of fields) {
+            result[item.name] = item.value
+          }
+
+          return result
+        })()
+  }
+})
+
+const $Math = new(class {
+  negate(number) {
+    return -number
+  }
+
+  abs(number) {
+    return Math.abs(number)
+  }
+
+  ceil(number) {
+    return Math.ceil(number)
+  }
+
+  floor(number) {
+    return Math.floor(number)
+  }
+
+  round(number) {
+    return Math.round(number)
+  }
+
+  min(number1, number2) {
+    return Math.min(number1, number2)
+  }
+
+  max(number1, number2) {
+    return Math.max(number1, number2)
+  }
+})
+
+const $Dom = new(class {
+  createElement(tag) {
+    return document.createElement(tag)
+  }
+
+  getElementById(id) {
+    return (() => {
+          let element = document.getElementById(id)
+
+          if (element) {
+            return new Just(element)
+          } else {
+            return new Nothing()
+          }
+        })()
+  }
+
+  getElementBySelector(selector) {
+    return (() => {
+          try {
+            let element = document.querySelector(selector)
+
+            if (element) {
+              return new Just(element)
+            } else {
+              return new Nothing()
+            }
           } catch (error) {
             return new Nothing()
           }
         })()
   }
 
-  toIso(date) {
-    return date.toISOString()
-  }
-
-  now() {
-    return new Date()
-  }
-
-  today() {
+  getDimensions(dom) {
     return (() => {
-          const date = new Date()
+          const rect = dom.getBoundingClientRect()
 
-          return new Date(Date.UTC(
-            date.getUTCFullYear(),
-            date.getUTCMonth(),
-            date.getUTCDate()
-          ))
+          return new Record({
+            bottom: rect.bottom,
+            height: rect.height,
+            width: rect.width,
+            right: rect.right,
+            left: rect.left,
+            top: rect.top,
+            x: rect.x,
+            y: rect.y
+          })
         })()
   }
 
-  from(year, month, day) {
-    return new Date(Date.UTC(year, month - 1, day))
-  }
-
-  day(date) {
-    return date.getUTCDate()
-  }
-
-  month(date) {
-    return (date.getUTCMonth() + 1)
-  }
-
-  year(date) {
-    return date.getUTCFullYear()
-  }
-
-  format(pattern, date) {
-    return DateFNS.format(date, pattern)
-  }
-
-  startOf(what, date) {
+  getValue(dom) {
     return (() => {
-          switch (what) {
-            case 'month':
-              return DateFNS.startOfMonth(date)
-            case 'week':
-              return DateFNS.startOfWeek(date, { weekStartsOn: 1 })
-            case 'day':
-              return DateFNS.startOfDay(date)
-            default:
-              return date
+          let value = dom.value
+
+          if (typeof value === "string") {
+            return value
+          } else {
+            return ""
           }
         })()
   }
 
-  endOf(what, date) {
+  setValue(value, dom) {
+    return (dom.value = value) && dom
+  }
+
+  matches(selector, dom) {
     return (() => {
-          switch (what) {
-            case 'month':
-              return DateFNS.endOfMonth(date)
-            case 'week':
-              return DateFNS.endOfWeek(date, { weekStartsOn: 1 })
-            case 'day':
-              return DateFNS.endOfDay(date)
-            default:
-              return date
+          try {
+            return dom.matches(selector)
+          } catch (error) {
+            return false
           }
         })()
   }
+})
 
-  range(from, to) {
-    return DateFNS.eachDay(from, to)
+const $Test_Context = new(class {
+  of(a) {
+    return new TestContext(a)
   }
 
-  nextMonth(date) {
+  then(proc, context) {
+    return context.step((subject)=> {
+          return proc(subject)
+        })
+  }
+
+  timeout(duration, context) {
+    return $Test_Context.then(((subject) => {
+    return $Timer.timeout(duration, subject)
+    }), context)
+  }
+
+  assertEqual(a, context) {
+    return context.step((subject)=> {
+          let result = _compare(a, subject)
+
+          if (result) {
+            return subject
+          } else {
+            throw `Assertion failed ${a} === ${subject}`
+          }
+        })
+  }
+})
+
+const $Test_Html = new(class {
+  start(node) {
     return (() => {
-          return DateFNS.addMonths(date, 1)
+          let root = document.createElement('div')
+          document.body.appendChild(root)
+          ReactDOM.render(node, root)
+          return new TestContext(root, () => {
+            ReactDOM.unmountComponentAtNode(root)
+            document.body.removeChild(root)
+          })
         })()
   }
 
-  previousMonth(date) {
+  triggerClick(selector, context) {
+    return context.step((element) => {
+          element.querySelector(selector).click()
+          return element
+        })
+  }
+
+  triggerMouseDown(selector, context) {
+    return context.step((element) => {
+          let event = document.createEvent ('MouseEvents')
+          event.initEvent ("mousedown", true, true)
+          element.querySelector(selector).dispatchEvent(event)
+          return element
+        })
+  }
+
+  triggerMouseMove(selector, context) {
+    return context.step((element) => {
+          let event = document.createEvent ('MouseEvents')
+          event.initEvent ("mousemove", true, true)
+          element.querySelector(selector).dispatchEvent(event)
+          return element
+        })
+  }
+
+  triggerMouseUp(selector, context) {
+    return context.step((element) => {
+          let event = document.createEvent ('MouseEvents')
+          event.initEvent ("mouseup", true, true)
+          element.querySelector(selector).dispatchEvent(event)
+          return element
+        })
+  }
+
+  assertTextOf(selector, value, context) {
+    return context.step((element) => {
+          let text = "";
+
+          try {
+            text = element.querySelector(selector).textContent
+          } catch (error) {
+            throw `Could not find element with selector: ${selector}`
+          }
+
+          if (text == value) {
+            return element
+          } else {
+            throw `"${text}" != "${value}"`
+          }
+        })
+  }
+
+  assertElementExists(selector, context) {
+    return context.step((element) => {
+          let subject = element.querySelector(selector)
+
+          if (subject) {
+            return element
+          } else {
+            throw `Could not find element with selector: ${selector}`
+          }
+        })
+  }
+
+  assertCSSOf(selector, property, value, context) {
+    return context.step((element) => {
+          let subject = element.querySelector(selector)
+
+          if (subject) {
+            let actual = getComputedStyle(subject)[property]
+
+            if (actual == value) {
+              return element
+            } else {
+              throw `Style did not match`
+            }
+          } else {
+            throw `Could not find element with selector: ${selector}`
+          }
+        })
+  }
+})
+
+const $Test_Window = new(class {
+  setScrollLeft(to, context) {
+    return $Test_Context.then(((subject) => {
+    return (() => {  $Window.setScrollLeft(100)
+
+    return $Promise.resolve(subject) })()
+    }), context)
+  }
+
+  setScrollTop(to, context) {
+    return $Test_Context.then(((subject) => {
+    return (() => {  $Window.setScrollTop(100)
+
+    return $Promise.resolve(subject) })()
+    }), context)
+  }
+})
+
+const $FormData = new(class {
+  empty() {
+    return new FormData
+  }
+
+  keys(formData) {
+    return Array.from(formData.keys())
+  }
+
+  addString(key, value, formData) {
     return (() => {
-          return DateFNS.addMonths(date, -1)
+         	formData.append(key, value)
+         	return formData
         })()
   }
 
-  relative(other, now) {
+  addFile(key, value, formData) {
     return (() => {
-          return DateFNS.distanceInWordsStrict(now, other, { addSuffix: true })
+         	formData.append(key, value)
+         	return formData
         })()
   }
 })
 
-const $Application = new (class extends Store {
-  get page () {
-    if (this.props.page != undefined) {
-      return this.props.page
-    } else {
-      return ``
-    }
-  }
-
-  get state () {
-    return {
-    page: this.page
-    }
-  }
-
-  setPage(a) {
-    return (async () => {
-            try {  await $Http.abortAll()
-
-     await new Promise((_resolve) => {
-      this.setState(_update(this.state, { page: a }), _resolve)
-    }) }
-            catch(_error) {
-              if (_error instanceof DoError) {
-              } else {
-                console.warn(`Unhandled error in do statement`)
-                console.log(_error)
-              }
-            } 
-          })()
+const $Debug = new(class {
+  log(value) {
+    return (() => {
+          console.log(value)
+          return value
+        })()
   }
 })
-$Application.__displayName = `Application`
+
+const $Maybe = new(class {
+  nothing() {
+    return new Nothing
+  }
+
+  just(value) {
+    return new Just(value)
+  }
+
+  isJust(maybe) {
+    return maybe instanceof Just
+  }
+
+  isNothing(maybe) {
+    return maybe instanceof Nothing
+  }
+
+  map(func, maybe) {
+    return (() => {
+         	if (maybe instanceof Just) {
+         		return new Just(func(maybe.value))
+         	} else {
+         		return maybe
+         	}
+        })()
+  }
+
+  withDefault(value, maybe) {
+    return (() => {
+        	if (maybe instanceof Just) {
+        		return maybe.value
+        	} else {
+        		return value
+        	}
+        })()
+  }
+
+  toResult(error, maybe) {
+    return (() => {
+          if (maybe instanceof Just) {
+            return new Ok(maybe.value)
+          } else {
+            return new Err(error)
+          }
+        })()
+  }
+})
 
 const $Users_List = new (class extends Store {
   get users () {
@@ -2345,104 +2311,6 @@ const $Users_List = new (class extends Store {
 })
 $Users_List.__displayName = `Users.List`
 
-const $Showcase_Store = new (class extends Store {
-  get active () {
-    if (this.props.active != undefined) {
-      return this.props.active
-    } else {
-      return `store`
-    }
-  }
-
-  get over () {
-    if (this.props.over != undefined) {
-      return this.props.over
-    } else {
-      return ``
-    }
-  }
-
-  get state () {
-    return {
-    active: this.active,
-    over: this.over
-    }
-  }
-
-  setActive(active) {
-    return new Promise((_resolve) => {
-      this.setState(_update(this.state, { active: active }), _resolve)
-    })
-  }
-
-  setOver(over) {
-    return new Promise((_resolve) => {
-      this.setState(_update(this.state, { over: over }), _resolve)
-    })
-  }
-})
-$Showcase_Store.__displayName = `Showcase.Store`
-
-const $Examples_Store = new (class extends Store {
-  get userManagement () {
-    if (this.props.userManagement != undefined) {
-      return this.props.userManagement
-    } else {
-      return new Record({
-      title: `User Management`,
-      href: `/users`,
-      description: `This example contains an implementation of a table of users with client side pagination and forms for creating new users and editing existsing ones through an HTTP API.`
-    })
-    }
-  }
-
-  get drag () {
-    if (this.props.drag != undefined) {
-      return this.props.drag
-    } else {
-      return new Record({
-      title: `Drag and Drop`,
-      href: `/drag`,
-      description: `This example shows how to drag and drop an HTML element on the page.`
-    })
-    }
-  }
-
-  get fileHandling () {
-    if (this.props.fileHandling != undefined) {
-      return this.props.fileHandling
-    } else {
-      return new Record({
-      title: `File Handling`,
-      href: `/examples/file-handling`,
-      description: `This example shows how to implement a component which loads and shows a file from the users computer and then uploads it to a server via HTTP.`
-    })
-    }
-  }
-
-  get counter () {
-    if (this.props.counter != undefined) {
-      return this.props.counter
-    } else {
-      return new Record({
-      title: `Counter`,
-      href: `/counter`,
-      description: `This example shows a counter which stored in a store with two buttons one for incrementing th counter and one for decrementing it.`
-    })
-    }
-  }
-
-  get state () {
-    return {
-    userManagement: this.userManagement,
-    drag: this.drag,
-    fileHandling: this.fileHandling,
-    counter: this.counter
-    }
-  }
-})
-$Examples_Store.__displayName = `Examples.Store`
-
 const $Versions = new (class extends Store {
   get versions () {
     if (this.props.versions != undefined) {
@@ -2580,6 +2448,66 @@ const $Counter_Store = new (class extends Store {
 })
 $Counter_Store.__displayName = `Counter.Store`
 
+const $Examples_Store = new (class extends Store {
+  get userManagement () {
+    if (this.props.userManagement != undefined) {
+      return this.props.userManagement
+    } else {
+      return new Record({
+      title: `User Management`,
+      href: `/users`,
+      description: `This example contains an implementation of a table of users with client side pagination and forms for creating new users and editing existsing ones through an HTTP API.`
+    })
+    }
+  }
+
+  get drag () {
+    if (this.props.drag != undefined) {
+      return this.props.drag
+    } else {
+      return new Record({
+      title: `Drag and Drop`,
+      href: `/drag`,
+      description: `This example shows how to drag and drop an HTML element on the page.`
+    })
+    }
+  }
+
+  get fileHandling () {
+    if (this.props.fileHandling != undefined) {
+      return this.props.fileHandling
+    } else {
+      return new Record({
+      title: `File Handling`,
+      href: `/examples/file-handling`,
+      description: `This example shows how to implement a component which loads and shows a file from the users computer and then uploads it to a server via HTTP.`
+    })
+    }
+  }
+
+  get counter () {
+    if (this.props.counter != undefined) {
+      return this.props.counter
+    } else {
+      return new Record({
+      title: `Counter`,
+      href: `/counter`,
+      description: `This example shows a counter which stored in a store with two buttons one for incrementing th counter and one for decrementing it.`
+    })
+    }
+  }
+
+  get state () {
+    return {
+    userManagement: this.userManagement,
+    drag: this.drag,
+    fileHandling: this.fileHandling,
+    counter: this.counter
+    }
+  }
+})
+$Examples_Store.__displayName = `Examples.Store`
+
 const $DragStore = new (class extends Store {
   get position () {
     if (this.props.position != undefined) {
@@ -2605,6 +2533,78 @@ const $DragStore = new (class extends Store {
   }
 })
 $DragStore.__displayName = `DragStore`
+
+const $Application = new (class extends Store {
+  get page () {
+    if (this.props.page != undefined) {
+      return this.props.page
+    } else {
+      return ``
+    }
+  }
+
+  get state () {
+    return {
+    page: this.page
+    }
+  }
+
+  setPage(a) {
+    return (async () => {
+            try {  await $Http.abortAll()
+
+     await new Promise((_resolve) => {
+      this.setState(_update(this.state, { page: a }), _resolve)
+    }) }
+            catch(_error) {
+              if (_error instanceof DoError) {
+              } else {
+                console.warn(`Unhandled error in do statement`)
+                console.log(_error)
+              }
+            } 
+          })()
+  }
+})
+$Application.__displayName = `Application`
+
+const $Showcase_Store = new (class extends Store {
+  get active () {
+    if (this.props.active != undefined) {
+      return this.props.active
+    } else {
+      return `store`
+    }
+  }
+
+  get over () {
+    if (this.props.over != undefined) {
+      return this.props.over
+    } else {
+      return ``
+    }
+  }
+
+  get state () {
+    return {
+    active: this.active,
+    over: this.over
+    }
+  }
+
+  setActive(active) {
+    return new Promise((_resolve) => {
+      this.setState(_update(this.state, { active: active }), _resolve)
+    })
+  }
+
+  setOver(over) {
+    return new Promise((_resolve) => {
+      this.setState(_update(this.state, { over: over }), _resolve)
+    })
+  }
+})
+$Showcase_Store.__displayName = `Showcase.Store`
 
 const $Ui = new (class extends Store {
   get theme () {
@@ -2706,6 +2706,29 @@ const $Ui = new (class extends Store {
 })
 $Ui.__displayName = `Ui`
 
+class $Title extends Component {
+  get children () {
+    if (this.props.children != undefined) {
+      return this.props.children
+    } else {
+      return []
+    }
+  }
+
+  render() {
+    return _createElement("div", {
+      className: `title-base-media-0 title-base`,
+      style: {
+
+      }
+    }, [this.children])
+  }
+}
+
+$Title.defaultProps = {
+  children: []
+}
+
 class $Main extends Component {
   get pages() {
     return [new Record({
@@ -2786,6 +2809,364 @@ class $Main extends Component {
 
     return _createElement($Layout, {  }, [content])
   }
+}
+
+class $Users_Table extends Component {
+  get loading () { return $Users_List.loading }
+
+  get users () { return $Users_List.users }
+
+  get page () { return $Users_List.page }
+
+  get perPage () { return $Users_List.perPage }
+
+  get error () { return $Users_List.error }
+
+  get theme () { return $Ui.theme }
+
+  componentWillUnmount () {
+    $Users_List._unsubscribe(this);$Ui._unsubscribe(this)
+  }
+
+  componentDidMount () {
+    $Users_List._subscribe(this);$Ui._subscribe(this)
+  }
+
+  setPage(a) {
+    return $Window.navigate(`/users?page=` + $Number.toString(a))
+  }
+
+  renderItem(item) {
+    return _createElement($UserRow, { key: $Number.toString(item.id), user: item })
+  }
+
+  render() {
+    let slicedUsers = $Array.slice(this.page * this.perPage, (this.page + 1) * this.perPage, this.users)
+
+    let rows = ($Array.isEmpty(slicedUsers) ? [_createElement("tr", {}, [_createElement("td", {
+      colspan: `5`
+    }, [_createElement("div", {
+      className: `users-table-empty`,
+      style: {
+
+      }
+    }, [`There are no users to display!`])])])] : $Array.map(this.renderItem.bind(this), slicedUsers))
+
+    return _createElement($Ui_Loader, { shown: this.loading }, [_createElement("div", {}, [_createElement("div", {
+      className: `users-table-header`,
+      style: {
+
+      }
+    }, [_createElement("div", {
+      className: `users-table-title`,
+      style: {
+
+      }
+    }, [`Users`])]), _createElement("table", {
+      className: `users-table-table`,
+      style: {
+        [`--users-table-table-border`]: `1px solid ` + this.theme.border.color,
+        [`--users-table-table-color`]: this.theme.colors.input.text,
+        [`--users-table-table-font-family`]: this.theme.fontFamily
+      }
+    }, [_createElement("thead", {}, [_createElement("tr", {}, [_createElement($Ui_Table_Th, { width: `40px` }, [`Id`]), _createElement($Ui_Table_Th, {  }, [`Name`]), _createElement($Ui_Table_Th, {  }, [`Status`]), _createElement($Ui_Table_Th, {  }, [`Last Updated`]), _createElement($Ui_Table_Th, { align: `center`, width: `70px` }, [`Active`])])]), _createElement("tbody", {}, [rows])]), _createElement($Ui_Pagination, { onChange: this.setPage.bind(this), page: this.page, total: $Array.size(this.users) })])])
+  }
+}
+
+$Users_Table.displayName = "Users.Table"
+
+class $SubTitle extends Component {
+  get children () {
+    if (this.props.children != undefined) {
+      return this.props.children
+    } else {
+      return []
+    }
+  }
+
+  render() {
+    return _createElement("div", {
+      className: `sub-title-base-media-0 sub-title-base`,
+      style: {
+
+      }
+    }, [this.children])
+  }
+}
+
+$SubTitle.defaultProps = {
+  children: []
+}
+
+class $Example extends Component {
+  get children () {
+    if (this.props.children != undefined) {
+      return this.props.children
+    } else {
+      return []
+    }
+  }
+
+  get subTitle () {
+    if (this.props.subTitle != undefined) {
+      return this.props.subTitle
+    } else {
+      return ``
+    }
+  }
+
+  get title () {
+    if (this.props.title != undefined) {
+      return this.props.title
+    } else {
+      return ``
+    }
+  }
+
+  render() {
+    return _createElement($Page, {  }, [_createElement($Title, {  }, [this.title]), _createElement($SubTitle, {  }, [this.subTitle]), _createElement("div", {
+      className: `example-frame`,
+      style: {
+
+      }
+    }, [this.children])])
+  }
+}
+
+$Example.defaultProps = {
+  children: [],subTitle: ``,title: ``
+}
+
+class $Logo extends Component {
+  get textFill () {
+    if (this.props.textFill != undefined) {
+      return this.props.textFill
+    } else {
+      return `#000`
+    }
+  }
+
+  get fill () {
+    if (this.props.fill != undefined) {
+      return this.props.fill
+    } else {
+      return `#000`
+    }
+  }
+
+  get height () {
+    if (this.props.height != undefined) {
+      return this.props.height
+    } else {
+      return 90
+    }
+  }
+
+  get width () {
+    if (this.props.width != undefined) {
+      return this.props.width
+    } else {
+      return 370
+    }
+  }
+
+  get mobileHeight () {
+    if (this.props.mobileHeight != undefined) {
+      return this.props.mobileHeight
+    } else {
+      return 90
+    }
+  }
+
+  get mobileWidth () {
+    if (this.props.mobileWidth != undefined) {
+      return this.props.mobileWidth
+    } else {
+      return 370
+    }
+  }
+
+  render() {
+    return _createElement("svg", {
+      viewBox: `0 0 370 90`,
+      height: `90`,
+      width: `370`,
+      className: `logo-base-media-0 logo-base`,
+      style: {
+        [`--logo-base-height`]: this.height + `px`,
+        [`--logo-base-width`]: this.width + `px`,
+        [`--logo-base-media-0-height`]: this.mobileHeight + `px`,
+        [`--logo-base-media-0-width`]: this.mobileWidth + `px`
+      }
+    }, [_createElement("path", {
+      d: `M84.082 87.484C78.584 68.76 61.48 49.421 41.624 42.668c19.855 6.446 33.906 16.269 43.375 35.914C85.304 15.348 27.268 31.617 1.304 0-10.304 80.424 58.73 97.307 84.082 87.484z`,
+      fill: this.fill
+    }), _createElement("path", {
+      d: `M177.222 25.537q6.198 0 11.529 2.603 5.454 2.48 8.801 7.81 3.347 5.331 3.347 13.14v39.67h-9.917V50.083q0-8.058-4.09-11.901-3.968-3.967-10.538-3.967-4.959 0-9.174 2.48-4.09 2.355-6.694 7.065-2.48 4.587-2.48 11.033V88.76h-9.917V50.083q0-8.058-4.09-11.901-3.967-3.967-10.538-3.967-4.462 0-8.677 2.355-4.215 2.232-6.942 7.066-2.728 4.835-2.728 12.025v33.1h-9.917V26.776h8.678l.62 9.67q3.223-5.455 8.43-8.183 5.33-2.727 11.404-2.727 6.818 0 12.52 3.1 5.827 3.099 8.802 9.049 2.728-5.95 8.926-9.05 6.198-3.099 12.645-3.099zM228.312 14.876q-3.348 0-5.455-1.983-1.983-2.108-1.983-5.455t1.983-5.33Q224.964 0 228.312 0q3.347 0 5.33 2.107 2.108 1.984 2.108 5.331 0 3.347-2.108 5.455-1.983 1.983-5.33 1.983zm4.958 73.884h-9.917V26.777h9.917V88.76zM286.406 25.537q10.537 0 17.355 6.075 6.818 6.074 6.818 17.479v39.67h-9.917V52.561q0-9.67-4.215-14.008-4.091-4.34-11.033-4.34-4.959 0-9.298 2.232-4.338 2.108-7.19 7.066-2.727 4.835-2.727 12.273V88.76h-9.917V26.777h8.677l.62 9.67q3.1-5.58 8.554-8.183 5.454-2.727 12.273-2.727zM370 84.421Q363.802 90 354.008 90q-7.562 0-12.396-4.09-4.711-4.092-4.835-12.522V35.331H324.38v-8.554h12.397V11.9l9.917-2.727v17.603h22.934v8.554h-22.934v36.322q0 4.463 2.48 6.818 2.603 2.231 6.818 2.231 5.95 0 10.537-4.586L370 84.42z`,
+      fill: this.textFill
+    })])
+  }
+}
+
+$Logo.defaultProps = {
+  textFill: `#000`,fill: `#000`,height: 90,width: 370,mobileHeight: 90,mobileWidth: 370
+}
+
+class $UserRow extends Component {
+  get textDecoration() {
+    return (() => {
+      let condition = this.user.status
+      let branch0 = `locked`
+
+      switch (condition) {
+        case branch0:
+          return `line-through`
+        default:
+          return ``
+      }
+    })()
+  }
+
+  get user () {
+    if (this.props.user != undefined) {
+      return this.props.user
+    } else {
+      return new Record({
+      createdAt: $Time.now(),
+      updatedAt: $Time.now(),
+      firstName: ``,
+      lastName: ``,
+      status: ``,
+      id: 0
+    })
+    }
+  }
+
+  updateUserStatus (...params) { return $Users_List.updateUserStatus(...params) }
+
+  componentWillUnmount () {
+    $Users_List._unsubscribe(this)
+  }
+
+  componentDidMount () {
+    $Users_List._subscribe(this)
+  }
+
+  onChange(isLocked) {
+    return this.updateUserStatus.bind(this)(this.user, isLocked)
+  }
+
+  render() {
+    return _createElement("tr", {
+      className: `user-row-tr`,
+      style: {
+        [`--user-row-tr-a-text-decoration`]: this.textDecoration
+      }
+    }, [_createElement($Ui_Table_Td, {  }, [_createElement($Ui_Link, { href: `/users/` + $Number.toString(this.user.id) }, [$Number.toString(this.user.id)])]), _createElement($Ui_Table_Td, {  }, [_createElement($Ui_Link, { href: `/users/` + $Number.toString(this.user.id) }, [this.user.firstName + ` ` + this.user.lastName])]), _createElement($Ui_Table_Td, {  }, [$String.capitalize(this.user.status)]), _createElement($Ui_Table_Td, {  }, [_createElement($Ui_Time, { date: this.user.updatedAt })]), _createElement($Ui_Table_Td, { align: `center` }, [_createElement($Ui_Checkbox, { checked: _compare(this.user.status, `locked`), onChange: this.onChange.bind(this) })])])
+  }
+}
+
+$UserRow.defaultProps = {
+  user: new Record({
+    createdAt: $Time.now(),
+    updatedAt: $Time.now(),
+    firstName: ``,
+    lastName: ``,
+    status: ``,
+    id: 0
+  })
+}
+
+class $Footer extends Component {
+  render() {
+    return _createElement("div", {
+      className: `footer-base`,
+      style: {
+
+      }
+    }, [_createElement("div", {
+      className: `footer-wrapper`,
+      style: {
+
+      }
+    }, [_createElement("div", {
+      className: `footer-column`,
+      style: {
+
+      }
+    }, [_createElement("div", {
+      className: `footer-title`,
+      style: {
+
+      }
+    }, [`Source`]), _createElement($Ui_Link, { href: `https://github.com/mint-lang/mint`, label: `Github Repository`, target: `_blank` }), _createElement($Ui_Link, { href: `https://github.com/mint-lang/mint/releases`, label: `Releases / Changelog`, target: `_blank` })]), _createElement("div", {
+      className: `footer-column`,
+      style: {
+
+      }
+    }, [_createElement("div", {
+      className: `footer-title`,
+      style: {
+
+      }
+    }, [`Community`]), _createElement($Ui_Link, { href: `https://gitter.im/mint-lang/Lobby`, target: `_blank`, label: `Gitter` })])])])
+  }
+}
+
+class $Counter extends Component {
+  get background() {
+    return (this.counter >= 10 ? `lightgreen` : (this.counter < 0 ? `orangered` : `#F2F2F2`))
+  }
+
+  get disabled () {
+    if (this.props.disabled != undefined) {
+      return this.props.disabled
+    } else {
+      return false
+    }
+  }
+
+  increment (...params) { return $Counter_Store.increment(...params) }
+
+  decrement (...params) { return $Counter_Store.decrement(...params) }
+
+  get counter () { return $Counter_Store.counter }
+
+  componentWillUnmount () {
+    $Counter_Store._unsubscribe(this)
+  }
+
+  componentDidMount () {
+    $Counter_Store._subscribe(this)
+  }
+
+  render() {
+    return _createElement("div", {
+      className: `counter-base`,
+      style: {
+        [`--counter-base-background`]: this.background
+      }
+    }, [_createElement("button", {
+      onClick: (event => (((event) => {
+      return this.decrement.bind(this)()
+      }))(_normalizeEvent(event))),
+      disabled: this.disabled
+    }, [`Decrement`]), _createElement("span", {
+      className: `counter-counter`,
+      style: {
+
+      }
+    }, [$Number.toString(this.counter)]), _createElement("button", {
+      onClick: (event => (((event) => {
+      return this.increment.bind(this)()
+      }))(_normalizeEvent(event))),
+      disabled: this.disabled
+    }, [`Increment`])])
+  }
+}
+
+$Counter.defaultProps = {
+  disabled: false
 }
 
 class $Examples_FileHandling extends Component {
@@ -2911,7 +3292,124 @@ $Layout.defaultProps = {
   children: []
 }
 
-class $SubTitle extends Component {
+class $Examples_Example extends Component {
+  get description () {
+    if (this.props.description != undefined) {
+      return this.props.description
+    } else {
+      return ``
+    }
+  }
+
+  get title () {
+    if (this.props.title != undefined) {
+      return this.props.title
+    } else {
+      return ``
+    }
+  }
+
+  get href () {
+    if (this.props.href != undefined) {
+      return this.props.href
+    } else {
+      return ``
+    }
+  }
+
+  render() {
+    return _createElement("div", {
+      onClick: (event => (((event) => {
+      return $Window.navigate(this.href)
+      }))(_normalizeEvent(event))),
+      className: `examples-example-base`,
+      style: {
+
+      }
+    }, [_createElement("div", {
+      className: `examples-example-title`,
+      style: {
+
+      }
+    }, [this.title]), _createElement("div", {
+      className: `examples-example-description`,
+      style: {
+
+      }
+    }, [this.description])])
+  }
+}
+
+$Examples_Example.displayName = "Examples.Example"
+
+$Examples_Example.defaultProps = {
+  description: ``,title: ``,href: ``
+}
+
+class $Examples extends Component {
+  get userManagement () { return $Examples_Store.userManagement }
+
+  get drag () { return $Examples_Store.drag }
+
+  get fileHandling () { return $Examples_Store.fileHandling }
+
+  get counter () { return $Examples_Store.counter }
+
+  componentWillUnmount () {
+    $Examples_Store._unsubscribe(this)
+  }
+
+  componentDidMount () {
+    $Examples_Store._subscribe(this)
+  }
+
+  render() {
+    return _createElement($Page, {  }, [_createElement($Title, {  }, [`Examples`]), _createElement($SubTitle, {  }, [`Here you can find some examples that showcase the language features.`]), _createElement("hr", {
+      className: `examples-hr`,
+      style: {
+
+      }
+    }), _createElement("div", {
+      className: `examples-grid`,
+      style: {
+
+      }
+    }, [_createElement($Examples_Example, { description: this.userManagement.description, title: this.userManagement.title, href: this.userManagement.href }), _createElement($Examples_Example, { description: this.drag.description, title: this.drag.title, href: this.drag.href }), _createElement($Examples_Example, { description: this.counter.description, title: this.counter.title, href: this.counter.href }), _createElement($Examples_Example, { description: this.fileHandling.description, title: this.fileHandling.title, href: this.fileHandling.href })])])
+  }
+}
+
+class $Header extends Component {
+  get theme () { return $Ui.theme }
+
+  componentWillUnmount () {
+    $Ui._unsubscribe(this)
+  }
+
+  componentDidMount () {
+    $Ui._subscribe(this)
+  }
+
+  render() {
+    return _createElement("div", {
+      className: `header-base`,
+      style: {
+
+      }
+    }, [_createElement("div", {
+      className: `header-wrapper`,
+      style: {
+
+      }
+    }, [_createElement($Ui_Toolbar_Title, { href: `/` }, [_createElement($Logo, { fill: this.theme.colors.primary.background, mobileHeight: 20, mobileWidth: 82, textFill: `#FFF`, height: 20, width: 82 })]), _createElement($Ui_Toolbar_Spacer, {  }), _createElement("div", {
+      className: `header-desktop-media-0 header-desktop`,
+      style: {
+
+      }
+    }, [_createElement($Ui_Link, { href: `/install`, label: `Install` }), _createElement($Ui_Toolbar_Separator, {  }), _createElement($Ui_Link, { href: `https://guide.mint-lang.com`, target: `_blank`, label: `Learn` }), _createElement($Ui_Toolbar_Separator, {  }), _createElement($Ui_Link, { href: `/examples`, label: `Examples` }), _createElement($Ui_Toolbar_Separator, {  }), _createElement($Ui_Link, { href: `/roadmap`, label: `Roadmap` })])])])
+  }
+}
+
+class $Users_Layout extends Component {
   get children () {
     if (this.props.children != undefined) {
       return this.props.children
@@ -2921,98 +3419,123 @@ class $SubTitle extends Component {
   }
 
   render() {
-    return _createElement("div", {
-      className: `sub-title-base-media-0 sub-title-base`,
+    return _createElement("div", {}, [_createElement($Ui_Breadcrumbs, { separator: `|` }, [_createElement($Ui_Breadcrumb, { label: `Home`, href: `/users` }), _createElement($Ui_Breadcrumb, { label: `New User`, href: `/users/new` })]), _createElement("div", {
+      className: `users-layout-wrapper`,
       style: {
 
       }
-    }, [this.children])
+    }, [_createElement("div", {
+      className: `users-layout-content`,
+      style: {
+
+      }
+    }, [this.children])])])
   }
 }
 
-$SubTitle.defaultProps = {
+$Users_Layout.displayName = "Users.Layout"
+
+$Users_Layout.defaultProps = {
   children: []
 }
 
-class $UserForm extends Component {
+class $Drag extends Component {
   constructor(props) {
     super(props)
     this.state = new Record({
-      saving: false
+      mousePosition: new Record({
+        left: 0,
+        top: 0
+      }),
+      startPosition: new Record({
+        left: 0,
+        top: 0
+      }),
+      dragging: false
     })
   }
 
-  get buttonLabel() {
-    return (this.state.saving ? (this.isNew ? `Creating` : `Saving`) : (this.isNew ? `Create` : `Save`))
+  setPosition (...params) { return $DragStore.setPosition(...params) }
+
+  get position () { return $DragStore.position }
+
+  componentWillUnmount () {
+    $DragStore._unsubscribe(this);$Provider_Mouse._unsubscribe(this)
   }
 
-  get disabled() {
-    return $String.isEmpty(this.user.firstName) || $String.isEmpty(this.user.lastName)
-  }
-
-  get title() {
-    return (this.isNew ? `Create User` : `Edit User`)
-  }
-
-  get deleteField() {
-    return (this.isNew ? [] : [_createElement($Ui_Form_Separator, {  }), _createElement($Ui_Button, { onClick: ((event) => {
-    return this.handleDelete.bind(this)()
-    }), type: `danger`, label: `Delete` })])
-  }
-
-  get isNew () {
-    if (this.props.isNew != undefined) {
-      return this.props.isNew
+  componentDidUpdate () {
+    if (this.state.dragging) {
+      $Provider_Mouse._subscribe(this, new Record({
+      moves: ((data) => {
+      return this.move.bind(this)(data)
+      }),
+      clicks: ((data) => {
+      return null
+      }),
+      ups: ((data) => {
+      return this.end.bind(this)()
+      })
+    }))
     } else {
-      return false
+      $Provider_Mouse._unsubscribe(this)
     }
   }
 
-  get theme () { return $Ui.theme }
-
-  get page () { return $Users_List.page }
-
-  refresh (...params) { return $Users_List.refresh(...params) }
-
-  get loading () { return $Users_List.loading }
-
-  get user () { return $Users_List.user }
-
-  saveUser (...params) { return $Users_List.saveUser(...params) }
-
-  setStatus (...params) { return $Users_List.setStatus(...params) }
-
-  setFirstName (...params) { return $Users_List.setFirstName(...params) }
-
-  setLastName (...params) { return $Users_List.setLastName(...params) }
-
-  get error () { return $Users_List.error }
-
-  createUser (...params) { return $Users_List.createUser(...params) }
-
-  deleteUser (...params) { return $Users_List.deleteUser(...params) }
-
-  componentWillUnmount () {
-    $Ui._unsubscribe(this);$Users_List._unsubscribe(this)
-  }
-
   componentDidMount () {
-    $Ui._subscribe(this);$Users_List._subscribe(this)
+    $DragStore._subscribe(this);if (this.state.dragging) {
+      $Provider_Mouse._subscribe(this, new Record({
+      moves: ((data) => {
+      return this.move.bind(this)(data)
+      }),
+      clicks: ((data) => {
+      return null
+      }),
+      ups: ((data) => {
+      return this.end.bind(this)()
+      })
+    }))
+    } else {
+      $Provider_Mouse._unsubscribe(this)
+    }
   }
 
-  create() {
-    return (async () => {
-            try {  await new Promise((_resolve) => {
-      this.setState(_update(this.state, { saving: true }), _resolve)
+  move(data) {
+    let diff = new Record({
+      left: this.state.mousePosition.left - data.pageX,
+      top: this.state.mousePosition.top - data.pageY
     })
 
-     await this.createUser.bind(this)()
+    return (this.state.dragging ? this.setPosition.bind(this)(new Record({
+      left: this.state.startPosition.left - diff.left,
+      top: this.state.startPosition.top - diff.top
+    })) : new Promise((_resolve) => {
+      this.setState(this.state, _resolve)
+    }))
+  }
+
+  end() {
+    return new Promise((_resolve) => {
+      this.setState(_update(this.state, { dragging: false }), _resolve)
+    })
+  }
+
+  start(event) {
+    let mousePosition = new Record({
+      left: event.pageX,
+      top: event.pageY
+    })
+
+    let startPosition = new Record({
+      left: this.position.left,
+      top: this.position.top
+    })
+
+    return (async () => {
+            try {  await $Html_Event.preventDefault(event)
 
      await new Promise((_resolve) => {
-      this.setState(_update(this.state, { saving: false }), _resolve)
-    })
-
-     await $Window.navigate(`/users`) }
+      this.setState(_update(this.state, { mousePosition: mousePosition, startPosition: startPosition, dragging: true }), _resolve)
+    }) }
             catch(_error) {
               if (_error instanceof DoError) {
               } else {
@@ -3021,77 +3544,19 @@ class $UserForm extends Component {
               }
             } 
           })()
-  }
-
-  save() {
-    return (async () => {
-            try {  await new Promise((_resolve) => {
-      this.setState(_update(this.state, { saving: true }), _resolve)
-    })
-
-     await this.saveUser.bind(this)()
-
-     await this.refresh.bind(this)()
-
-     await new Promise((_resolve) => {
-      this.setState(_update(this.state, { saving: false }), _resolve)
-    })
-
-     await $Window.navigate(`/users?page=` + $Number.toString(this.page)) }
-            catch(_error) {
-              if (_error instanceof DoError) {
-              } else {
-                console.warn(`Unhandled error in do statement`)
-                console.log(_error)
-              }
-            } 
-          })()
-  }
-
-  handleDelete() {
-    return (async () => {
-            try {  await this.deleteUser.bind(this)()
-
-     await $Window.navigate(`/users?page=` + $Number.toString(this.page)) }
-            catch(_error) {
-              if (_error instanceof DoError) {
-              } else {
-                console.warn(`Unhandled error in do statement`)
-                console.log(_error)
-              }
-            } 
-          })()
-  }
-
-  onClick(event) {
-    return (this.isNew ? this.create.bind(this)() : this.save.bind(this)())
-  }
-
-  onClearFirstName() {
-    return this.setFirstName.bind(this)(``)
-  }
-
-  onClearLastName() {
-    return this.setLastName.bind(this)(``)
   }
 
   render() {
-    return _createElement($Ui_Loader, { shown: this.loading }, [_createElement("div", {}, [_createElement("div", {
-      className: `user-form-title`,
+    return _createElement("div", {
+      onMouseDown: (event => (((event) => {
+      return this.start.bind(this)(event)
+      }))(_normalizeEvent(event))),
+      className: `drag-base`,
       style: {
-
+        [`--drag-base-transform`]: `translate3d(` + this.position.left + `px,` + this.position.top + `px, 0)`
       }
-    }, [this.title]), _createElement("div", {
-      className: `user-form-form`,
-      style: {
-
-      }
-    }, [_createElement($Ui_Form_Field, { label: `First Name` }, [_createElement($Ui_Input, { value: this.user.firstName, onInput: this.setFirstName.bind(this), onClear: this.onClearFirstName.bind(this), placeholder: `John` })]), _createElement($Ui_Form_Field, { label: `Last Name` }, [_createElement($Ui_Input, { value: this.user.lastName, onInput: this.setLastName.bind(this), onClear: this.onClearLastName.bind(this), placeholder: `Doe` })]), _createElement($Ui_Form_Field, { label: `Status` }, [_createElement($Ui_Toggle, { checked: _compare(this.user.status, `locked`), onChange: this.setStatus.bind(this), offLabel: `Locked`, onLabel: `Active`, width: 150 })]), _createElement($Ui_Button, { label: this.buttonLabel, onClick: this.onClick.bind(this), disabled: this.disabled }), this.deleteField])])])
+    }, [`DragMe`])
   }
-}
-
-$UserForm.defaultProps = {
-  isNew: false
 }
 
 class $Install extends Component {
@@ -3195,6 +3660,42 @@ class $Install extends Component {
 
       }
     }, [_createElement("li", {}, [_createElement($Ui_Link, { href: `https://s3-eu-west-1.amazonaws.com/mint-lang/mint-latest-linux`, label: `mint-latest-linux` })]), _createElement("li", {}, [_createElement($Ui_Link, { href: `https://s3-eu-west-1.amazonaws.com/mint-lang/mint-latest-osx`, label: `mint-latest-osx` })])])])])
+  }
+}
+
+class $Home extends Component {
+  get theme () { return $Ui.theme }
+
+  componentWillUnmount () {
+    $Ui._unsubscribe(this)
+  }
+
+  componentDidMount () {
+    $Ui._subscribe(this)
+  }
+
+  render() {
+    return _createElement("div", {
+      className: `home-base`,
+      style: {
+
+      }
+    }, [_createElement("div", {
+      className: `home-hero-media-0 home-hero`,
+      style: {
+
+      }
+    }, [_createElement($Logo, { fill: this.theme.colors.primary.background, mobileHeight: 60, mobileWidth: 250, textFill: `#222` }), _createElement("h2", {
+      className: `home-slogan-media-0 home-slogan`,
+      style: {
+
+      }
+    }, [`A refreshing language for the front-end web.`]), _createElement("div", {
+      className: `home-buttons`,
+      style: {
+
+      }
+    }, [_createElement($Ui_Link, { href: `/install` }, [_createElement($Ui_Button, { size: 22, label: `Install` })]), _createElement($Ui_Link, { href: `https://guide.mint-lang.com`, target: `_blank` }, [_createElement($Ui_Button, { size: 22, type: `secondary`, label: `Learn` })])])]), _createElement($Showcase, {  }), _createElement($CallToAction, {  })])
   }
 }
 
@@ -3335,43 +3836,160 @@ class $Roadmap extends Component {
   }
 }
 
-class $Home extends Component {
-  get theme () { return $Ui.theme }
-
-  componentWillUnmount () {
-    $Ui._unsubscribe(this)
+class $CallToAction extends Component {
+  get children () {
+    if (this.props.children != undefined) {
+      return this.props.children
+    } else {
+      return []
+    }
   }
 
-  componentDidMount () {
-    $Ui._subscribe(this)
+  get text () {
+    if (this.props.text != undefined) {
+      return this.props.text
+    } else {
+      return ``
+    }
   }
 
   render() {
     return _createElement("div", {
-      className: `home-base`,
+      className: `call-to-action-base`,
       style: {
 
       }
     }, [_createElement("div", {
-      className: `home-hero-media-0 home-hero`,
+      className: `call-to-action-text`,
       style: {
 
       }
-    }, [_createElement($Logo, { fill: this.theme.colors.primary.background, mobileHeight: 60, mobileWidth: 250, textFill: `#222` }), _createElement("h2", {
-      className: `home-slogan-media-0 home-slogan`,
+    }, [`Interested?`]), _createElement("div", {
+      className: `call-to-action-buttons`,
       style: {
 
       }
-    }, [`A refreshing language for the front-end web.`]), _createElement("div", {
-      className: `home-buttons`,
-      style: {
-
-      }
-    }, [_createElement($Ui_Link, { href: `/install` }, [_createElement($Ui_Button, { size: 22, label: `Install` })]), _createElement($Ui_Link, { href: `https://guide.mint-lang.com`, target: `_blank` }, [_createElement($Ui_Button, { size: 22, type: `secondary`, label: `Learn` })])])]), _createElement($Showcase, {  }), _createElement($CallToAction, {  })])
+    }, [_createElement($Ui_Link, { href: `/install` }, [_createElement($Ui_Button, { size: 20, type: `secondary`, label: `Install` })]), _createElement($Ui_Link, { href: `https://guide.mint-lang.com`, target: `_blank` }, [_createElement($Ui_Button, { size: 20, type: `secondary`, label: `Learn` })])])])
   }
 }
 
-class $Showcase_Block extends Component {
+$CallToAction.defaultProps = {
+  children: [],text: ``
+}
+
+class $Showcase_Highlight extends Component {
+  get border() {
+    return (_compare(this.over, this.name) ? `1px dashed rgba(0,0,0,0.6)` : `1px dashed rgba(0,0,0,0.1)`)
+  }
+
+  get color() {
+    return (_compare(this.active, this.name) ? `white` : ``)
+  }
+
+  get background() {
+    return (_compare(this.active, this.name) ? `#3aad57` : (_compare(this.over, this.name) ? `rgba(0,0,0,0.15)` : `rgba(0,0,0,0.07)`))
+  }
+
+  get text () {
+    if (this.props.text != undefined) {
+      return this.props.text
+    } else {
+      return ``
+    }
+  }
+
+  get name () {
+    if (this.props.name != undefined) {
+      return this.props.name
+    } else {
+      return ``
+    }
+  }
+
+  get active () { return $Showcase_Store.active }
+
+  get over () { return $Showcase_Store.over }
+
+  setActive (...params) { return $Showcase_Store.setActive(...params) }
+
+  setOver (...params) { return $Showcase_Store.setOver(...params) }
+
+  componentWillUnmount () {
+    $Showcase_Store._unsubscribe(this)
+  }
+
+  componentDidMount () {
+    $Showcase_Store._subscribe(this)
+  }
+
+  handleClick(event) {
+    return (async () => {
+            try {  await $Html_Event.stopPropagation(event)
+
+     await this.setActive.bind(this)(this.name) }
+            catch(_error) {
+              if (_error instanceof DoError) {
+              } else {
+                console.warn(`Unhandled error in do statement`)
+                console.log(_error)
+              }
+            } 
+          })()
+  }
+
+  handleMouseEnter(event) {
+    return (async () => {
+            try {  await $Html_Event.stopPropagation(event)
+
+     await this.setOver.bind(this)(this.name) }
+            catch(_error) {
+              if (_error instanceof DoError) {
+              } else {
+                console.warn(`Unhandled error in do statement`)
+                console.log(_error)
+              }
+            } 
+          })()
+  }
+
+  handleMouseLeave(event) {
+    return this.setOver.bind(this)(``)
+  }
+
+  render() {
+    return _createElement("div", {
+      onMouseLeave: (event => (this.handleMouseLeave.bind(this))(_normalizeEvent(event))),
+      onMouseOver: (event => (this.handleMouseEnter.bind(this))(_normalizeEvent(event))),
+      onClick: (event => (this.handleClick.bind(this))(_normalizeEvent(event))),
+      className: `showcase-highlight-base`,
+      style: {
+        [`--showcase-highlight-base-background`]: this.background,
+        [`--showcase-highlight-base-border`]: this.border,
+        [`--showcase-highlight-base-color`]: this.color
+      }
+    }, [this.text])
+  }
+}
+
+$Showcase_Highlight.displayName = "Showcase.Highlight"
+
+$Showcase_Highlight.defaultProps = {
+  text: ``,name: ``
+}
+
+class $Showcase_HighlightBlock extends Component {
+  get border() {
+    return (_compare(this.over, this.name) && !_compare(this.active, this.name) ? `1px dashed rgba(0,0,0,0.8)` : `1px dashed rgba(0,0,0,0.1)`)
+  }
+
+  get color() {
+    return (_compare(this.active, this.name) ? `white` : ``)
+  }
+
+  get background() {
+    return (_compare(this.active, this.name) ? `#3aad57` : (_compare(this.over, this.name) ? `rgba(0,0,0,0.15)` : `rgba(0,0,0,0.07)`))
+  }
+
   get children () {
     if (this.props.children != undefined) {
       return this.props.children
@@ -3396,6 +4014,14 @@ class $Showcase_Block extends Component {
     }
   }
 
+  get padding () {
+    if (this.props.padding != undefined) {
+      return this.props.padding
+    } else {
+      return `5px`
+    }
+  }
+
   get line () {
     if (this.props.line != undefined) {
       return this.props.line
@@ -3404,14 +4030,78 @@ class $Showcase_Block extends Component {
     }
   }
 
+  get name () {
+    if (this.props.name != undefined) {
+      return this.props.name
+    } else {
+      return ``
+    }
+  }
+
+  get active () { return $Showcase_Store.active }
+
+  get over () { return $Showcase_Store.over }
+
+  setActive (...params) { return $Showcase_Store.setActive(...params) }
+
+  setOver (...params) { return $Showcase_Store.setOver(...params) }
+
+  componentWillUnmount () {
+    $Showcase_Store._unsubscribe(this)
+  }
+
+  componentDidMount () {
+    $Showcase_Store._subscribe(this)
+  }
+
+  handleClick(event) {
+    return (async () => {
+            try {  await $Html_Event.stopPropagation(event)
+
+     await this.setActive.bind(this)(this.name) }
+            catch(_error) {
+              if (_error instanceof DoError) {
+              } else {
+                console.warn(`Unhandled error in do statement`)
+                console.log(_error)
+              }
+            } 
+          })()
+  }
+
+  handleMouseEnter(event) {
+    return (async () => {
+            try {  await $Html_Event.stopPropagation(event)
+
+     await this.setOver.bind(this)(this.name) }
+            catch(_error) {
+              if (_error instanceof DoError) {
+              } else {
+                console.warn(`Unhandled error in do statement`)
+                console.log(_error)
+              }
+            } 
+          })()
+  }
+
+  handleMouseLeave(event) {
+    return this.setOver.bind(this)(``)
+  }
+
   render() {
     return _createElement("div", {
-      className: `showcase-block-base`,
+      onMouseLeave: (event => (this.handleMouseLeave.bind(this))(_normalizeEvent(event))),
+      onMouseOver: (event => (this.handleMouseEnter.bind(this))(_normalizeEvent(event))),
+      onClick: (event => (this.handleClick.bind(this))(_normalizeEvent(event))),
+      className: `showcase-highlight-block-base-media-0 showcase-highlight-block-base`,
       style: {
-
+        [`--showcase-highlight-block-base-background`]: this.background,
+        [`--showcase-highlight-block-base-padding`]: this.padding,
+        [`--showcase-highlight-block-base-border`]: this.border,
+        [`--showcase-highlight-block-base-color`]: this.color
       }
     }, [_createElement("div", {}, [this.line + this.openingChar]), _createElement("div", {
-      className: `showcase-block-content`,
+      className: `showcase-highlight-block-content`,
       style: {
 
       }
@@ -3419,10 +4109,10 @@ class $Showcase_Block extends Component {
   }
 }
 
-$Showcase_Block.displayName = "Showcase.Block"
+$Showcase_HighlightBlock.displayName = "Showcase.HighlightBlock"
 
-$Showcase_Block.defaultProps = {
-  children: [],openingChar: ` {`,closingChar: `}`,line: ``
+$Showcase_HighlightBlock.defaultProps = {
+  children: [],openingChar: ` {`,closingChar: `}`,padding: `5px`,line: ``,name: ``
 }
 
 class $Showcase extends Component {
@@ -3630,160 +4320,7 @@ class $Showcase extends Component {
   }
 }
 
-class $Showcase_Highlight extends Component {
-  get border() {
-    return (_compare(this.over, this.name) ? `1px dashed rgba(0,0,0,0.6)` : `1px dashed rgba(0,0,0,0.1)`)
-  }
-
-  get color() {
-    return (_compare(this.active, this.name) ? `white` : ``)
-  }
-
-  get background() {
-    return (_compare(this.active, this.name) ? `#3aad57` : (_compare(this.over, this.name) ? `rgba(0,0,0,0.15)` : `rgba(0,0,0,0.07)`))
-  }
-
-  get text () {
-    if (this.props.text != undefined) {
-      return this.props.text
-    } else {
-      return ``
-    }
-  }
-
-  get name () {
-    if (this.props.name != undefined) {
-      return this.props.name
-    } else {
-      return ``
-    }
-  }
-
-  get active () { return $Showcase_Store.active }
-
-  get over () { return $Showcase_Store.over }
-
-  setActive (...params) { return $Showcase_Store.setActive(...params) }
-
-  setOver (...params) { return $Showcase_Store.setOver(...params) }
-
-  componentWillUnmount () {
-    $Showcase_Store._unsubscribe(this)
-  }
-
-  componentDidMount () {
-    $Showcase_Store._subscribe(this)
-  }
-
-  handleClick(event) {
-    return (async () => {
-            try {  await $Html_Event.stopPropagation(event)
-
-     await this.setActive.bind(this)(this.name) }
-            catch(_error) {
-              if (_error instanceof DoError) {
-              } else {
-                console.warn(`Unhandled error in do statement`)
-                console.log(_error)
-              }
-            } 
-          })()
-  }
-
-  handleMouseEnter(event) {
-    return (async () => {
-            try {  await $Html_Event.stopPropagation(event)
-
-     await this.setOver.bind(this)(this.name) }
-            catch(_error) {
-              if (_error instanceof DoError) {
-              } else {
-                console.warn(`Unhandled error in do statement`)
-                console.log(_error)
-              }
-            } 
-          })()
-  }
-
-  handleMouseLeave(event) {
-    return this.setOver.bind(this)(``)
-  }
-
-  render() {
-    return _createElement("div", {
-      onMouseLeave: (event => (this.handleMouseLeave.bind(this))(_normalizeEvent(event))),
-      onMouseOver: (event => (this.handleMouseEnter.bind(this))(_normalizeEvent(event))),
-      onClick: (event => (this.handleClick.bind(this))(_normalizeEvent(event))),
-      className: `showcase-highlight-base`,
-      style: {
-        [`--showcase-highlight-base-background`]: this.background,
-        [`--showcase-highlight-base-border`]: this.border,
-        [`--showcase-highlight-base-color`]: this.color
-      }
-    }, [this.text])
-  }
-}
-
-$Showcase_Highlight.displayName = "Showcase.Highlight"
-
-$Showcase_Highlight.defaultProps = {
-  text: ``,name: ``
-}
-
-class $CallToAction extends Component {
-  get children () {
-    if (this.props.children != undefined) {
-      return this.props.children
-    } else {
-      return []
-    }
-  }
-
-  get text () {
-    if (this.props.text != undefined) {
-      return this.props.text
-    } else {
-      return ``
-    }
-  }
-
-  render() {
-    return _createElement("div", {
-      className: `call-to-action-base`,
-      style: {
-
-      }
-    }, [_createElement("div", {
-      className: `call-to-action-text`,
-      style: {
-
-      }
-    }, [`Interested?`]), _createElement("div", {
-      className: `call-to-action-buttons`,
-      style: {
-
-      }
-    }, [_createElement($Ui_Link, { href: `/install` }, [_createElement($Ui_Button, { size: 20, type: `secondary`, label: `Install` })]), _createElement($Ui_Link, { href: `https://guide.mint-lang.com`, target: `_blank` }, [_createElement($Ui_Button, { size: 20, type: `secondary`, label: `Learn` })])])])
-  }
-}
-
-$CallToAction.defaultProps = {
-  children: [],text: ``
-}
-
-class $Showcase_HighlightBlock extends Component {
-  get border() {
-    return (_compare(this.over, this.name) && !_compare(this.active, this.name) ? `1px dashed rgba(0,0,0,0.8)` : `1px dashed rgba(0,0,0,0.1)`)
-  }
-
-  get color() {
-    return (_compare(this.active, this.name) ? `white` : ``)
-  }
-
-  get background() {
-    return (_compare(this.active, this.name) ? `#3aad57` : (_compare(this.over, this.name) ? `rgba(0,0,0,0.15)` : `rgba(0,0,0,0.07)`))
-  }
-
+class $Showcase_Block extends Component {
   get children () {
     if (this.props.children != undefined) {
       return this.props.children
@@ -3808,14 +4345,6 @@ class $Showcase_HighlightBlock extends Component {
     }
   }
 
-  get padding () {
-    if (this.props.padding != undefined) {
-      return this.props.padding
-    } else {
-      return `5px`
-    }
-  }
-
   get line () {
     if (this.props.line != undefined) {
       return this.props.line
@@ -3824,78 +4353,14 @@ class $Showcase_HighlightBlock extends Component {
     }
   }
 
-  get name () {
-    if (this.props.name != undefined) {
-      return this.props.name
-    } else {
-      return ``
-    }
-  }
-
-  get active () { return $Showcase_Store.active }
-
-  get over () { return $Showcase_Store.over }
-
-  setActive (...params) { return $Showcase_Store.setActive(...params) }
-
-  setOver (...params) { return $Showcase_Store.setOver(...params) }
-
-  componentWillUnmount () {
-    $Showcase_Store._unsubscribe(this)
-  }
-
-  componentDidMount () {
-    $Showcase_Store._subscribe(this)
-  }
-
-  handleClick(event) {
-    return (async () => {
-            try {  await $Html_Event.stopPropagation(event)
-
-     await this.setActive.bind(this)(this.name) }
-            catch(_error) {
-              if (_error instanceof DoError) {
-              } else {
-                console.warn(`Unhandled error in do statement`)
-                console.log(_error)
-              }
-            } 
-          })()
-  }
-
-  handleMouseEnter(event) {
-    return (async () => {
-            try {  await $Html_Event.stopPropagation(event)
-
-     await this.setOver.bind(this)(this.name) }
-            catch(_error) {
-              if (_error instanceof DoError) {
-              } else {
-                console.warn(`Unhandled error in do statement`)
-                console.log(_error)
-              }
-            } 
-          })()
-  }
-
-  handleMouseLeave(event) {
-    return this.setOver.bind(this)(``)
-  }
-
   render() {
     return _createElement("div", {
-      onMouseLeave: (event => (this.handleMouseLeave.bind(this))(_normalizeEvent(event))),
-      onMouseOver: (event => (this.handleMouseEnter.bind(this))(_normalizeEvent(event))),
-      onClick: (event => (this.handleClick.bind(this))(_normalizeEvent(event))),
-      className: `showcase-highlight-block-base-media-0 showcase-highlight-block-base`,
+      className: `showcase-block-base`,
       style: {
-        [`--showcase-highlight-block-base-background`]: this.background,
-        [`--showcase-highlight-block-base-padding`]: this.padding,
-        [`--showcase-highlight-block-base-border`]: this.border,
-        [`--showcase-highlight-block-base-color`]: this.color
+
       }
     }, [_createElement("div", {}, [this.line + this.openingChar]), _createElement("div", {
-      className: `showcase-highlight-block-content`,
+      className: `showcase-block-content`,
       style: {
 
       }
@@ -3903,259 +4368,170 @@ class $Showcase_HighlightBlock extends Component {
   }
 }
 
-$Showcase_HighlightBlock.displayName = "Showcase.HighlightBlock"
+$Showcase_Block.displayName = "Showcase.Block"
 
-$Showcase_HighlightBlock.defaultProps = {
-  children: [],openingChar: ` {`,closingChar: `}`,padding: `5px`,line: ``,name: ``
+$Showcase_Block.defaultProps = {
+  children: [],openingChar: ` {`,closingChar: `}`,line: ``
 }
 
-class $Logo extends Component {
-  get textFill () {
-    if (this.props.textFill != undefined) {
-      return this.props.textFill
+class $UserForm extends Component {
+  constructor(props) {
+    super(props)
+    this.state = new Record({
+      saving: false
+    })
+  }
+
+  get buttonLabel() {
+    return (this.state.saving ? (this.isNew ? `Creating` : `Saving`) : (this.isNew ? `Create` : `Save`))
+  }
+
+  get disabled() {
+    return $String.isEmpty(this.user.firstName) || $String.isEmpty(this.user.lastName)
+  }
+
+  get title() {
+    return (this.isNew ? `Create User` : `Edit User`)
+  }
+
+  get deleteField() {
+    return (this.isNew ? [] : [_createElement($Ui_Form_Separator, {  }), _createElement($Ui_Button, { onClick: ((event) => {
+    return this.handleDelete.bind(this)()
+    }), type: `danger`, label: `Delete` })])
+  }
+
+  get isNew () {
+    if (this.props.isNew != undefined) {
+      return this.props.isNew
     } else {
-      return `#000`
+      return false
     }
   }
 
-  get fill () {
-    if (this.props.fill != undefined) {
-      return this.props.fill
-    } else {
-      return `#000`
-    }
+  get theme () { return $Ui.theme }
+
+  get page () { return $Users_List.page }
+
+  refresh (...params) { return $Users_List.refresh(...params) }
+
+  get loading () { return $Users_List.loading }
+
+  get user () { return $Users_List.user }
+
+  saveUser (...params) { return $Users_List.saveUser(...params) }
+
+  setStatus (...params) { return $Users_List.setStatus(...params) }
+
+  setFirstName (...params) { return $Users_List.setFirstName(...params) }
+
+  setLastName (...params) { return $Users_List.setLastName(...params) }
+
+  get error () { return $Users_List.error }
+
+  createUser (...params) { return $Users_List.createUser(...params) }
+
+  deleteUser (...params) { return $Users_List.deleteUser(...params) }
+
+  componentWillUnmount () {
+    $Ui._unsubscribe(this);$Users_List._unsubscribe(this)
   }
 
-  get height () {
-    if (this.props.height != undefined) {
-      return this.props.height
-    } else {
-      return 90
-    }
+  componentDidMount () {
+    $Ui._subscribe(this);$Users_List._subscribe(this)
   }
 
-  get width () {
-    if (this.props.width != undefined) {
-      return this.props.width
-    } else {
-      return 370
-    }
+  create() {
+    return (async () => {
+            try {  await new Promise((_resolve) => {
+      this.setState(_update(this.state, { saving: true }), _resolve)
+    })
+
+     await this.createUser.bind(this)()
+
+     await new Promise((_resolve) => {
+      this.setState(_update(this.state, { saving: false }), _resolve)
+    })
+
+     await $Window.navigate(`/users`) }
+            catch(_error) {
+              if (_error instanceof DoError) {
+              } else {
+                console.warn(`Unhandled error in do statement`)
+                console.log(_error)
+              }
+            } 
+          })()
   }
 
-  get mobileHeight () {
-    if (this.props.mobileHeight != undefined) {
-      return this.props.mobileHeight
-    } else {
-      return 90
-    }
+  save() {
+    return (async () => {
+            try {  await new Promise((_resolve) => {
+      this.setState(_update(this.state, { saving: true }), _resolve)
+    })
+
+     await this.saveUser.bind(this)()
+
+     await this.refresh.bind(this)()
+
+     await new Promise((_resolve) => {
+      this.setState(_update(this.state, { saving: false }), _resolve)
+    })
+
+     await $Window.navigate(`/users?page=` + $Number.toString(this.page)) }
+            catch(_error) {
+              if (_error instanceof DoError) {
+              } else {
+                console.warn(`Unhandled error in do statement`)
+                console.log(_error)
+              }
+            } 
+          })()
   }
 
-  get mobileWidth () {
-    if (this.props.mobileWidth != undefined) {
-      return this.props.mobileWidth
-    } else {
-      return 370
-    }
+  handleDelete() {
+    return (async () => {
+            try {  await this.deleteUser.bind(this)()
+
+     await $Window.navigate(`/users?page=` + $Number.toString(this.page)) }
+            catch(_error) {
+              if (_error instanceof DoError) {
+              } else {
+                console.warn(`Unhandled error in do statement`)
+                console.log(_error)
+              }
+            } 
+          })()
+  }
+
+  onClick(event) {
+    return (this.isNew ? this.create.bind(this)() : this.save.bind(this)())
+  }
+
+  onClearFirstName() {
+    return this.setFirstName.bind(this)(``)
+  }
+
+  onClearLastName() {
+    return this.setLastName.bind(this)(``)
   }
 
   render() {
-    return _createElement("svg", {
-      viewBox: `0 0 370 90`,
-      height: `90`,
-      width: `370`,
-      className: `logo-base-media-0 logo-base`,
-      style: {
-        [`--logo-base-height`]: this.height + `px`,
-        [`--logo-base-width`]: this.width + `px`,
-        [`--logo-base-media-0-height`]: this.mobileHeight + `px`,
-        [`--logo-base-media-0-width`]: this.mobileWidth + `px`
-      }
-    }, [_createElement("path", {
-      d: `M84.082 87.484C78.584 68.76 61.48 49.421 41.624 42.668c19.855 6.446 33.906 16.269 43.375 35.914C85.304 15.348 27.268 31.617 1.304 0-10.304 80.424 58.73 97.307 84.082 87.484z`,
-      fill: this.fill
-    }), _createElement("path", {
-      d: `M177.222 25.537q6.198 0 11.529 2.603 5.454 2.48 8.801 7.81 3.347 5.331 3.347 13.14v39.67h-9.917V50.083q0-8.058-4.09-11.901-3.968-3.967-10.538-3.967-4.959 0-9.174 2.48-4.09 2.355-6.694 7.065-2.48 4.587-2.48 11.033V88.76h-9.917V50.083q0-8.058-4.09-11.901-3.967-3.967-10.538-3.967-4.462 0-8.677 2.355-4.215 2.232-6.942 7.066-2.728 4.835-2.728 12.025v33.1h-9.917V26.776h8.678l.62 9.67q3.223-5.455 8.43-8.183 5.33-2.727 11.404-2.727 6.818 0 12.52 3.1 5.827 3.099 8.802 9.049 2.728-5.95 8.926-9.05 6.198-3.099 12.645-3.099zM228.312 14.876q-3.348 0-5.455-1.983-1.983-2.108-1.983-5.455t1.983-5.33Q224.964 0 228.312 0q3.347 0 5.33 2.107 2.108 1.984 2.108 5.331 0 3.347-2.108 5.455-1.983 1.983-5.33 1.983zm4.958 73.884h-9.917V26.777h9.917V88.76zM286.406 25.537q10.537 0 17.355 6.075 6.818 6.074 6.818 17.479v39.67h-9.917V52.561q0-9.67-4.215-14.008-4.091-4.34-11.033-4.34-4.959 0-9.298 2.232-4.338 2.108-7.19 7.066-2.727 4.835-2.727 12.273V88.76h-9.917V26.777h8.677l.62 9.67q3.1-5.58 8.554-8.183 5.454-2.727 12.273-2.727zM370 84.421Q363.802 90 354.008 90q-7.562 0-12.396-4.09-4.711-4.092-4.835-12.522V35.331H324.38v-8.554h12.397V11.9l9.917-2.727v17.603h22.934v8.554h-22.934v36.322q0 4.463 2.48 6.818 2.603 2.231 6.818 2.231 5.95 0 10.537-4.586L370 84.42z`,
-      fill: this.textFill
-    })])
-  }
-}
-
-$Logo.defaultProps = {
-  textFill: `#000`,fill: `#000`,height: 90,width: 370,mobileHeight: 90,mobileWidth: 370
-}
-
-class $Examples_Example extends Component {
-  get description () {
-    if (this.props.description != undefined) {
-      return this.props.description
-    } else {
-      return ``
-    }
-  }
-
-  get title () {
-    if (this.props.title != undefined) {
-      return this.props.title
-    } else {
-      return ``
-    }
-  }
-
-  get href () {
-    if (this.props.href != undefined) {
-      return this.props.href
-    } else {
-      return ``
-    }
-  }
-
-  render() {
-    return _createElement("div", {
-      onClick: (event => (((event) => {
-      return $Window.navigate(this.href)
-      }))(_normalizeEvent(event))),
-      className: `examples-example-base`,
-      style: {
-
-      }
-    }, [_createElement("div", {
-      className: `examples-example-title`,
+    return _createElement($Ui_Loader, { shown: this.loading }, [_createElement("div", {}, [_createElement("div", {
+      className: `user-form-title`,
       style: {
 
       }
     }, [this.title]), _createElement("div", {
-      className: `examples-example-description`,
+      className: `user-form-form`,
       style: {
 
       }
-    }, [this.description])])
+    }, [_createElement($Ui_Form_Field, { label: `First Name` }, [_createElement($Ui_Input, { value: this.user.firstName, onInput: this.setFirstName.bind(this), onClear: this.onClearFirstName.bind(this), placeholder: `John` })]), _createElement($Ui_Form_Field, { label: `Last Name` }, [_createElement($Ui_Input, { value: this.user.lastName, onInput: this.setLastName.bind(this), onClear: this.onClearLastName.bind(this), placeholder: `Doe` })]), _createElement($Ui_Form_Field, { label: `Status` }, [_createElement($Ui_Toggle, { checked: _compare(this.user.status, `locked`), onChange: this.setStatus.bind(this), offLabel: `Locked`, onLabel: `Active`, width: 150 })]), _createElement($Ui_Button, { label: this.buttonLabel, onClick: this.onClick.bind(this), disabled: this.disabled }), this.deleteField])])])
   }
 }
 
-$Examples_Example.displayName = "Examples.Example"
-
-$Examples_Example.defaultProps = {
-  description: ``,title: ``,href: ``
-}
-
-class $Examples extends Component {
-  get userManagement () { return $Examples_Store.userManagement }
-
-  get drag () { return $Examples_Store.drag }
-
-  get fileHandling () { return $Examples_Store.fileHandling }
-
-  get counter () { return $Examples_Store.counter }
-
-  componentWillUnmount () {
-    $Examples_Store._unsubscribe(this)
-  }
-
-  componentDidMount () {
-    $Examples_Store._subscribe(this)
-  }
-
-  render() {
-    return _createElement($Page, {  }, [_createElement($Title, {  }, [`Examples`]), _createElement($SubTitle, {  }, [`Here you can find some examples that showcase the language features.`]), _createElement("hr", {
-      className: `examples-hr`,
-      style: {
-
-      }
-    }), _createElement("div", {
-      className: `examples-grid`,
-      style: {
-
-      }
-    }, [_createElement($Examples_Example, { description: this.userManagement.description, title: this.userManagement.title, href: this.userManagement.href }), _createElement($Examples_Example, { description: this.drag.description, title: this.drag.title, href: this.drag.href }), _createElement($Examples_Example, { description: this.counter.description, title: this.counter.title, href: this.counter.href }), _createElement($Examples_Example, { description: this.fileHandling.description, title: this.fileHandling.title, href: this.fileHandling.href })])])
-  }
-}
-
-class $Title extends Component {
-  get children () {
-    if (this.props.children != undefined) {
-      return this.props.children
-    } else {
-      return []
-    }
-  }
-
-  render() {
-    return _createElement("div", {
-      className: `title-base-media-0 title-base`,
-      style: {
-
-      }
-    }, [this.children])
-  }
-}
-
-$Title.defaultProps = {
-  children: []
-}
-
-class $UserRow extends Component {
-  get textDecoration() {
-    return (() => {
-      let condition = this.user.status
-      let branch0 = `locked`
-
-      switch (condition) {
-        case branch0:
-          return `line-through`
-        default:
-          return ``
-      }
-    })()
-  }
-
-  get user () {
-    if (this.props.user != undefined) {
-      return this.props.user
-    } else {
-      return new Record({
-      createdAt: $Time.now(),
-      updatedAt: $Time.now(),
-      firstName: ``,
-      lastName: ``,
-      status: ``,
-      id: 0
-    })
-    }
-  }
-
-  updateUserStatus (...params) { return $Users_List.updateUserStatus(...params) }
-
-  componentWillUnmount () {
-    $Users_List._unsubscribe(this)
-  }
-
-  componentDidMount () {
-    $Users_List._subscribe(this)
-  }
-
-  onChange(isLocked) {
-    return this.updateUserStatus.bind(this)(this.user, isLocked)
-  }
-
-  render() {
-    return _createElement("tr", {
-      className: `user-row-tr`,
-      style: {
-        [`--user-row-tr-a-text-decoration`]: this.textDecoration
-      }
-    }, [_createElement($Ui_Table_Td, {  }, [_createElement($Ui_Link, { href: `/users/` + $Number.toString(this.user.id) }, [$Number.toString(this.user.id)])]), _createElement($Ui_Table_Td, {  }, [_createElement($Ui_Link, { href: `/users/` + $Number.toString(this.user.id) }, [this.user.firstName + ` ` + this.user.lastName])]), _createElement($Ui_Table_Td, {  }, [$String.capitalize(this.user.status)]), _createElement($Ui_Table_Td, {  }, [_createElement($Ui_Time, { date: this.user.updatedAt })]), _createElement($Ui_Table_Td, { align: `center` }, [_createElement($Ui_Checkbox, { checked: _compare(this.user.status, `locked`), onChange: this.onChange.bind(this) })])])
-  }
-}
-
-$UserRow.defaultProps = {
-  user: new Record({
-    createdAt: $Time.now(),
-    updatedAt: $Time.now(),
-    firstName: ``,
-    lastName: ``,
-    status: ``,
-    id: 0
-  })
+$UserForm.defaultProps = {
+  isNew: false
 }
 
 class $Page extends Component {
@@ -4179,453 +4555,6 @@ class $Page extends Component {
 
 $Page.defaultProps = {
   children: []
-}
-
-class $Users_Layout extends Component {
-  get children () {
-    if (this.props.children != undefined) {
-      return this.props.children
-    } else {
-      return []
-    }
-  }
-
-  render() {
-    return _createElement("div", {}, [_createElement($Ui_Breadcrumbs, { separator: `|` }, [_createElement($Ui_Breadcrumb, { label: `Home`, href: `/users` }), _createElement($Ui_Breadcrumb, { label: `New User`, href: `/users/new` })]), _createElement("div", {
-      className: `users-layout-wrapper`,
-      style: {
-
-      }
-    }, [_createElement("div", {
-      className: `users-layout-content`,
-      style: {
-
-      }
-    }, [this.children])])])
-  }
-}
-
-$Users_Layout.displayName = "Users.Layout"
-
-$Users_Layout.defaultProps = {
-  children: []
-}
-
-class $Users_Table extends Component {
-  get loading () { return $Users_List.loading }
-
-  get users () { return $Users_List.users }
-
-  get page () { return $Users_List.page }
-
-  get perPage () { return $Users_List.perPage }
-
-  get error () { return $Users_List.error }
-
-  get theme () { return $Ui.theme }
-
-  componentWillUnmount () {
-    $Users_List._unsubscribe(this);$Ui._unsubscribe(this)
-  }
-
-  componentDidMount () {
-    $Users_List._subscribe(this);$Ui._subscribe(this)
-  }
-
-  setPage(a) {
-    return $Window.navigate(`/users?page=` + $Number.toString(a))
-  }
-
-  renderItem(item) {
-    return _createElement($UserRow, { key: $Number.toString(item.id), user: item })
-  }
-
-  render() {
-    let slicedUsers = $Array.slice(this.page * this.perPage, (this.page + 1) * this.perPage, this.users)
-
-    let rows = ($Array.isEmpty(slicedUsers) ? [_createElement("tr", {}, [_createElement("td", {
-      colspan: `5`
-    }, [_createElement("div", {
-      className: `users-table-empty`,
-      style: {
-
-      }
-    }, [`There are no users to display!`])])])] : $Array.map(this.renderItem.bind(this), slicedUsers))
-
-    return _createElement($Ui_Loader, { shown: this.loading }, [_createElement("div", {}, [_createElement("div", {
-      className: `users-table-header`,
-      style: {
-
-      }
-    }, [_createElement("div", {
-      className: `users-table-title`,
-      style: {
-
-      }
-    }, [`Users`])]), _createElement("table", {
-      className: `users-table-table`,
-      style: {
-        [`--users-table-table-border`]: `1px solid ` + this.theme.border.color,
-        [`--users-table-table-color`]: this.theme.colors.input.text,
-        [`--users-table-table-font-family`]: this.theme.fontFamily
-      }
-    }, [_createElement("thead", {}, [_createElement("tr", {}, [_createElement($Ui_Table_Th, { width: `40px` }, [`Id`]), _createElement($Ui_Table_Th, {  }, [`Name`]), _createElement($Ui_Table_Th, {  }, [`Status`]), _createElement($Ui_Table_Th, {  }, [`Last Updated`]), _createElement($Ui_Table_Th, { align: `center`, width: `70px` }, [`Active`])])]), _createElement("tbody", {}, [rows])]), _createElement($Ui_Pagination, { onChange: this.setPage.bind(this), page: this.page, total: $Array.size(this.users) })])])
-  }
-}
-
-$Users_Table.displayName = "Users.Table"
-
-class $Header extends Component {
-  get theme () { return $Ui.theme }
-
-  componentWillUnmount () {
-    $Ui._unsubscribe(this)
-  }
-
-  componentDidMount () {
-    $Ui._subscribe(this)
-  }
-
-  render() {
-    return _createElement("div", {
-      className: `header-base`,
-      style: {
-
-      }
-    }, [_createElement("div", {
-      className: `header-wrapper`,
-      style: {
-
-      }
-    }, [_createElement($Ui_Toolbar_Title, { href: `/` }, [_createElement($Logo, { fill: this.theme.colors.primary.background, mobileHeight: 20, mobileWidth: 82, textFill: `#FFF`, height: 20, width: 82 })]), _createElement($Ui_Toolbar_Spacer, {  }), _createElement("div", {
-      className: `header-desktop-media-0 header-desktop`,
-      style: {
-
-      }
-    }, [_createElement($Ui_Link, { href: `/install`, label: `Install` }), _createElement($Ui_Toolbar_Separator, {  }), _createElement($Ui_Link, { href: `https://guide.mint-lang.com`, target: `_blank`, label: `Learn` }), _createElement($Ui_Toolbar_Separator, {  }), _createElement($Ui_Link, { href: `/examples`, label: `Examples` }), _createElement($Ui_Toolbar_Separator, {  }), _createElement($Ui_Link, { href: `/roadmap`, label: `Roadmap` })])])])
-  }
-}
-
-class $Footer extends Component {
-  render() {
-    return _createElement("div", {
-      className: `footer-base`,
-      style: {
-
-      }
-    }, [_createElement("div", {
-      className: `footer-wrapper`,
-      style: {
-
-      }
-    }, [_createElement("div", {
-      className: `footer-column`,
-      style: {
-
-      }
-    }, [_createElement("div", {
-      className: `footer-title`,
-      style: {
-
-      }
-    }, [`Source`]), _createElement($Ui_Link, { href: `https://github.com/mint-lang/mint`, label: `Github Repository`, target: `_blank` }), _createElement($Ui_Link, { href: `https://github.com/mint-lang/mint/releases`, label: `Releases / Changelog`, target: `_blank` })]), _createElement("div", {
-      className: `footer-column`,
-      style: {
-
-      }
-    }, [_createElement("div", {
-      className: `footer-title`,
-      style: {
-
-      }
-    }, [`Community`]), _createElement($Ui_Link, { href: `https://gitter.im/mint-lang/Lobby`, target: `_blank`, label: `Gitter` })])])])
-  }
-}
-
-class $Example extends Component {
-  get children () {
-    if (this.props.children != undefined) {
-      return this.props.children
-    } else {
-      return []
-    }
-  }
-
-  get subTitle () {
-    if (this.props.subTitle != undefined) {
-      return this.props.subTitle
-    } else {
-      return ``
-    }
-  }
-
-  get title () {
-    if (this.props.title != undefined) {
-      return this.props.title
-    } else {
-      return ``
-    }
-  }
-
-  render() {
-    return _createElement($Page, {  }, [_createElement($Title, {  }, [this.title]), _createElement($SubTitle, {  }, [this.subTitle]), _createElement("div", {
-      className: `example-frame`,
-      style: {
-
-      }
-    }, [this.children])])
-  }
-}
-
-$Example.defaultProps = {
-  children: [],subTitle: ``,title: ``
-}
-
-class $Counter extends Component {
-  get background() {
-    return (this.counter >= 10 ? `lightgreen` : (this.counter < 0 ? `orangered` : `#F2F2F2`))
-  }
-
-  get disabled () {
-    if (this.props.disabled != undefined) {
-      return this.props.disabled
-    } else {
-      return false
-    }
-  }
-
-  increment (...params) { return $Counter_Store.increment(...params) }
-
-  decrement (...params) { return $Counter_Store.decrement(...params) }
-
-  get counter () { return $Counter_Store.counter }
-
-  componentWillUnmount () {
-    $Counter_Store._unsubscribe(this)
-  }
-
-  componentDidMount () {
-    $Counter_Store._subscribe(this)
-  }
-
-  render() {
-    return _createElement("div", {
-      className: `counter-base`,
-      style: {
-        [`--counter-base-background`]: this.background
-      }
-    }, [_createElement("button", {
-      onClick: (event => (((event) => {
-      return this.decrement.bind(this)()
-      }))(_normalizeEvent(event))),
-      disabled: this.disabled
-    }, [`Decrement`]), _createElement("span", {
-      className: `counter-counter`,
-      style: {
-
-      }
-    }, [$Number.toString(this.counter)]), _createElement("button", {
-      onClick: (event => (((event) => {
-      return this.increment.bind(this)()
-      }))(_normalizeEvent(event))),
-      disabled: this.disabled
-    }, [`Increment`])])
-  }
-}
-
-$Counter.defaultProps = {
-  disabled: false
-}
-
-class $Drag extends Component {
-  constructor(props) {
-    super(props)
-    this.state = new Record({
-      mousePosition: new Record({
-        left: 0,
-        top: 0
-      }),
-      startPosition: new Record({
-        left: 0,
-        top: 0
-      }),
-      dragging: false
-    })
-  }
-
-  setPosition (...params) { return $DragStore.setPosition(...params) }
-
-  get position () { return $DragStore.position }
-
-  componentWillUnmount () {
-    $DragStore._unsubscribe(this);$Provider_Mouse._unsubscribe(this)
-  }
-
-  componentDidUpdate () {
-    if (this.state.dragging) {
-      $Provider_Mouse._subscribe(this, new Record({
-      moves: ((data) => {
-      return this.move.bind(this)(data)
-      }),
-      clicks: ((data) => {
-      return null
-      }),
-      ups: ((data) => {
-      return this.end.bind(this)()
-      })
-    }))
-    } else {
-      $Provider_Mouse._unsubscribe(this)
-    }
-  }
-
-  componentDidMount () {
-    $DragStore._subscribe(this);if (this.state.dragging) {
-      $Provider_Mouse._subscribe(this, new Record({
-      moves: ((data) => {
-      return this.move.bind(this)(data)
-      }),
-      clicks: ((data) => {
-      return null
-      }),
-      ups: ((data) => {
-      return this.end.bind(this)()
-      })
-    }))
-    } else {
-      $Provider_Mouse._unsubscribe(this)
-    }
-  }
-
-  move(data) {
-    let diff = new Record({
-      left: this.state.mousePosition.left - data.pageX,
-      top: this.state.mousePosition.top - data.pageY
-    })
-
-    return (this.state.dragging ? this.setPosition.bind(this)(new Record({
-      left: this.state.startPosition.left - diff.left,
-      top: this.state.startPosition.top - diff.top
-    })) : new Promise((_resolve) => {
-      this.setState(this.state, _resolve)
-    }))
-  }
-
-  end() {
-    return new Promise((_resolve) => {
-      this.setState(_update(this.state, { dragging: false }), _resolve)
-    })
-  }
-
-  start(event) {
-    let mousePosition = new Record({
-      left: event.pageX,
-      top: event.pageY
-    })
-
-    let startPosition = new Record({
-      left: this.position.left,
-      top: this.position.top
-    })
-
-    return (async () => {
-            try {  await $Html_Event.preventDefault(event)
-
-     await new Promise((_resolve) => {
-      this.setState(_update(this.state, { mousePosition: mousePosition, startPosition: startPosition, dragging: true }), _resolve)
-    }) }
-            catch(_error) {
-              if (_error instanceof DoError) {
-              } else {
-                console.warn(`Unhandled error in do statement`)
-                console.log(_error)
-              }
-            } 
-          })()
-  }
-
-  render() {
-    return _createElement("div", {
-      onMouseDown: (event => (((event) => {
-      return this.start.bind(this)(event)
-      }))(_normalizeEvent(event))),
-      className: `drag-base`,
-      style: {
-        [`--drag-base-transform`]: `translate3d(` + this.position.left + `px,` + this.position.top + `px, 0)`
-      }
-    }, [`DragMe`])
-  }
-}
-
-class $Ui_Table_Td extends Component {
-  get borderBottom() {
-    return (this.header ? `2px solid ` + this.theme.border.color : ``)
-  }
-
-  get fontWeight() {
-    return (this.header ? `bold` : `normal`)
-  }
-
-  get children () {
-    if (this.props.children != undefined) {
-      return this.props.children
-    } else {
-      return []
-    }
-  }
-
-  get align () {
-    if (this.props.align != undefined) {
-      return this.props.align
-    } else {
-      return `left`
-    }
-  }
-
-  get width () {
-    if (this.props.width != undefined) {
-      return this.props.width
-    } else {
-      return `auto`
-    }
-  }
-
-  get header () {
-    if (this.props.header != undefined) {
-      return this.props.header
-    } else {
-      return false
-    }
-  }
-
-  get theme () { return $Ui.theme }
-
-  componentWillUnmount () {
-    $Ui._unsubscribe(this)
-  }
-
-  componentDidMount () {
-    $Ui._subscribe(this)
-  }
-
-  render() {
-    return _createElement("td", {
-      className: `ui-table-td-td`,
-      style: {
-        [`--ui-table-td-td-border`]: `1px solid ` + this.theme.border.color,
-        [`--ui-table-td-td-border-bottom`]: this.borderBottom,
-        [`--ui-table-td-td-font-weight`]: this.fontWeight,
-        [`--ui-table-td-td-text-align`]: this.align,
-        [`--ui-table-td-td-width`]: this.width
-      }
-    }, [this.children])
-  }
-}
-
-$Ui_Table_Td.displayName = "Ui.Table.Td"
-
-$Ui_Table_Td.defaultProps = {
-  children: [],align: `left`,width: `auto`,header: false
 }
 
 class $Ui_Table_Th extends Component {
@@ -4662,723 +4591,6 @@ $Ui_Table_Th.displayName = "Ui.Table.Th"
 
 $Ui_Table_Th.defaultProps = {
   align: `left`,width: `auto`,children: []
-}
-
-class $Ui_Loader extends Component {
-  get pointerEvents() {
-    return (this.shown ? `` : `none`)
-  }
-
-  get opacity() {
-    return (this.shown ? 1 : 0)
-  }
-
-  get children () {
-    if (this.props.children != undefined) {
-      return this.props.children
-    } else {
-      return []
-    }
-  }
-
-  get shown () {
-    if (this.props.shown != undefined) {
-      return this.props.shown
-    } else {
-      return false
-    }
-  }
-
-  render() {
-    return _createElement("div", {
-      className: `ui-loader-base`,
-      style: {
-
-      }
-    }, [this.children, _createElement("div", {
-      className: `ui-loader-loader`,
-      style: {
-        [`--ui-loader-loader-pointer-events`]: this.pointerEvents,
-        [`--ui-loader-loader-opacity`]: this.opacity
-      }
-    }, [`Loading...`])])
-  }
-}
-
-$Ui_Loader.displayName = "Ui.Loader"
-
-$Ui_Loader.defaultProps = {
-  children: [],shown: false
-}
-
-class $Ui_Link extends Component {
-  get colors() {
-    return (() => {
-      let condition = this.type
-      let branch0 = `secondary`
-      let branch1 = `warning`
-      let branch2 = `success`
-      let branch3 = `primary`
-      let branch4 = `danger`
-      let branch5 = `inherit`
-
-      switch (condition) {
-        case branch0:
-          return this.theme.colors.secondary
-        case branch1:
-          return this.theme.colors.warning
-        case branch2:
-          return this.theme.colors.success
-        case branch3:
-          return this.theme.colors.primary
-        case branch4:
-          return this.theme.colors.danger
-        case branch5:
-          return new Record({
-          background: `inherit`,
-          focus: `inherit`,
-          text: `inherit`
-        })
-        default:
-          return new Record({
-          background: ``,
-          focus: ``,
-          text: ``
-        })
-      }
-    })()
-  }
-
-  get children () {
-    if (this.props.children != undefined) {
-      return this.props.children
-    } else {
-      return []
-    }
-  }
-
-  get type () {
-    if (this.props.type != undefined) {
-      return this.props.type
-    } else {
-      return `primary`
-    }
-  }
-
-  get target () {
-    if (this.props.target != undefined) {
-      return this.props.target
-    } else {
-      return ``
-    }
-  }
-
-  get label () {
-    if (this.props.label != undefined) {
-      return this.props.label
-    } else {
-      return ``
-    }
-  }
-
-  get href () {
-    if (this.props.href != undefined) {
-      return this.props.href
-    } else {
-      return ``
-    }
-  }
-
-  get theme () { return $Ui.theme }
-
-  componentWillUnmount () {
-    $Ui._unsubscribe(this)
-  }
-
-  componentDidMount () {
-    $Ui._subscribe(this)
-  }
-
-  sameOrigin() {
-    let windowUrl = $Window.url()
-
-    let url = $Url.parse(this.href)
-
-    return !_compare(windowUrl.origin, url.origin)
-  }
-
-  onClick(event) {
-    return (event.ctrlKey || _compare(event.button, 1) || this.sameOrigin.bind(this)() ? null : ($String.isEmpty(this.href) ? $Html_Event.preventDefault(event) : (async () => {
-            try {  await $Html_Event.preventDefault(event)
-
-     await $Window.navigate(this.href) }
-            catch(_error) {
-              if (_error instanceof DoError) {
-              } else {
-                console.warn(`Unhandled error in do statement`)
-                console.log(_error)
-              }
-            } 
-          })()))
-  }
-
-  render() {
-    return _createElement("a", {
-      onClick: (event => (this.onClick.bind(this))(_normalizeEvent(event))),
-      target: this.target,
-      href: this.href,
-      className: `ui-link-base`,
-      style: {
-        [`--ui-link-base-color`]: this.colors.background,
-        [`--ui-link-base-hover-color`]: this.colors.focus,
-        [`--ui-link-base-focus-color`]: this.colors.focus
-      }
-    }, [this.label, this.children])
-  }
-}
-
-$Ui_Link.displayName = "Ui.Link"
-
-$Ui_Link.defaultProps = {
-  children: [],type: `primary`,target: ``,label: ``,href: ``
-}
-
-class $Ui_Checkbox extends Component {
-  get opacity() {
-    return (this.checked ? `1` : `0`)
-  }
-
-  get transform() {
-    return (this.checked ? `scale(1)` : `scale(0.4) rotate(45deg)`)
-  }
-
-  get onChange () {
-    if (this.props.onChange != undefined) {
-      return this.props.onChange
-    } else {
-      return ((value) => {
-    return null
-    })
-    }
-  }
-
-  get disabled () {
-    if (this.props.disabled != undefined) {
-      return this.props.disabled
-    } else {
-      return false
-    }
-  }
-
-  get readonly () {
-    if (this.props.readonly != undefined) {
-      return this.props.readonly
-    } else {
-      return false
-    }
-  }
-
-  get checked () {
-    if (this.props.checked != undefined) {
-      return this.props.checked
-    } else {
-      return false
-    }
-  }
-
-  get theme () { return $Ui.theme }
-
-  componentWillUnmount () {
-    $Ui._unsubscribe(this)
-  }
-
-  componentDidMount () {
-    $Ui._subscribe(this)
-  }
-
-  toggle() {
-    return this.onChange($Bool.not(this.checked))
-  }
-
-  render() {
-    return _createElement("button", {
-      disabled: this.disabled,
-      onClick: (event => (((event) => {
-      return this.toggle.bind(this)()
-      }))(_normalizeEvent(event))),
-      className: `ui-checkbox-base`,
-      style: {
-        [`--ui-checkbox-base-background-color`]: this.theme.colors.input.background,
-        [`--ui-checkbox-base-border`]: `1px solid ` + this.theme.border.color,
-        [`--ui-checkbox-base-border-radius`]: this.theme.border.radius,
-        [`--ui-checkbox-base-color`]: this.theme.colors.input.text,
-        [`--ui-checkbox-base-focus-box-shadow`]: `0 0 2px ` + this.theme.outline.fadedColor + ` inset,
-                          0 0 2px ` + this.theme.outline.fadedColor,
-        [`--ui-checkbox-base-focus-border-color`]: this.theme.outline.color,
-        [`--ui-checkbox-base-focus-color`]: this.theme.outline.color,
-        [`--ui-checkbox-base-disabled-background`]: this.theme.colors.disabled.background,
-        [`--ui-checkbox-base-disabled-color`]: this.theme.colors.disabled.text
-      }
-    }, [_createElement("svg", {
-      viewBox: `0 0 36 36`,
-      className: `ui-checkbox-icon`,
-      style: {
-        [`--ui-checkbox-icon-transform`]: this.transform,
-        [`--ui-checkbox-icon-opacity`]: this.opacity
-      }
-    }, [_createElement("path", {
-      d: `M35.792 5.332L31.04 1.584c-.147-.12-.33-.208-.537-.208-.207 0-.398.087-.545.217l-17.286 22.21S5.877 17.27 5.687 17.08c-.19-.19-.442-.51-.822-.51-.38 0-.554.268-.753.467-.148.156-2.57 2.7-3.766 3.964-.07.077-.112.12-.173.18-.104.148-.173.313-.173.494 0 .19.07.347.173.494l.242.225s12.058 11.582 12.257 11.78c.2.2.442.45.797.45.345 0 .63-.37.795-.536l21.562-27.7c.104-.146.173-.31.173-.5 0-.217-.087-.4-.208-.555z`
-    })])])
-  }
-}
-
-$Ui_Checkbox.displayName = "Ui.Checkbox"
-
-$Ui_Checkbox.defaultProps = {
-  onChange: ((value) => {
-  return null
-  }),disabled: false,readonly: false,checked: false
-}
-
-class $Ui_Form_Separator extends Component {
-  render() {
-    return _createElement("div", {
-      className: `ui-form-separator-base`,
-      style: {
-
-      }
-    })
-  }
-}
-
-$Ui_Form_Separator.displayName = "Ui.Form.Separator"
-
-class $Ui_Calendar extends Component {
-  get nextMonthIcon() {
-    return _createElement($Ui_Icon_Path, { onClick: ((event) => {
-    return this.nextMonth.bind(this)()
-    }), viewbox: `0 0 9 16`, height: `16px`, width: `9px`, path: `M6 8L.1 1.78c-.14-.16-.14-.4.02-.57L1.17.13c.15-.16.4-.16.54 0l7.2 7.6c.07.07.1.18.1.28 0 .1-.03.2-.1.3l-7.2 7.6c-.14.14-.38.14-.53-.02l-1.05-1.1c-.16-.15-.16-.4 0-.56L5.98 8z` })
-  }
-
-  get previousMonthIcon() {
-    return _createElement($Ui_Icon_Path, { onClick: ((event) => {
-    return this.previousMonth.bind(this)()
-    }), viewbox: `0 0 9 16`, height: `16px`, width: `9px`, path: `M3 8l5.9-6.22c.14-.16.14-.4-.02-.57L7.83.13c-.15-.16-.4-.16-.54 0L.1 7.7c-.07.07-.1.17-.1.28 0 .1.03.2.1.3l7.2 7.6c.14.14.38.14.53-.02l1.05-1.1c.16-.15.16-.4 0-.56L3.02 8z` })
-  }
-
-  get onMonthChange () {
-    if (this.props.onMonthChange != undefined) {
-      return this.props.onMonthChange
-    } else {
-      return ((date) => {
-    return null
-    })
-    }
-  }
-
-  get onChange () {
-    if (this.props.onChange != undefined) {
-      return this.props.onChange
-    } else {
-      return ((day) => {
-    return null
-    })
-    }
-  }
-
-  get changeMonthOnSelect () {
-    if (this.props.changeMonthOnSelect != undefined) {
-      return this.props.changeMonthOnSelect
-    } else {
-      return false
-    }
-  }
-
-  get month () {
-    if (this.props.month != undefined) {
-      return this.props.month
-    } else {
-      return $Time.today()
-    }
-  }
-
-  get date () {
-    if (this.props.date != undefined) {
-      return this.props.date
-    } else {
-      return $Time.today()
-    }
-  }
-
-  get disabled () {
-    if (this.props.disabled != undefined) {
-      return this.props.disabled
-    } else {
-      return false
-    }
-  }
-
-  get theme () { return $Ui.theme }
-
-  componentWillUnmount () {
-    $Ui._unsubscribe(this)
-  }
-
-  componentDidMount () {
-    $Ui._subscribe(this)
-  }
-
-  days() {
-    let startDate = $Time.startOf(`week`, $Time.startOf(`month`, this.month))
-
-    let endDate = $Time.endOf(`week`, $Time.endOf(`month`, this.month))
-
-    return $Time.range(startDate, endDate)
-  }
-
-  onCellClick(day) {
-    return (!_compare($Time.month(day), $Time.month(this.month)) && this.changeMonthOnSelect ? (async () => {
-            try {  await this.onMonthChange(day)
-
-     await this.onChange(day) }
-            catch(_error) {
-              if (_error instanceof DoError) {
-              } else {
-                console.warn(`Unhandled error in do statement`)
-                console.log(_error)
-              }
-            } 
-          })() : this.onChange(day))
-  }
-
-  cells() {
-    let range = $Time.range($Time.startOf(`month`, this.month), $Time.endOf(`month`, this.month))
-
-    return $Array.map(((day) => {
-    return _createElement($Ui_Calendar_Cell, { active: $Array.any(((item) => {
-    return _compare(day, item)
-    }), range), selected: _compare(this.date, day), onClick: this.onCellClick.bind(this), day: day })
-    }), this.days.bind(this)())
-  }
-
-  dayName(day) {
-    return _createElement("div", {
-      className: `ui-calendar-day-name`,
-      style: {
-
-      }
-    }, [$Time.format(`ddd`, day)])
-  }
-
-  dayNames() {
-    return $Array.map(this.dayName.bind(this), $Time.range($Time.startOf(`week`, this.date), $Time.endOf(`week`, this.date)))
-  }
-
-  previousMonth() {
-    return this.onMonthChange($Time.previousMonth(this.month))
-  }
-
-  nextMonth() {
-    return this.onMonthChange($Time.nextMonth(this.month))
-  }
-
-  render() {
-    return _createElement("div", {
-      className: `ui-calendar-base`,
-      style: {
-        [`--ui-calendar-base-background`]: this.theme.colors.input.background,
-        [`--ui-calendar-base-border`]: `1px solid ` + this.theme.border.color,
-        [`--ui-calendar-base-border-radius`]: this.theme.border.radius,
-        [`--ui-calendar-base-color`]: this.theme.colors.input.text,
-        [`--ui-calendar-base-font-family`]: this.theme.fontFamily
-      }
-    }, [_createElement("div", {
-      className: `ui-calendar-header`,
-      style: {
-
-      }
-    }, [this.previousMonthIcon, _createElement("div", {
-      className: `ui-calendar-text`,
-      style: {
-
-      }
-    }, [$Time.format(`MMMM - YYYY`, this.month)]), this.nextMonthIcon]), _createElement("div", {
-      className: `ui-calendar-day-names`,
-      style: {
-        [`--ui-calendar-day-names-border-bottom`]: `1px dashed ` + this.theme.border.color,
-        [`--ui-calendar-day-names-border-top`]: `1px dashed ` + this.theme.border.color
-      }
-    }, [this.dayNames.bind(this)()]), _createElement("div", {
-      className: `ui-calendar-table`,
-      style: {
-
-      }
-    }, [this.cells.bind(this)()])])
-  }
-}
-
-$Ui_Calendar.displayName = "Ui.Calendar"
-
-$Ui_Calendar.defaultProps = {
-  onMonthChange: ((date) => {
-  return null
-  }),onChange: ((day) => {
-  return null
-  }),changeMonthOnSelect: false,month: $Time.today(),date: $Time.today(),disabled: false
-}
-
-class $Ui_Dropdown extends Component {
-  constructor(props) {
-    super(props)
-    this.state = new Record({
-      uid: $Uid.generate(),
-      left: 0,
-      top: 0
-    })
-  }
-
-  get panel() {
-    return _createElement("div", {
-      id: this.state.uid,
-      className: `ui-dropdown-panel`,
-      style: {
-        [`--ui-dropdown-panel-left`]: this.state.left + `px`,
-        [`--ui-dropdown-panel-top`]: this.state.top + `px`
-      }
-    }, [this.children])
-  }
-
-  get panelPortal() {
-    return (this.open ? _createElement($Html_Portals_Body, {  }, [this.panel]) : $Html.empty())
-  }
-
-  get element () {
-    if (this.props.element != undefined) {
-      return this.props.element
-    } else {
-      return $Html.empty()
-    }
-  }
-
-  get children () {
-    if (this.props.children != undefined) {
-      return this.props.children
-    } else {
-      return []
-    }
-  }
-
-  get open () {
-    if (this.props.open != undefined) {
-      return this.props.open
-    } else {
-      return true
-    }
-  }
-
-  componentWillUnmount () {
-    $Provider_Mouse._unsubscribe(this);$Provider_AnimationFrame._unsubscribe(this)
-  }
-
-  componentDidUpdate () {
-    if (this.open) {
-      $Provider_Mouse._subscribe(this, new Record({
-      clicks: ((event) => {
-      return null
-      }),
-      moves: ((data) => {
-      return null
-      }),
-      ups: ((data) => {
-      return null
-      })
-    }))
-    } else {
-      $Provider_Mouse._unsubscribe(this)
-    };if (this.open) {
-      $Provider_AnimationFrame._subscribe(this, new Record({
-      frames: this.updateDimensions.bind(this)
-    }))
-    } else {
-      $Provider_AnimationFrame._unsubscribe(this)
-    }
-  }
-
-  componentDidMount () {
-    if (this.open) {
-      $Provider_Mouse._subscribe(this, new Record({
-      clicks: ((event) => {
-      return null
-      }),
-      moves: ((data) => {
-      return null
-      }),
-      ups: ((data) => {
-      return null
-      })
-    }))
-    } else {
-      $Provider_Mouse._unsubscribe(this)
-    };if (this.open) {
-      $Provider_AnimationFrame._subscribe(this, new Record({
-      frames: this.updateDimensions.bind(this)
-    }))
-    } else {
-      $Provider_AnimationFrame._unsubscribe(this)
-    }
-  }
-
-  updateDimensions() {
-    let dom = $Maybe.withDefault($Dom.createElement(`div`), $Dom.getElementById(this.state.uid))
-
-    let width = $Window.width()
-
-    let height = $Window.height()
-
-    let panelDimensions = $Dom.getDimensions(dom)
-
-    let dimensions = $Dom.getDimensions(ReactDOM.findDOMNode(this))
-
-    let top = dimensions.top + dimensions.height
-
-    let left = dimensions.left
-
-    return new Promise((_resolve) => {
-      this.setState(_update(this.state, { top: top, left: left }), _resolve)
-    })
-  }
-
-  render() {
-    return [this.element, this.panelPortal]
-  }
-}
-
-$Ui_Dropdown.displayName = "Ui.Dropdown"
-
-$Ui_Dropdown.defaultProps = {
-  element: $Html.empty(),children: [],open: true
-}
-
-class $Ui_Breadcrumb extends Component {
-  get children () {
-    if (this.props.children != undefined) {
-      return this.props.children
-    } else {
-      return []
-    }
-  }
-
-  get target () {
-    if (this.props.target != undefined) {
-      return this.props.target
-    } else {
-      return ``
-    }
-  }
-
-  get label () {
-    if (this.props.label != undefined) {
-      return this.props.label
-    } else {
-      return ``
-    }
-  }
-
-  get type () {
-    if (this.props.type != undefined) {
-      return this.props.type
-    } else {
-      return ``
-    }
-  }
-
-  get href () {
-    if (this.props.href != undefined) {
-      return this.props.href
-    } else {
-      return ``
-    }
-  }
-
-  get theme () { return $Ui.theme }
-
-  componentWillUnmount () {
-    $Ui._unsubscribe(this)
-  }
-
-  componentDidMount () {
-    $Ui._subscribe(this)
-  }
-
-  render() {
-    return _createElement("div", {
-      className: `ui-breadcrumb-base`,
-      style: {
-        [`--ui-breadcrumb-base-hover-color`]: this.theme.hover.color,
-        [`--ui-breadcrumb-base-a-focus-color`]: this.theme.hover.color
-      }
-    }, [_createElement($Ui_Link, { children: this.children, target: this.target, type: `inherit`, label: this.label, href: this.href })])
-  }
-}
-
-$Ui_Breadcrumb.displayName = "Ui.Breadcrumb"
-
-$Ui_Breadcrumb.defaultProps = {
-  children: [],target: ``,label: ``,type: ``,href: ``
-}
-
-class $Ui_Breadcrumbs extends Component {
-  get span() {
-    return _createElement("span", {
-      className: `ui-breadcrumbs-separator`,
-      style: {
-
-      }
-    }, [this.separator])
-  }
-
-  get children () {
-    if (this.props.children != undefined) {
-      return this.props.children
-    } else {
-      return []
-    }
-  }
-
-  get separator () {
-    if (this.props.separator != undefined) {
-      return this.props.separator
-    } else {
-      return `|`
-    }
-  }
-
-  get theme () { return $Ui.theme }
-
-  componentWillUnmount () {
-    $Ui._unsubscribe(this)
-  }
-
-  componentDidMount () {
-    $Ui._subscribe(this)
-  }
-
-  render() {
-    return _createElement("div", {
-      className: `ui-breadcrumbs-base`,
-      style: {
-        [`--ui-breadcrumbs-base-background`]: this.theme.colors.inputSecondary.background,
-        [`--ui-breadcrumbs-base-color`]: this.theme.colors.inputSecondary.text,
-        [`--ui-breadcrumbs-base-font-family`]: this.theme.fontFamily
-      }
-    }, [$Array.intersperse(this.span, this.children)])
-  }
-}
-
-$Ui_Breadcrumbs.displayName = "Ui.Breadcrumbs"
-
-$Ui_Breadcrumbs.defaultProps = {
-  children: [],separator: `|`
 }
 
 class $Ui_Toolbar extends Component {
@@ -5441,11 +4653,7 @@ $Ui_Toolbar.defaultProps = {
   children: [],background: ``,color: ``
 }
 
-class $Ui_Toggle extends Component {
-  get left() {
-    return (this.checked ? `2px` : `50%`)
-  }
-
+class $Ui_Slider extends Component {
   get onChange () {
     if (this.props.onChange != undefined) {
       return this.props.onChange
@@ -5453,22 +4661,6 @@ class $Ui_Toggle extends Component {
       return ((value) => {
     return null
     })
-    }
-  }
-
-  get offLabel () {
-    if (this.props.offLabel != undefined) {
-      return this.props.offLabel
-    } else {
-      return `OFF`
-    }
-  }
-
-  get onLabel () {
-    if (this.props.onLabel != undefined) {
-      return this.props.onLabel
-    } else {
-      return `ON`
     }
   }
 
@@ -5480,19 +4672,149 @@ class $Ui_Toggle extends Component {
     }
   }
 
-  get readonly () {
-    if (this.props.readonly != undefined) {
-      return this.props.readonly
+  get max () {
+    if (this.props.max != undefined) {
+      return this.props.max
     } else {
-      return false
+      return 100
     }
   }
 
-  get checked () {
-    if (this.props.checked != undefined) {
-      return this.props.checked
+  get value () {
+    if (this.props.value != undefined) {
+      return this.props.value
     } else {
-      return false
+      return 0
+    }
+  }
+
+  get step () {
+    if (this.props.step != undefined) {
+      return this.props.step
+    } else {
+      return 1
+    }
+  }
+
+  get min () {
+    if (this.props.min != undefined) {
+      return this.props.min
+    } else {
+      return 0
+    }
+  }
+
+  get theme () { return $Ui.theme }
+
+  componentWillUnmount () {
+    $Ui._unsubscribe(this)
+  }
+
+  componentDidMount () {
+    $Ui._subscribe(this)
+  }
+
+  changed(event) {
+    return this.onChange($Maybe.withDefault(0, $Number.fromString($Dom.getValue(event.target))))
+  }
+
+  render() {
+    return _createElement("input", {
+      value: $Number.toString(this.value),
+      step: $Number.toString(this.step),
+      max: $Number.toString(this.max),
+      min: $Number.toString(this.min),
+      disabled: this.disabled,
+      onChange: (event => (this.changed.bind(this))(_normalizeEvent(event))),
+      type: `range`,
+      className: `ui-slider-base`,
+      style: {
+        [`--ui-slider-base-webkit-slider-thumb-background-color`]: this.theme.colors.primary.background,
+        [`--ui-slider-base-webkit-slider-thumb-border-radius`]: this.theme.border.radius,
+        [`--ui-slider-base-moz-range-thumb-background-color`]: this.theme.colors.primary.background,
+        [`--ui-slider-base-moz-range-thumb-border-radius`]: this.theme.border.radius,
+        [`--ui-slider-base-ms-thumb-background-color`]: this.theme.colors.primary.background,
+        [`--ui-slider-base-ms-thumb-border-radius`]: this.theme.border.radius,
+        [`--ui-slider-base-focus-webkit-slider-thumb-background-color`]: this.theme.hover.color,
+        [`--ui-slider-base-focus-moz-range-thumb-background-color`]: this.theme.hover.color,
+        [`--ui-slider-base-focus-ms-thumb-background-color`]: this.theme.hover.color,
+        [`--ui-slider-base-webkit-slider-runnable-track-background-color`]: this.theme.colors.input.background,
+        [`--ui-slider-base-webkit-slider-runnable-track-border`]: `1px solid ` + this.theme.border.color,
+        [`--ui-slider-base-webkit-slider-runnable-track-border-radius`]: this.theme.border.radius,
+        [`--ui-slider-base-moz-range-track-background-color`]: this.theme.colors.input.background,
+        [`--ui-slider-base-moz-range-track-border`]: `1px solid ` + this.theme.border.color,
+        [`--ui-slider-base-moz-range-track-border-radius`]: this.theme.border.radius,
+        [`--ui-slider-base-ms-track-background-color`]: this.theme.colors.input.background,
+        [`--ui-slider-base-ms-track-border`]: `1px solid ` + this.theme.border.color,
+        [`--ui-slider-base-ms-track-border-radius`]: this.theme.border.radius,
+        [`--ui-slider-base-focus-webkit-slider-runnable-track-box-shadow`]: `0 0 2px ` + this.theme.outline.fadedColor + ` inset,
+                          0 0 2px ` + this.theme.outline.fadedColor,
+        [`--ui-slider-base-focus-webkit-slider-runnable-track-border-color`]: this.theme.outline.color,
+        [`--ui-slider-base-focus-moz-range-track-box-shadow`]: `0 0 2px ` + this.theme.outline.fadedColor + ` inset,
+                          0 0 2px ` + this.theme.outline.fadedColor,
+        [`--ui-slider-base-focus-moz-range-track-border-color`]: this.theme.outline.color,
+        [`--ui-slider-base-focus-ms-track-box-shadow`]: `0 0 2px ` + this.theme.outline.fadedColor + ` inset,
+                          0 0 2px ` + this.theme.outline.fadedColor,
+        [`--ui-slider-base-focus-ms-track-border-color`]: this.theme.outline.color
+      }
+    })
+  }
+}
+
+$Ui_Slider.displayName = "Ui.Slider"
+
+$Ui_Slider.defaultProps = {
+  onChange: ((value) => {
+  return null
+  }),disabled: false,max: 100,value: 0,step: 1,min: 0
+}
+
+class $Ui_Icon_Path extends Component {
+  get pointerEvents() {
+    return (this.clickable ? `` : `none`)
+  }
+
+  get cursor() {
+    return (this.clickable ? `pointer` : ``)
+  }
+
+  get handler() {
+    return (this.clickable ? this.onClick : ((event) => {
+    return null
+    }))
+  }
+
+  get onClick () {
+    if (this.props.onClick != undefined) {
+      return this.props.onClick
+    } else {
+      return ((event) => {
+    return null
+    })
+    }
+  }
+
+  get clickable () {
+    if (this.props.clickable != undefined) {
+      return this.props.clickable
+    } else {
+      return true
+    }
+  }
+
+  get viewbox () {
+    if (this.props.viewbox != undefined) {
+      return this.props.viewbox
+    } else {
+      return ``
+    }
+  }
+
+  get height () {
+    if (this.props.height != undefined) {
+      return this.props.height
+    } else {
+      return ``
     }
   }
 
@@ -5500,7 +4822,15 @@ class $Ui_Toggle extends Component {
     if (this.props.width != undefined) {
       return this.props.width
     } else {
-      return 100
+      return ``
+    }
+  }
+
+  get path () {
+    if (this.props.path != undefined) {
+      return this.props.path
+    } else {
+      return ``
     }
   }
 
@@ -5514,137 +4844,195 @@ class $Ui_Toggle extends Component {
     $Ui._subscribe(this)
   }
 
-  toggle() {
-    return this.onChange($Bool.not(this.checked))
-  }
-
   render() {
-    return _createElement("button", {
-      onClick: (event => (((event) => {
-      return this.toggle.bind(this)()
-      }))(_normalizeEvent(event))),
-      className: `ui-toggle-base`,
+    return _createElement("svg", {
+      onClick: (event => (this.handler)(_normalizeEvent(event))),
+      viewBox: this.viewbox,
+      height: this.height,
+      width: this.width,
+      className: `ui-icon-path-svg`,
       style: {
-        [`--ui-toggle-base-background-color`]: this.theme.colors.input.background,
-        [`--ui-toggle-base-border`]: `1px solid ` + this.theme.border.color,
-        [`--ui-toggle-base-border-radius`]: this.theme.border.radius,
-        [`--ui-toggle-base-color`]: this.theme.colors.input.text,
-        [`--ui-toggle-base-font-family`]: this.theme.fontFamily,
-        [`--ui-toggle-base-width`]: this.width + `px`,
-        [`--ui-toggle-base-focus-box-shadow`]: `0 0 2px ` + this.theme.outline.fadedColor + ` inset,
-                          0 0 2px ` + this.theme.outline.fadedColor,
-        [`--ui-toggle-base-focus-border-color`]: this.theme.outline.color,
-        [`--ui-toggle-base-focus-color`]: this.theme.outline.color,
-        [`--ui-toggle-base-disabled-background`]: this.theme.colors.disabled.background,
-        [`--ui-toggle-base-disabled-color`]: this.theme.colors.disabled.text
+        [`--ui-icon-path-svg-pointer-events`]: this.pointerEvents,
+        [`--ui-icon-path-svg-hover-fill`]: this.theme.hover.color,
+        [`--ui-icon-path-svg-hover-cursor`]: this.cursor
       }
-    }, [_createElement("div", {
-      className: `ui-toggle-label`,
-      style: {
-
-      }
-    }, [this.onLabel]), _createElement("div", {
-      className: `ui-toggle-label`,
-      style: {
-
-      }
-    }, [this.offLabel]), _createElement("div", {
-      className: `ui-toggle-overlay`,
-      style: {
-        [`--ui-toggle-overlay-background`]: this.theme.colors.primary.background,
-        [`--ui-toggle-overlay-border-radius`]: this.theme.border.radius,
-        [`--ui-toggle-overlay-left`]: this.left
-      }
+    }, [_createElement("path", {
+      d: this.path
     })])
   }
 }
 
-$Ui_Toggle.displayName = "Ui.Toggle"
+$Ui_Icon_Path.displayName = "Ui.Icon.Path"
 
-$Ui_Toggle.defaultProps = {
-  onChange: ((value) => {
+$Ui_Icon_Path.defaultProps = {
+  onClick: ((event) => {
   return null
-  }),offLabel: `OFF`,onLabel: `ON`,disabled: false,readonly: false,checked: false,width: 100
+  }),clickable: true,viewbox: ``,height: ``,width: ``,path: ``
 }
 
-class $Ui_Calendar_Cell extends Component {
-  get colors() {
-    return (this.selected ? this.theme.colors.primary : this.theme.colors.inputSecondary)
+class $Ui_Toolbar_Separator extends Component {
+  render() {
+    return _createElement("div", {
+      className: `ui-toolbar-separator-base`,
+      style: {
+
+      }
+    })
+  }
+}
+
+$Ui_Toolbar_Separator.displayName = "Ui.Toolbar.Separator"
+
+class $Ui_Pagination extends Component {
+  get pages() {
+    return $Math.floor($Math.max(this.total - 1, 0) / this.perPage)
   }
 
-  get opacity() {
-    return (this.active ? `1` : `0.25`)
+  get buttonRange() {
+    return $Array.range($Math.max(1, this.page - this.sidePages), $Math.min(this.page + this.sidePages + 1, this.pages))
   }
 
-  get onClick () {
-    if (this.props.onClick != undefined) {
-      return this.props.onClick
+  get buttons() {
+    return $Array.map(((index) => {
+    return _createElement($Ui_Button, { onClick: ((event) => {
+    return this.onChange(index)
+    }), label: $Number.toString(index + 1), key: $Number.toString(index), outline: !_compare(index, this.page) })
+    }), this.buttonRange)
+  }
+
+  get previousButton() {
+    return (!_compare(this.page, 0) && this.pages > 0 ? _createElement($Ui_Button, { onClick: ((event) => {
+    return this.onChange(this.page - 1)
+    }), outline: true, label: `Prev` }) : $Html.empty())
+  }
+
+  get nextButton() {
+    return (!_compare(this.page, this.pages) && this.pages > 0 ? _createElement($Ui_Button, { onClick: ((event) => {
+    return this.onChange(this.page + 1)
+    }), outline: true, label: `Next` }) : $Html.empty())
+  }
+
+  get leftDots() {
+    return (this.sidePages < (this.page - 1) && this.pages > 0 ? _createElement("span", {
+      className: `ui-pagination-span`,
+      style: {
+
+      }
+    }) : $Html.empty())
+  }
+
+  get rightDots() {
+    return ((this.page + this.sidePages + 1 < this.pages) && this.pages > 0 ? _createElement("span", {
+      className: `ui-pagination-span`,
+      style: {
+
+      }
+    }) : $Html.empty())
+  }
+
+  get rightButton() {
+    return (this.pages > 1 ? _createElement($Ui_Button, { onClick: ((event) => {
+    return this.onChange(this.pages)
+    }), label: $Number.toString(this.pages + 1), outline: !_compare(this.page, this.pages) }) : $Html.empty())
+  }
+
+  get leftButton() {
+    return (this.pages >= 1 ? _createElement($Ui_Button, { onClick: ((event) => {
+    return this.onChange(0)
+    }), outline: !_compare(this.page, 0), label: `1` }) : $Html.empty())
+  }
+
+  get onChange () {
+    if (this.props.onChange != undefined) {
+      return this.props.onChange
     } else {
-      return ((day) => {
+      return ((page) => {
     return null
     })
     }
   }
 
-  get day () {
-    if (this.props.day != undefined) {
-      return this.props.day
+  get sidePages () {
+    if (this.props.sidePages != undefined) {
+      return this.props.sidePages
     } else {
-      return $Time.now()
+      return 2
     }
   }
 
-  get selected () {
-    if (this.props.selected != undefined) {
-      return this.props.selected
+  get perPage () {
+    if (this.props.perPage != undefined) {
+      return this.props.perPage
     } else {
-      return false
+      return 10
     }
   }
 
-  get active () {
-    if (this.props.active != undefined) {
-      return this.props.active
+  get total () {
+    if (this.props.total != undefined) {
+      return this.props.total
     } else {
-      return false
+      return 0
     }
   }
 
-  get theme () { return $Ui.theme }
-
-  componentWillUnmount () {
-    $Ui._unsubscribe(this)
-  }
-
-  componentDidMount () {
-    $Ui._subscribe(this)
+  get page () {
+    if (this.props.page != undefined) {
+      return this.props.page
+    } else {
+      return 0
+    }
   }
 
   render() {
     return _createElement("div", {
-      title: $Time.format(`YYYY-MM-DD HH:mm:ss`, this.day),
-      onClick: (event => (((event) => {
-      return this.onClick(this.day)
-      }))(_normalizeEvent(event))),
-      className: `ui-calendar-cell-style`,
+      className: `ui-pagination-base`,
       style: {
-        [`--ui-calendar-cell-style-border-radius`]: this.theme.border.radius,
-        [`--ui-calendar-cell-style-background`]: this.colors.background,
-        [`--ui-calendar-cell-style-color`]: this.colors.text,
-        [`--ui-calendar-cell-style-opacity`]: this.opacity,
-        [`--ui-calendar-cell-style-hover-background`]: this.theme.colors.primary.background,
-        [`--ui-calendar-cell-style-hover-color`]: this.theme.colors.primary.text
+
       }
-    }, [$Number.toString($Time.day(this.day))])
+    }, [this.previousButton, this.leftButton, this.leftDots, this.buttons, this.rightDots, this.rightButton, this.nextButton])
   }
 }
 
-$Ui_Calendar_Cell.displayName = "Ui.Calendar.Cell"
+$Ui_Pagination.displayName = "Ui.Pagination"
 
-$Ui_Calendar_Cell.defaultProps = {
-  onClick: ((day) => {
+$Ui_Pagination.defaultProps = {
+  onChange: ((page) => {
   return null
-  }),day: $Time.now(),selected: false,active: false
+  }),sidePages: 2,perPage: 10,total: 0,page: 0
+}
+
+class $Ui_Toolbar_Title extends Component {
+  get children () {
+    if (this.props.children != undefined) {
+      return this.props.children
+    } else {
+      return []
+    }
+  }
+
+  get href () {
+    if (this.props.href != undefined) {
+      return this.props.href
+    } else {
+      return ``
+    }
+  }
+
+  render() {
+    return _createElement("div", {
+      className: `ui-toolbar-title-base`,
+      style: {
+
+      }
+    }, [_createElement($Ui_Link, { href: this.href }, [this.children])])
+  }
+}
+
+$Ui_Toolbar_Title.displayName = "Ui.Toolbar.Title"
+
+$Ui_Toolbar_Title.defaultProps = {
+  children: [],href: ``
 }
 
 class $Ui_Input extends Component {
@@ -5825,352 +5213,256 @@ $Ui_Input.defaultProps = {
   })
 }
 
-class $Ui_Card extends Component {
-  get children () {
-    if (this.props.children != undefined) {
-      return this.props.children
-    } else {
-      return []
-    }
-  }
-
-  render() {
-    return _createElement("div", {
-      className: `ui-card-base`,
-      style: {
-
-      }
-    }, [this.children])
-  }
-}
-
-$Ui_Card.displayName = "Ui.Card"
-
-$Ui_Card.defaultProps = {
-  children: []
-}
-
-class $Ui_Card_Image extends Component {
-  get src () {
-    if (this.props.src != undefined) {
-      return this.props.src
-    } else {
-      return ``
-    }
-  }
-
-  render() {
-    return _createElement("img", {
-      src: this.src,
-      className: `ui-card-image-base`,
-      style: {
-
-      }
-    })
-  }
-}
-
-$Ui_Card_Image.displayName = "Ui.Card.Image"
-
-$Ui_Card_Image.defaultProps = {
-  src: ``
-}
-
-class $Ui_Card_Block extends Component {
-  get children () {
-    if (this.props.children != undefined) {
-      return this.props.children
-    } else {
-      return []
-    }
-  }
-
-  render() {
-    return _createElement("div", {
-      className: `ui-card-block-base`,
-      style: {
-
-      }
-    }, [this.children])
-  }
-}
-
-$Ui_Card_Block.displayName = "Ui.Card.Block"
-
-$Ui_Card_Block.defaultProps = {
-  children: []
-}
-
-class $Ui_Card_Title extends Component {
-  get children () {
-    if (this.props.children != undefined) {
-      return this.props.children
-    } else {
-      return []
-    }
-  }
-
-  render() {
-    return _createElement("div", {
-      className: `ui-card-title-base`,
-      style: {
-
-      }
-    }, [this.children])
-  }
-}
-
-$Ui_Card_Title.displayName = "Ui.Card.Title"
-
-$Ui_Card_Title.defaultProps = {
-  children: []
-}
-
-class $Ui_Card_Text extends Component {
-  get children () {
-    if (this.props.children != undefined) {
-      return this.props.children
-    } else {
-      return []
-    }
-  }
-
-  render() {
-    return _createElement("div", {
-      className: `ui-card-text-base`,
-      style: {
-
-      }
-    }, [this.children])
-  }
-}
-
-$Ui_Card_Text.displayName = "Ui.Card.Text"
-
-$Ui_Card_Text.defaultProps = {
-  children: []
-}
-
-class $Ui_Toolbar_Separator extends Component {
-  render() {
-    return _createElement("div", {
-      className: `ui-toolbar-separator-base`,
-      style: {
-
-      }
-    })
-  }
-}
-
-$Ui_Toolbar_Separator.displayName = "Ui.Toolbar.Separator"
-
-class $Ui_Table extends Component {
-  get headers () {
-    if (this.props.headers != undefined) {
-      return this.props.headers
-    } else {
-      return []
-    }
-  }
-
-  get rows () {
-    if (this.props.rows != undefined) {
-      return this.props.rows
-    } else {
-      return []
-    }
-  }
-
-  render() {
-    return _createElement("table", {}, [_createElement("thead", {}, [this.headers])])
-  }
-}
-
-$Ui_Table.displayName = "Ui.Table"
-
-$Ui_Table.defaultProps = {
-  headers: [],rows: []
-}
-
-class $Ui_Form_Label extends Component {
-  get fontSize () {
-    if (this.props.fontSize != undefined) {
-      return this.props.fontSize
-    } else {
-      return 16
-    }
-  }
-
-  get text () {
-    if (this.props.text != undefined) {
-      return this.props.text
-    } else {
-      return ``
-    }
-  }
-
-  get theme () { return $Ui.theme }
-
-  componentWillUnmount () {
-    $Ui._unsubscribe(this)
-  }
-
-  componentDidMount () {
-    $Ui._subscribe(this)
-  }
-
-  render() {
-    return _createElement("div", {
-      className: `ui-form-label-base`,
-      style: {
-        [`--ui-form-label-base-font-size`]: $Number.toString(this.fontSize) + `px`,
-        [`--ui-form-label-base-font-family`]: this.theme.fontFamily
-      }
-    }, [this.text])
-  }
-}
-
-$Ui_Form_Label.displayName = "Ui.Form.Label"
-
-$Ui_Form_Label.defaultProps = {
-  fontSize: 16,text: ``
-}
-
-class $Ui_Toolbar_Title extends Component {
-  get children () {
-    if (this.props.children != undefined) {
-      return this.props.children
-    } else {
-      return []
-    }
-  }
-
-  get href () {
-    if (this.props.href != undefined) {
-      return this.props.href
-    } else {
-      return ``
-    }
-  }
-
-  render() {
-    return _createElement("div", {
-      className: `ui-toolbar-title-base`,
-      style: {
-
-      }
-    }, [_createElement($Ui_Link, { href: this.href }, [this.children])])
-  }
-}
-
-$Ui_Toolbar_Title.displayName = "Ui.Toolbar.Title"
-
-$Ui_Toolbar_Title.defaultProps = {
-  children: [],href: ``
-}
-
-class $Ui_Icon_Path extends Component {
+class $Ui_Pager_Page extends Component {
   get pointerEvents() {
-    return (this.clickable ? `` : `none`)
+    return (_compare(this.transition, `fade`) && _compare(this.opacity, 0) ? `none` : ``)
   }
 
-  get cursor() {
-    return (this.clickable ? `pointer` : ``)
+  get transform() {
+    return (_compare(this.transition, `slide`) ? `translate3d(0,0,0) translateX(` + $Number.toString(this.position) + `%)` : ``)
   }
 
-  get handler() {
-    return (this.clickable ? this.onClick : ((event) => {
-    return null
-    }))
+  get opacity() {
+    return (_compare(this.transition, `fade`) ? 1 - $Math.abs(this.position) / 100 : 1)
   }
 
-  get onClick () {
-    if (this.props.onClick != undefined) {
-      return this.props.onClick
+  get transitionDuration() {
+    return (this.transitioning ? this.duration : 0)
+  }
+
+  get transition () {
+    if (this.props.transition != undefined) {
+      return this.props.transition
     } else {
-      return ((event) => {
-    return null
-    })
+      return `slide`
     }
   }
 
-  get clickable () {
-    if (this.props.clickable != undefined) {
-      return this.props.clickable
+  get transitioning () {
+    if (this.props.transitioning != undefined) {
+      return this.props.transitioning
+    } else {
+      return false
+    }
+  }
+
+  get children () {
+    if (this.props.children != undefined) {
+      return this.props.children
+    } else {
+      return []
+    }
+  }
+
+  get duration () {
+    if (this.props.duration != undefined) {
+      return this.props.duration
+    } else {
+      return 1000
+    }
+  }
+
+  get position () {
+    if (this.props.position != undefined) {
+      return this.props.position
+    } else {
+      return 0
+    }
+  }
+
+  render() {
+    return _createElement("div", {
+      className: `ui-pager-page-base`,
+      style: {
+        [`--ui-pager-page-base-transition`]: this.transitionDuration + `ms`,
+        [`--ui-pager-page-base-pointer-events`]: this.pointerEvents,
+        [`--ui-pager-page-base-transform`]: this.transform,
+        [`--ui-pager-page-base-opacity`]: this.opacity
+      }
+    }, [this.children])
+  }
+}
+
+$Ui_Pager_Page.displayName = "Ui.Pager.Page"
+
+$Ui_Pager_Page.defaultProps = {
+  transition: `slide`,transitioning: false,children: [],duration: 1000,position: 0
+}
+
+class $Ui_Pager extends Component {
+  constructor(props) {
+    super(props)
+    this.state = new Record({
+      transitioning: false,
+      left: ``,
+      center: ``
+    })
+  }
+
+  get isPage() {
+    return $Array.any(((item) => {
+    return _compare(item.name, this.state.center)
+    }), this.pages)
+  }
+
+  get hasPage() {
+    return $Array.any(((item) => {
+    return _compare(item.name, this.active)
+    }), this.pages)
+  }
+
+  get pages () {
+    if (this.props.pages != undefined) {
+      return this.props.pages
+    } else {
+      return []
+    }
+  }
+
+  get transition () {
+    if (this.props.transition != undefined) {
+      return this.props.transition
+    } else {
+      return `slide`
+    }
+  }
+
+  get duration () {
+    if (this.props.duration != undefined) {
+      return this.props.duration
+    } else {
+      return 1000
+    }
+  }
+
+  get active () {
+    if (this.props.active != undefined) {
+      return this.props.active
+    } else {
+      return ``
+    }
+  }
+
+  componentDidUpdate() {
+    return (!_compare(this.state.center, this.active) && this.hasPage ? (this.isPage ? this.switchPages.bind(this)() : new Promise((_resolve) => {
+      this.setState(_update(this.state, { center: this.active }), _resolve)
+    })) : null)
+  }
+
+  switchPages() {
+    return (async () => {
+            try {  await new Promise((_resolve) => {
+      this.setState(_update(this.state, { left: this.state.center, center: this.active, transitioning: true }), _resolve)
+    })
+
+     await (async ()=> {
+                try {
+                  return await $Timer.timeout(this.duration, `a`)
+                } catch(_error) {
+                  
+
+                  throw new DoError
+                }})()
+
+     await new Promise((_resolve) => {
+      this.setState(_update(this.state, { transitioning: false, left: `` }), _resolve)
+    }) }
+            catch(_error) {
+              if (_error instanceof DoError) {
+              } else {
+                console.warn(`Unhandled error in do statement`)
+                console.log(_error)
+              }
+            } 
+          })()
+  }
+
+  renderPage(item) {
+    let transitioning = (_compare(this.state.left, item.name) || _compare(this.state.center, item.name)) && this.state.transitioning
+
+    let position = (_compare(this.state.left, item.name) ? -100 : (_compare(this.state.center, item.name) ? 0 : 100))
+
+    return _createElement($Ui_Pager_Page, { transitioning: transitioning, transition: this.transition, position: position, duration: this.duration }, [item.contents])
+  }
+
+  render() {
+    return _createElement("div", {
+      className: `ui-pager-base`,
+      style: {
+
+      }
+    }, [$Array.map(this.renderPage.bind(this), this.pages)])
+  }
+}
+
+$Ui_Pager.displayName = "Ui.Pager"
+
+$Ui_Pager.defaultProps = {
+  pages: [],transition: `slide`,duration: 1000,active: ``
+}
+
+class $Ui_Link extends Component {
+  get colors() {
+    return (() => {
+      let condition = this.type
+      let branch0 = `secondary`
+      let branch1 = `warning`
+      let branch2 = `success`
+      let branch3 = `primary`
+      let branch4 = `danger`
+      let branch5 = `inherit`
+
+      switch (condition) {
+        case branch0:
+          return this.theme.colors.secondary
+        case branch1:
+          return this.theme.colors.warning
+        case branch2:
+          return this.theme.colors.success
+        case branch3:
+          return this.theme.colors.primary
+        case branch4:
+          return this.theme.colors.danger
+        case branch5:
+          return new Record({
+          background: `inherit`,
+          focus: `inherit`,
+          text: `inherit`
+        })
+        default:
+          return new Record({
+          background: ``,
+          focus: ``,
+          text: ``
+        })
+      }
+    })()
+  }
+
+  get children () {
+    if (this.props.children != undefined) {
+      return this.props.children
+    } else {
+      return []
+    }
+  }
+
+  get scrollToTop () {
+    if (this.props.scrollToTop != undefined) {
+      return this.props.scrollToTop
     } else {
       return true
     }
   }
 
-  get viewbox () {
-    if (this.props.viewbox != undefined) {
-      return this.props.viewbox
+  get type () {
+    if (this.props.type != undefined) {
+      return this.props.type
     } else {
-      return ``
+      return `primary`
     }
   }
 
-  get height () {
-    if (this.props.height != undefined) {
-      return this.props.height
-    } else {
-      return ``
-    }
-  }
-
-  get width () {
-    if (this.props.width != undefined) {
-      return this.props.width
-    } else {
-      return ``
-    }
-  }
-
-  get path () {
-    if (this.props.path != undefined) {
-      return this.props.path
-    } else {
-      return ``
-    }
-  }
-
-  get theme () { return $Ui.theme }
-
-  componentWillUnmount () {
-    $Ui._unsubscribe(this)
-  }
-
-  componentDidMount () {
-    $Ui._subscribe(this)
-  }
-
-  render() {
-    return _createElement("svg", {
-      onClick: (event => (this.handler)(_normalizeEvent(event))),
-      viewBox: this.viewbox,
-      height: this.height,
-      width: this.width,
-      className: `ui-icon-path-svg`,
-      style: {
-        [`--ui-icon-path-svg-pointer-events`]: this.pointerEvents,
-        [`--ui-icon-path-svg-hover-fill`]: this.theme.hover.color,
-        [`--ui-icon-path-svg-hover-cursor`]: this.cursor
-      }
-    }, [_createElement("path", {
-      d: this.path
-    })])
-  }
-}
-
-$Ui_Icon_Path.displayName = "Ui.Icon.Path"
-
-$Ui_Icon_Path.defaultProps = {
-  onClick: ((event) => {
-  return null
-  }),clickable: true,viewbox: ``,height: ``,width: ``,path: ``
-}
-
-class $Ui_Toolbar_Link extends Component {
   get target () {
     if (this.props.target != undefined) {
       return this.props.target
@@ -6195,34 +5487,374 @@ class $Ui_Toolbar_Link extends Component {
     }
   }
 
-  render() {
-    return _createElement("div", {
-      className: `ui-toolbar-link-base`,
-      style: {
+  get theme () { return $Ui.theme }
 
+  componentWillUnmount () {
+    $Ui._unsubscribe(this)
+  }
+
+  componentDidMount () {
+    $Ui._subscribe(this)
+  }
+
+  sameOrigin() {
+    let windowUrl = $Window.url()
+
+    let url = $Url.parse(this.href)
+
+    return !_compare(windowUrl.origin, url.origin)
+  }
+
+  onClick(event) {
+    return (event.ctrlKey || _compare(event.button, 1) || this.sameOrigin.bind(this)() ? null : ($String.isEmpty(this.href) ? $Html_Event.preventDefault(event) : (async () => {
+            try {  await $Html_Event.preventDefault(event)
+
+     await $Window.navigate(this.href)
+
+     await (this.scrollToTop ? $Window.setScrollTop(0) : null) }
+            catch(_error) {
+              if (_error instanceof DoError) {
+              } else {
+                console.warn(`Unhandled error in do statement`)
+                console.log(_error)
+              }
+            } 
+          })()))
+  }
+
+  render() {
+    return _createElement("a", {
+      onClick: (event => (this.onClick.bind(this))(_normalizeEvent(event))),
+      target: this.target,
+      href: this.href,
+      className: `ui-link-base`,
+      style: {
+        [`--ui-link-base-color`]: this.colors.background,
+        [`--ui-link-base-hover-color`]: this.colors.focus,
+        [`--ui-link-base-focus-color`]: this.colors.focus
       }
-    }, [_createElement($Ui_Link, { target: this.target, label: this.label, href: this.href })])
+    }, [this.label, this.children])
   }
 }
 
-$Ui_Toolbar_Link.displayName = "Ui.Toolbar.Link"
+$Ui_Link.displayName = "Ui.Link"
 
-$Ui_Toolbar_Link.defaultProps = {
-  target: ``,label: ``,href: ``
+$Ui_Link.defaultProps = {
+  children: [],scrollToTop: true,type: `primary`,target: ``,label: ``,href: ``
 }
 
-class $Ui_Toolbar_Spacer extends Component {
+class $Ui_Loader extends Component {
+  get pointerEvents() {
+    return (this.shown ? `` : `none`)
+  }
+
+  get opacity() {
+    return (this.shown ? 1 : 0)
+  }
+
+  get children () {
+    if (this.props.children != undefined) {
+      return this.props.children
+    } else {
+      return []
+    }
+  }
+
+  get shown () {
+    if (this.props.shown != undefined) {
+      return this.props.shown
+    } else {
+      return false
+    }
+  }
+
   render() {
     return _createElement("div", {
-      className: `ui-toolbar-spacer-base`,
+      className: `ui-loader-base`,
       style: {
 
       }
+    }, [this.children, _createElement("div", {
+      className: `ui-loader-loader`,
+      style: {
+        [`--ui-loader-loader-pointer-events`]: this.pointerEvents,
+        [`--ui-loader-loader-opacity`]: this.opacity
+      }
+    }, [`Loading...`])])
+  }
+}
+
+$Ui_Loader.displayName = "Ui.Loader"
+
+$Ui_Loader.defaultProps = {
+  children: [],shown: false
+}
+
+class $Ui_Toggle extends Component {
+  get left() {
+    return (this.checked ? `2px` : `50%`)
+  }
+
+  get onChange () {
+    if (this.props.onChange != undefined) {
+      return this.props.onChange
+    } else {
+      return ((value) => {
+    return null
+    })
+    }
+  }
+
+  get offLabel () {
+    if (this.props.offLabel != undefined) {
+      return this.props.offLabel
+    } else {
+      return `OFF`
+    }
+  }
+
+  get onLabel () {
+    if (this.props.onLabel != undefined) {
+      return this.props.onLabel
+    } else {
+      return `ON`
+    }
+  }
+
+  get disabled () {
+    if (this.props.disabled != undefined) {
+      return this.props.disabled
+    } else {
+      return false
+    }
+  }
+
+  get readonly () {
+    if (this.props.readonly != undefined) {
+      return this.props.readonly
+    } else {
+      return false
+    }
+  }
+
+  get checked () {
+    if (this.props.checked != undefined) {
+      return this.props.checked
+    } else {
+      return false
+    }
+  }
+
+  get width () {
+    if (this.props.width != undefined) {
+      return this.props.width
+    } else {
+      return 100
+    }
+  }
+
+  get theme () { return $Ui.theme }
+
+  componentWillUnmount () {
+    $Ui._unsubscribe(this)
+  }
+
+  componentDidMount () {
+    $Ui._subscribe(this)
+  }
+
+  toggle() {
+    return this.onChange($Bool.not(this.checked))
+  }
+
+  render() {
+    return _createElement("button", {
+      onClick: (event => (((event) => {
+      return this.toggle.bind(this)()
+      }))(_normalizeEvent(event))),
+      className: `ui-toggle-base`,
+      style: {
+        [`--ui-toggle-base-background-color`]: this.theme.colors.input.background,
+        [`--ui-toggle-base-border`]: `1px solid ` + this.theme.border.color,
+        [`--ui-toggle-base-border-radius`]: this.theme.border.radius,
+        [`--ui-toggle-base-color`]: this.theme.colors.input.text,
+        [`--ui-toggle-base-font-family`]: this.theme.fontFamily,
+        [`--ui-toggle-base-width`]: this.width + `px`,
+        [`--ui-toggle-base-focus-box-shadow`]: `0 0 2px ` + this.theme.outline.fadedColor + ` inset,
+                          0 0 2px ` + this.theme.outline.fadedColor,
+        [`--ui-toggle-base-focus-border-color`]: this.theme.outline.color,
+        [`--ui-toggle-base-focus-color`]: this.theme.outline.color,
+        [`--ui-toggle-base-disabled-background`]: this.theme.colors.disabled.background,
+        [`--ui-toggle-base-disabled-color`]: this.theme.colors.disabled.text
+      }
+    }, [_createElement("div", {
+      className: `ui-toggle-label`,
+      style: {
+
+      }
+    }, [this.onLabel]), _createElement("div", {
+      className: `ui-toggle-label`,
+      style: {
+
+      }
+    }, [this.offLabel]), _createElement("div", {
+      className: `ui-toggle-overlay`,
+      style: {
+        [`--ui-toggle-overlay-background`]: this.theme.colors.primary.background,
+        [`--ui-toggle-overlay-border-radius`]: this.theme.border.radius,
+        [`--ui-toggle-overlay-left`]: this.left
+      }
+    })])
+  }
+}
+
+$Ui_Toggle.displayName = "Ui.Toggle"
+
+$Ui_Toggle.defaultProps = {
+  onChange: ((value) => {
+  return null
+  }),offLabel: `OFF`,onLabel: `ON`,disabled: false,readonly: false,checked: false,width: 100
+}
+
+class $Ui_Time extends Component {
+  constructor(props) {
+    super(props)
+    this.state = new Record({
+      now: $Time.now()
     })
   }
+
+  get date () {
+    if (this.props.date != undefined) {
+      return this.props.date
+    } else {
+      return $Time.now()
+    }
+  }
+
+  componentWillUnmount () {
+    $Provider_Tick._unsubscribe(this)
+  }
+
+  componentDidUpdate () {
+    if (true) {
+      $Provider_Tick._subscribe(this, new Record({
+      ticks: (() => {
+      return new Promise((_resolve) => {
+        this.setState(new Record({
+        now: $Time.now()
+      }), _resolve)
+      })
+      })
+    }))
+    } else {
+      $Provider_Tick._unsubscribe(this)
+    }
+  }
+
+  componentDidMount () {
+    if (true) {
+      $Provider_Tick._subscribe(this, new Record({
+      ticks: (() => {
+      return new Promise((_resolve) => {
+        this.setState(new Record({
+        now: $Time.now()
+      }), _resolve)
+      })
+      })
+    }))
+    } else {
+      $Provider_Tick._unsubscribe(this)
+    }
+  }
+
+  render() {
+    return _createElement("div", {
+      title: $Time.toIso(this.date),
+      className: `ui-time-base`,
+      style: {
+
+      }
+    }, [$Time.relative(this.date, this.state.now)])
+  }
 }
 
-$Ui_Toolbar_Spacer.displayName = "Ui.Toolbar.Spacer"
+$Ui_Time.displayName = "Ui.Time"
+
+$Ui_Time.defaultProps = {
+  date: $Time.now()
+}
+
+class $Ui_Table_Td extends Component {
+  get borderBottom() {
+    return (this.header ? `2px solid ` + this.theme.border.color : ``)
+  }
+
+  get fontWeight() {
+    return (this.header ? `bold` : `normal`)
+  }
+
+  get children () {
+    if (this.props.children != undefined) {
+      return this.props.children
+    } else {
+      return []
+    }
+  }
+
+  get align () {
+    if (this.props.align != undefined) {
+      return this.props.align
+    } else {
+      return `left`
+    }
+  }
+
+  get width () {
+    if (this.props.width != undefined) {
+      return this.props.width
+    } else {
+      return `auto`
+    }
+  }
+
+  get header () {
+    if (this.props.header != undefined) {
+      return this.props.header
+    } else {
+      return false
+    }
+  }
+
+  get theme () { return $Ui.theme }
+
+  componentWillUnmount () {
+    $Ui._unsubscribe(this)
+  }
+
+  componentDidMount () {
+    $Ui._subscribe(this)
+  }
+
+  render() {
+    return _createElement("td", {
+      className: `ui-table-td-td`,
+      style: {
+        [`--ui-table-td-td-border`]: `1px solid ` + this.theme.border.color,
+        [`--ui-table-td-td-border-bottom`]: this.borderBottom,
+        [`--ui-table-td-td-font-weight`]: this.fontWeight,
+        [`--ui-table-td-td-text-align`]: this.align,
+        [`--ui-table-td-td-width`]: this.width
+      }
+    }, [this.children])
+  }
+}
+
+$Ui_Table_Td.displayName = "Ui.Table.Td"
+
+$Ui_Table_Td.defaultProps = {
+  children: [],align: `left`,width: `auto`,header: false
+}
 
 class $Ui_Button extends Component {
   get flexDirection() {
@@ -6445,7 +6077,438 @@ $Ui_Button.defaultProps = {
   })
 }
 
-class $Ui_Slider extends Component {
+class $Ui_Card extends Component {
+  get children () {
+    if (this.props.children != undefined) {
+      return this.props.children
+    } else {
+      return []
+    }
+  }
+
+  render() {
+    return _createElement("div", {
+      className: `ui-card-base`,
+      style: {
+
+      }
+    }, [this.children])
+  }
+}
+
+$Ui_Card.displayName = "Ui.Card"
+
+$Ui_Card.defaultProps = {
+  children: []
+}
+
+class $Ui_Card_Image extends Component {
+  get src () {
+    if (this.props.src != undefined) {
+      return this.props.src
+    } else {
+      return ``
+    }
+  }
+
+  render() {
+    return _createElement("img", {
+      src: this.src,
+      className: `ui-card-image-base`,
+      style: {
+
+      }
+    })
+  }
+}
+
+$Ui_Card_Image.displayName = "Ui.Card.Image"
+
+$Ui_Card_Image.defaultProps = {
+  src: ``
+}
+
+class $Ui_Card_Block extends Component {
+  get children () {
+    if (this.props.children != undefined) {
+      return this.props.children
+    } else {
+      return []
+    }
+  }
+
+  render() {
+    return _createElement("div", {
+      className: `ui-card-block-base`,
+      style: {
+
+      }
+    }, [this.children])
+  }
+}
+
+$Ui_Card_Block.displayName = "Ui.Card.Block"
+
+$Ui_Card_Block.defaultProps = {
+  children: []
+}
+
+class $Ui_Card_Title extends Component {
+  get children () {
+    if (this.props.children != undefined) {
+      return this.props.children
+    } else {
+      return []
+    }
+  }
+
+  render() {
+    return _createElement("div", {
+      className: `ui-card-title-base`,
+      style: {
+
+      }
+    }, [this.children])
+  }
+}
+
+$Ui_Card_Title.displayName = "Ui.Card.Title"
+
+$Ui_Card_Title.defaultProps = {
+  children: []
+}
+
+class $Ui_Card_Text extends Component {
+  get children () {
+    if (this.props.children != undefined) {
+      return this.props.children
+    } else {
+      return []
+    }
+  }
+
+  render() {
+    return _createElement("div", {
+      className: `ui-card-text-base`,
+      style: {
+
+      }
+    }, [this.children])
+  }
+}
+
+$Ui_Card_Text.displayName = "Ui.Card.Text"
+
+$Ui_Card_Text.defaultProps = {
+  children: []
+}
+
+class $Ui_Calendar_Cell extends Component {
+  get colors() {
+    return (this.selected ? this.theme.colors.primary : this.theme.colors.inputSecondary)
+  }
+
+  get opacity() {
+    return (this.active ? `1` : `0.25`)
+  }
+
+  get onClick () {
+    if (this.props.onClick != undefined) {
+      return this.props.onClick
+    } else {
+      return ((day) => {
+    return null
+    })
+    }
+  }
+
+  get day () {
+    if (this.props.day != undefined) {
+      return this.props.day
+    } else {
+      return $Time.now()
+    }
+  }
+
+  get selected () {
+    if (this.props.selected != undefined) {
+      return this.props.selected
+    } else {
+      return false
+    }
+  }
+
+  get active () {
+    if (this.props.active != undefined) {
+      return this.props.active
+    } else {
+      return false
+    }
+  }
+
+  get theme () { return $Ui.theme }
+
+  componentWillUnmount () {
+    $Ui._unsubscribe(this)
+  }
+
+  componentDidMount () {
+    $Ui._subscribe(this)
+  }
+
+  render() {
+    return _createElement("div", {
+      title: $Time.format(`YYYY-MM-DD HH:mm:ss`, this.day),
+      onClick: (event => (((event) => {
+      return this.onClick(this.day)
+      }))(_normalizeEvent(event))),
+      className: `ui-calendar-cell-style`,
+      style: {
+        [`--ui-calendar-cell-style-border-radius`]: this.theme.border.radius,
+        [`--ui-calendar-cell-style-background`]: this.colors.background,
+        [`--ui-calendar-cell-style-color`]: this.colors.text,
+        [`--ui-calendar-cell-style-opacity`]: this.opacity,
+        [`--ui-calendar-cell-style-hover-background`]: this.theme.colors.primary.background,
+        [`--ui-calendar-cell-style-hover-color`]: this.theme.colors.primary.text
+      }
+    }, [$Number.toString($Time.day(this.day))])
+  }
+}
+
+$Ui_Calendar_Cell.displayName = "Ui.Calendar.Cell"
+
+$Ui_Calendar_Cell.defaultProps = {
+  onClick: ((day) => {
+  return null
+  }),day: $Time.now(),selected: false,active: false
+}
+
+class $Ui_Toolbar_Link extends Component {
+  get target () {
+    if (this.props.target != undefined) {
+      return this.props.target
+    } else {
+      return ``
+    }
+  }
+
+  get label () {
+    if (this.props.label != undefined) {
+      return this.props.label
+    } else {
+      return ``
+    }
+  }
+
+  get href () {
+    if (this.props.href != undefined) {
+      return this.props.href
+    } else {
+      return ``
+    }
+  }
+
+  render() {
+    return _createElement("div", {
+      className: `ui-toolbar-link-base`,
+      style: {
+
+      }
+    }, [_createElement($Ui_Link, { target: this.target, label: this.label, href: this.href })])
+  }
+}
+
+$Ui_Toolbar_Link.displayName = "Ui.Toolbar.Link"
+
+$Ui_Toolbar_Link.defaultProps = {
+  target: ``,label: ``,href: ``
+}
+
+class $Ui_Dropdown extends Component {
+  constructor(props) {
+    super(props)
+    this.state = new Record({
+      uid: $Uid.generate(),
+      left: 0,
+      top: 0
+    })
+  }
+
+  get panel() {
+    return _createElement("div", {
+      id: this.state.uid,
+      className: `ui-dropdown-panel`,
+      style: {
+        [`--ui-dropdown-panel-left`]: this.state.left + `px`,
+        [`--ui-dropdown-panel-top`]: this.state.top + `px`
+      }
+    }, [this.children])
+  }
+
+  get panelPortal() {
+    return (this.open ? _createElement($Html_Portals_Body, {  }, [this.panel]) : $Html.empty())
+  }
+
+  get element () {
+    if (this.props.element != undefined) {
+      return this.props.element
+    } else {
+      return $Html.empty()
+    }
+  }
+
+  get children () {
+    if (this.props.children != undefined) {
+      return this.props.children
+    } else {
+      return []
+    }
+  }
+
+  get open () {
+    if (this.props.open != undefined) {
+      return this.props.open
+    } else {
+      return true
+    }
+  }
+
+  componentWillUnmount () {
+    $Provider_Mouse._unsubscribe(this);$Provider_AnimationFrame._unsubscribe(this)
+  }
+
+  componentDidUpdate () {
+    if (this.open) {
+      $Provider_Mouse._subscribe(this, new Record({
+      clicks: ((event) => {
+      return null
+      }),
+      moves: ((data) => {
+      return null
+      }),
+      ups: ((data) => {
+      return null
+      })
+    }))
+    } else {
+      $Provider_Mouse._unsubscribe(this)
+    };if (this.open) {
+      $Provider_AnimationFrame._subscribe(this, new Record({
+      frames: this.updateDimensions.bind(this)
+    }))
+    } else {
+      $Provider_AnimationFrame._unsubscribe(this)
+    }
+  }
+
+  componentDidMount () {
+    if (this.open) {
+      $Provider_Mouse._subscribe(this, new Record({
+      clicks: ((event) => {
+      return null
+      }),
+      moves: ((data) => {
+      return null
+      }),
+      ups: ((data) => {
+      return null
+      })
+    }))
+    } else {
+      $Provider_Mouse._unsubscribe(this)
+    };if (this.open) {
+      $Provider_AnimationFrame._subscribe(this, new Record({
+      frames: this.updateDimensions.bind(this)
+    }))
+    } else {
+      $Provider_AnimationFrame._unsubscribe(this)
+    }
+  }
+
+  updateDimensions() {
+    let dom = $Maybe.withDefault($Dom.createElement(`div`), $Dom.getElementById(this.state.uid))
+
+    let width = $Window.width()
+
+    let height = $Window.height()
+
+    let panelDimensions = $Dom.getDimensions(dom)
+
+    let dimensions = $Dom.getDimensions(ReactDOM.findDOMNode(this))
+
+    let top = dimensions.top + dimensions.height
+
+    let left = dimensions.left
+
+    return new Promise((_resolve) => {
+      this.setState(_update(this.state, { top: top, left: left }), _resolve)
+    })
+  }
+
+  render() {
+    return [this.element, this.panelPortal]
+  }
+}
+
+$Ui_Dropdown.displayName = "Ui.Dropdown"
+
+$Ui_Dropdown.defaultProps = {
+  element: $Html.empty(),children: [],open: true
+}
+
+class $Ui_Form_Label extends Component {
+  get fontSize () {
+    if (this.props.fontSize != undefined) {
+      return this.props.fontSize
+    } else {
+      return 16
+    }
+  }
+
+  get text () {
+    if (this.props.text != undefined) {
+      return this.props.text
+    } else {
+      return ``
+    }
+  }
+
+  get theme () { return $Ui.theme }
+
+  componentWillUnmount () {
+    $Ui._unsubscribe(this)
+  }
+
+  componentDidMount () {
+    $Ui._subscribe(this)
+  }
+
+  render() {
+    return _createElement("div", {
+      className: `ui-form-label-base`,
+      style: {
+        [`--ui-form-label-base-font-size`]: $Number.toString(this.fontSize) + `px`,
+        [`--ui-form-label-base-font-family`]: this.theme.fontFamily
+      }
+    }, [this.text])
+  }
+}
+
+$Ui_Form_Label.displayName = "Ui.Form.Label"
+
+$Ui_Form_Label.defaultProps = {
+  fontSize: 16,text: ``
+}
+
+class $Ui_Checkbox extends Component {
+  get opacity() {
+    return (this.checked ? `1` : `0`)
+  }
+
+  get transform() {
+    return (this.checked ? `scale(1)` : `scale(0.4) rotate(45deg)`)
+  }
+
   get onChange () {
     if (this.props.onChange != undefined) {
       return this.props.onChange
@@ -6464,35 +6527,19 @@ class $Ui_Slider extends Component {
     }
   }
 
-  get max () {
-    if (this.props.max != undefined) {
-      return this.props.max
+  get readonly () {
+    if (this.props.readonly != undefined) {
+      return this.props.readonly
     } else {
-      return 100
+      return false
     }
   }
 
-  get value () {
-    if (this.props.value != undefined) {
-      return this.props.value
+  get checked () {
+    if (this.props.checked != undefined) {
+      return this.props.checked
     } else {
-      return 0
-    }
-  }
-
-  get step () {
-    if (this.props.step != undefined) {
-      return this.props.step
-    } else {
-      return 1
-    }
-  }
-
-  get min () {
-    if (this.props.min != undefined) {
-      return this.props.min
-    } else {
-      return 0
+      return false
     }
   }
 
@@ -6506,215 +6553,164 @@ class $Ui_Slider extends Component {
     $Ui._subscribe(this)
   }
 
-  changed(event) {
-    return this.onChange($Maybe.withDefault(0, $Number.fromString($Dom.getValue(event.target))))
+  toggle() {
+    return this.onChange($Bool.not(this.checked))
   }
 
   render() {
-    return _createElement("input", {
-      value: $Number.toString(this.value),
-      step: $Number.toString(this.step),
-      max: $Number.toString(this.max),
-      min: $Number.toString(this.min),
+    return _createElement("button", {
       disabled: this.disabled,
-      onChange: (event => (this.changed.bind(this))(_normalizeEvent(event))),
-      type: `range`,
-      className: `ui-slider-base`,
+      onClick: (event => (((event) => {
+      return this.toggle.bind(this)()
+      }))(_normalizeEvent(event))),
+      className: `ui-checkbox-base`,
       style: {
-        [`--ui-slider-base-webkit-slider-thumb-background-color`]: this.theme.colors.primary.background,
-        [`--ui-slider-base-webkit-slider-thumb-border-radius`]: this.theme.border.radius,
-        [`--ui-slider-base-moz-range-thumb-background-color`]: this.theme.colors.primary.background,
-        [`--ui-slider-base-moz-range-thumb-border-radius`]: this.theme.border.radius,
-        [`--ui-slider-base-ms-thumb-background-color`]: this.theme.colors.primary.background,
-        [`--ui-slider-base-ms-thumb-border-radius`]: this.theme.border.radius,
-        [`--ui-slider-base-focus-webkit-slider-thumb-background-color`]: this.theme.hover.color,
-        [`--ui-slider-base-focus-moz-range-thumb-background-color`]: this.theme.hover.color,
-        [`--ui-slider-base-focus-ms-thumb-background-color`]: this.theme.hover.color,
-        [`--ui-slider-base-webkit-slider-runnable-track-background-color`]: this.theme.colors.input.background,
-        [`--ui-slider-base-webkit-slider-runnable-track-border`]: `1px solid ` + this.theme.border.color,
-        [`--ui-slider-base-webkit-slider-runnable-track-border-radius`]: this.theme.border.radius,
-        [`--ui-slider-base-moz-range-track-background-color`]: this.theme.colors.input.background,
-        [`--ui-slider-base-moz-range-track-border`]: `1px solid ` + this.theme.border.color,
-        [`--ui-slider-base-moz-range-track-border-radius`]: this.theme.border.radius,
-        [`--ui-slider-base-ms-track-background-color`]: this.theme.colors.input.background,
-        [`--ui-slider-base-ms-track-border`]: `1px solid ` + this.theme.border.color,
-        [`--ui-slider-base-ms-track-border-radius`]: this.theme.border.radius,
-        [`--ui-slider-base-focus-webkit-slider-runnable-track-box-shadow`]: `0 0 2px ` + this.theme.outline.fadedColor + ` inset,
+        [`--ui-checkbox-base-background-color`]: this.theme.colors.input.background,
+        [`--ui-checkbox-base-border`]: `1px solid ` + this.theme.border.color,
+        [`--ui-checkbox-base-border-radius`]: this.theme.border.radius,
+        [`--ui-checkbox-base-color`]: this.theme.colors.input.text,
+        [`--ui-checkbox-base-focus-box-shadow`]: `0 0 2px ` + this.theme.outline.fadedColor + ` inset,
                           0 0 2px ` + this.theme.outline.fadedColor,
-        [`--ui-slider-base-focus-webkit-slider-runnable-track-border-color`]: this.theme.outline.color,
-        [`--ui-slider-base-focus-moz-range-track-box-shadow`]: `0 0 2px ` + this.theme.outline.fadedColor + ` inset,
-                          0 0 2px ` + this.theme.outline.fadedColor,
-        [`--ui-slider-base-focus-moz-range-track-border-color`]: this.theme.outline.color,
-        [`--ui-slider-base-focus-ms-track-box-shadow`]: `0 0 2px ` + this.theme.outline.fadedColor + ` inset,
-                          0 0 2px ` + this.theme.outline.fadedColor,
-        [`--ui-slider-base-focus-ms-track-border-color`]: this.theme.outline.color
+        [`--ui-checkbox-base-focus-border-color`]: this.theme.outline.color,
+        [`--ui-checkbox-base-focus-color`]: this.theme.outline.color,
+        [`--ui-checkbox-base-disabled-background`]: this.theme.colors.disabled.background,
+        [`--ui-checkbox-base-disabled-color`]: this.theme.colors.disabled.text
+      }
+    }, [_createElement("svg", {
+      viewBox: `0 0 36 36`,
+      className: `ui-checkbox-icon`,
+      style: {
+        [`--ui-checkbox-icon-transform`]: this.transform,
+        [`--ui-checkbox-icon-opacity`]: this.opacity
+      }
+    }, [_createElement("path", {
+      d: `M35.792 5.332L31.04 1.584c-.147-.12-.33-.208-.537-.208-.207 0-.398.087-.545.217l-17.286 22.21S5.877 17.27 5.687 17.08c-.19-.19-.442-.51-.822-.51-.38 0-.554.268-.753.467-.148.156-2.57 2.7-3.766 3.964-.07.077-.112.12-.173.18-.104.148-.173.313-.173.494 0 .19.07.347.173.494l.242.225s12.058 11.582 12.257 11.78c.2.2.442.45.797.45.345 0 .63-.37.795-.536l21.562-27.7c.104-.146.173-.31.173-.5 0-.217-.087-.4-.208-.555z`
+    })])])
+  }
+}
+
+$Ui_Checkbox.displayName = "Ui.Checkbox"
+
+$Ui_Checkbox.defaultProps = {
+  onChange: ((value) => {
+  return null
+  }),disabled: false,readonly: false,checked: false
+}
+
+class $Ui_Toolbar_Spacer extends Component {
+  render() {
+    return _createElement("div", {
+      className: `ui-toolbar-spacer-base`,
+      style: {
+
       }
     })
   }
 }
 
-$Ui_Slider.displayName = "Ui.Slider"
+$Ui_Toolbar_Spacer.displayName = "Ui.Toolbar.Spacer"
 
-$Ui_Slider.defaultProps = {
-  onChange: ((value) => {
-  return null
-  }),disabled: false,max: 100,value: 0,step: 1,min: 0
+class $Ui_Form_Separator extends Component {
+  render() {
+    return _createElement("div", {
+      className: `ui-form-separator-base`,
+      style: {
+
+      }
+    })
+  }
 }
 
-class $Ui_Pager_Page extends Component {
-  get pointerEvents() {
-    return (_compare(this.transition, `fade`) && _compare(this.opacity, 0) ? `none` : ``)
+$Ui_Form_Separator.displayName = "Ui.Form.Separator"
+
+class $Ui_Calendar extends Component {
+  get nextMonthIcon() {
+    return _createElement($Ui_Icon_Path, { onClick: ((event) => {
+    return this.nextMonth.bind(this)()
+    }), viewbox: `0 0 9 16`, height: `16px`, width: `9px`, path: `M6 8L.1 1.78c-.14-.16-.14-.4.02-.57L1.17.13c.15-.16.4-.16.54 0l7.2 7.6c.07.07.1.18.1.28 0 .1-.03.2-.1.3l-7.2 7.6c-.14.14-.38.14-.53-.02l-1.05-1.1c-.16-.15-.16-.4 0-.56L5.98 8z` })
   }
 
-  get transform() {
-    return (_compare(this.transition, `slide`) ? `translate3d(0,0,0) translateX(` + $Number.toString(this.position) + `%)` : ``)
+  get previousMonthIcon() {
+    return _createElement($Ui_Icon_Path, { onClick: ((event) => {
+    return this.previousMonth.bind(this)()
+    }), viewbox: `0 0 9 16`, height: `16px`, width: `9px`, path: `M3 8l5.9-6.22c.14-.16.14-.4-.02-.57L7.83.13c-.15-.16-.4-.16-.54 0L.1 7.7c-.07.07-.1.17-.1.28 0 .1.03.2.1.3l7.2 7.6c.14.14.38.14.53-.02l1.05-1.1c.16-.15.16-.4 0-.56L3.02 8z` })
   }
 
-  get opacity() {
-    return (_compare(this.transition, `fade`) ? 1 - $Math.abs(this.position) / 100 : 1)
-  }
-
-  get transitionDuration() {
-    return (this.transitioning ? this.duration : 0)
-  }
-
-  get transition () {
-    if (this.props.transition != undefined) {
-      return this.props.transition
+  get onMonthChange () {
+    if (this.props.onMonthChange != undefined) {
+      return this.props.onMonthChange
     } else {
-      return `slide`
+      return ((date) => {
+    return null
+    })
     }
   }
 
-  get transitioning () {
-    if (this.props.transitioning != undefined) {
-      return this.props.transitioning
+  get onChange () {
+    if (this.props.onChange != undefined) {
+      return this.props.onChange
+    } else {
+      return ((day) => {
+    return null
+    })
+    }
+  }
+
+  get changeMonthOnSelect () {
+    if (this.props.changeMonthOnSelect != undefined) {
+      return this.props.changeMonthOnSelect
     } else {
       return false
     }
   }
 
-  get children () {
-    if (this.props.children != undefined) {
-      return this.props.children
+  get month () {
+    if (this.props.month != undefined) {
+      return this.props.month
     } else {
-      return []
+      return $Time.today()
     }
   }
 
-  get duration () {
-    if (this.props.duration != undefined) {
-      return this.props.duration
+  get date () {
+    if (this.props.date != undefined) {
+      return this.props.date
     } else {
-      return 1000
+      return $Time.today()
     }
   }
 
-  get position () {
-    if (this.props.position != undefined) {
-      return this.props.position
+  get disabled () {
+    if (this.props.disabled != undefined) {
+      return this.props.disabled
     } else {
-      return 0
+      return false
     }
   }
 
-  render() {
-    return _createElement("div", {
-      className: `ui-pager-page-base`,
-      style: {
-        [`--ui-pager-page-base-transition`]: this.transitionDuration + `ms`,
-        [`--ui-pager-page-base-pointer-events`]: this.pointerEvents,
-        [`--ui-pager-page-base-transform`]: this.transform,
-        [`--ui-pager-page-base-opacity`]: this.opacity
-      }
-    }, [this.children])
-  }
-}
+  get theme () { return $Ui.theme }
 
-$Ui_Pager_Page.displayName = "Ui.Pager.Page"
-
-$Ui_Pager_Page.defaultProps = {
-  transition: `slide`,transitioning: false,children: [],duration: 1000,position: 0
-}
-
-class $Ui_Pager extends Component {
-  constructor(props) {
-    super(props)
-    this.state = new Record({
-      transitioning: false,
-      left: ``,
-      center: ``
-    })
+  componentWillUnmount () {
+    $Ui._unsubscribe(this)
   }
 
-  get isPage() {
-    return $Array.any(((item) => {
-    return _compare(item.name, this.state.center)
-    }), this.pages)
+  componentDidMount () {
+    $Ui._subscribe(this)
   }
 
-  get hasPage() {
-    return $Array.any(((item) => {
-    return _compare(item.name, this.active)
-    }), this.pages)
+  days() {
+    let startDate = $Time.startOf(`week`, $Time.startOf(`month`, this.month))
+
+    let endDate = $Time.endOf(`week`, $Time.endOf(`month`, this.month))
+
+    return $Time.range(startDate, endDate)
   }
 
-  get pages () {
-    if (this.props.pages != undefined) {
-      return this.props.pages
-    } else {
-      return []
-    }
-  }
+  onCellClick(day) {
+    return (!_compare($Time.month(day), $Time.month(this.month)) && this.changeMonthOnSelect ? (async () => {
+            try {  await this.onMonthChange(day)
 
-  get transition () {
-    if (this.props.transition != undefined) {
-      return this.props.transition
-    } else {
-      return `slide`
-    }
-  }
-
-  get duration () {
-    if (this.props.duration != undefined) {
-      return this.props.duration
-    } else {
-      return 1000
-    }
-  }
-
-  get active () {
-    if (this.props.active != undefined) {
-      return this.props.active
-    } else {
-      return ``
-    }
-  }
-
-  componentDidUpdate() {
-    return (!_compare(this.state.center, this.active) && this.hasPage ? (this.isPage ? this.switchPages.bind(this)() : new Promise((_resolve) => {
-      this.setState(_update(this.state, { center: this.active }), _resolve)
-    })) : null)
-  }
-
-  switchPages() {
-    return (async () => {
-            try {  await new Promise((_resolve) => {
-      this.setState(_update(this.state, { left: this.state.center, center: this.active, transitioning: true }), _resolve)
-    })
-
-     await (async ()=> {
-                try {
-                  return await $Timer.timeout(this.duration, `a`)
-                } catch(_error) {
-                  
-
-                  throw new DoError
-                }})()
-
-     await new Promise((_resolve) => {
-      this.setState(_update(this.state, { transitioning: false, left: `` }), _resolve)
-    }) }
+     await this.onChange(day) }
             catch(_error) {
               if (_error instanceof DoError) {
               } else {
@@ -6722,219 +6718,111 @@ class $Ui_Pager extends Component {
                 console.log(_error)
               }
             } 
-          })()
+          })() : this.onChange(day))
   }
 
-  renderPage(item) {
-    let transitioning = (_compare(this.state.left, item.name) || _compare(this.state.center, item.name)) && this.state.transitioning
+  cells() {
+    let range = $Time.range($Time.startOf(`month`, this.month), $Time.endOf(`month`, this.month))
 
-    let position = (_compare(this.state.left, item.name) ? -100 : (_compare(this.state.center, item.name) ? 0 : 100))
+    return $Array.map(((day) => {
+    return _createElement($Ui_Calendar_Cell, { active: $Array.any(((item) => {
+    return _compare(day, item)
+    }), range), selected: _compare(this.date, day), onClick: this.onCellClick.bind(this), day: day })
+    }), this.days.bind(this)())
+  }
 
-    return _createElement($Ui_Pager_Page, { transitioning: transitioning, transition: this.transition, position: position, duration: this.duration }, [item.contents])
+  dayName(day) {
+    return _createElement("div", {
+      className: `ui-calendar-day-name`,
+      style: {
+
+      }
+    }, [$Time.format(`ddd`, day)])
+  }
+
+  dayNames() {
+    return $Array.map(this.dayName.bind(this), $Time.range($Time.startOf(`week`, this.date), $Time.endOf(`week`, this.date)))
+  }
+
+  previousMonth() {
+    return this.onMonthChange($Time.previousMonth(this.month))
+  }
+
+  nextMonth() {
+    return this.onMonthChange($Time.nextMonth(this.month))
   }
 
   render() {
     return _createElement("div", {
-      className: `ui-pager-base`,
+      className: `ui-calendar-base`,
+      style: {
+        [`--ui-calendar-base-background`]: this.theme.colors.input.background,
+        [`--ui-calendar-base-border`]: `1px solid ` + this.theme.border.color,
+        [`--ui-calendar-base-border-radius`]: this.theme.border.radius,
+        [`--ui-calendar-base-color`]: this.theme.colors.input.text,
+        [`--ui-calendar-base-font-family`]: this.theme.fontFamily
+      }
+    }, [_createElement("div", {
+      className: `ui-calendar-header`,
       style: {
 
       }
-    }, [$Array.map(this.renderPage.bind(this), this.pages)])
+    }, [this.previousMonthIcon, _createElement("div", {
+      className: `ui-calendar-text`,
+      style: {
+
+      }
+    }, [$Time.format(`MMMM - YYYY`, this.month)]), this.nextMonthIcon]), _createElement("div", {
+      className: `ui-calendar-day-names`,
+      style: {
+        [`--ui-calendar-day-names-border-bottom`]: `1px dashed ` + this.theme.border.color,
+        [`--ui-calendar-day-names-border-top`]: `1px dashed ` + this.theme.border.color
+      }
+    }, [this.dayNames.bind(this)()]), _createElement("div", {
+      className: `ui-calendar-table`,
+      style: {
+
+      }
+    }, [this.cells.bind(this)()])])
   }
 }
 
-$Ui_Pager.displayName = "Ui.Pager"
+$Ui_Calendar.displayName = "Ui.Calendar"
 
-$Ui_Pager.defaultProps = {
-  pages: [],transition: `slide`,duration: 1000,active: ``
-}
-
-class $Ui_Pagination extends Component {
-  get pages() {
-    return $Math.floor($Math.max(this.total - 1, 0) / this.perPage)
-  }
-
-  get buttonRange() {
-    return $Array.range($Math.max(1, this.page - this.sidePages), $Math.min(this.page + this.sidePages + 1, this.pages))
-  }
-
-  get buttons() {
-    return $Array.map(((index) => {
-    return _createElement($Ui_Button, { onClick: ((event) => {
-    return this.onChange(index)
-    }), label: $Number.toString(index + 1), key: $Number.toString(index), outline: !_compare(index, this.page) })
-    }), this.buttonRange)
-  }
-
-  get previousButton() {
-    return (!_compare(this.page, 0) && this.pages > 0 ? _createElement($Ui_Button, { onClick: ((event) => {
-    return this.onChange(this.page - 1)
-    }), outline: true, label: `Prev` }) : $Html.empty())
-  }
-
-  get nextButton() {
-    return (!_compare(this.page, this.pages) && this.pages > 0 ? _createElement($Ui_Button, { onClick: ((event) => {
-    return this.onChange(this.page + 1)
-    }), outline: true, label: `Next` }) : $Html.empty())
-  }
-
-  get leftDots() {
-    return (this.sidePages < (this.page - 1) && this.pages > 0 ? _createElement("span", {
-      className: `ui-pagination-span`,
-      style: {
-
-      }
-    }) : $Html.empty())
-  }
-
-  get rightDots() {
-    return ((this.page + this.sidePages + 1 < this.pages) && this.pages > 0 ? _createElement("span", {
-      className: `ui-pagination-span`,
-      style: {
-
-      }
-    }) : $Html.empty())
-  }
-
-  get rightButton() {
-    return (this.pages > 1 ? _createElement($Ui_Button, { onClick: ((event) => {
-    return this.onChange(this.pages)
-    }), label: $Number.toString(this.pages + 1), outline: !_compare(this.page, this.pages) }) : $Html.empty())
-  }
-
-  get leftButton() {
-    return (this.pages >= 1 ? _createElement($Ui_Button, { onClick: ((event) => {
-    return this.onChange(0)
-    }), outline: !_compare(this.page, 0), label: `1` }) : $Html.empty())
-  }
-
-  get onChange () {
-    if (this.props.onChange != undefined) {
-      return this.props.onChange
-    } else {
-      return ((page) => {
-    return null
-    })
-    }
-  }
-
-  get sidePages () {
-    if (this.props.sidePages != undefined) {
-      return this.props.sidePages
-    } else {
-      return 2
-    }
-  }
-
-  get perPage () {
-    if (this.props.perPage != undefined) {
-      return this.props.perPage
-    } else {
-      return 10
-    }
-  }
-
-  get total () {
-    if (this.props.total != undefined) {
-      return this.props.total
-    } else {
-      return 0
-    }
-  }
-
-  get page () {
-    if (this.props.page != undefined) {
-      return this.props.page
-    } else {
-      return 0
-    }
-  }
-
-  render() {
-    return _createElement("div", {
-      className: `ui-pagination-base`,
-      style: {
-
-      }
-    }, [this.previousButton, this.leftButton, this.leftDots, this.buttons, this.rightDots, this.rightButton, this.nextButton])
-  }
-}
-
-$Ui_Pagination.displayName = "Ui.Pagination"
-
-$Ui_Pagination.defaultProps = {
-  onChange: ((page) => {
+$Ui_Calendar.defaultProps = {
+  onMonthChange: ((date) => {
   return null
-  }),sidePages: 2,perPage: 10,total: 0,page: 0
+  }),onChange: ((day) => {
+  return null
+  }),changeMonthOnSelect: false,month: $Time.today(),date: $Time.today(),disabled: false
 }
 
-class $Ui_Time extends Component {
-  constructor(props) {
-    super(props)
-    this.state = new Record({
-      now: $Time.now()
-    })
-  }
-
-  get date () {
-    if (this.props.date != undefined) {
-      return this.props.date
+class $Ui_Table extends Component {
+  get headers () {
+    if (this.props.headers != undefined) {
+      return this.props.headers
     } else {
-      return $Time.now()
+      return []
     }
   }
 
-  componentWillUnmount () {
-    $Provider_Tick._unsubscribe(this)
-  }
-
-  componentDidUpdate () {
-    if (true) {
-      $Provider_Tick._subscribe(this, new Record({
-      ticks: (() => {
-      return new Promise((_resolve) => {
-        this.setState(new Record({
-        now: $Time.now()
-      }), _resolve)
-      })
-      })
-    }))
+  get rows () {
+    if (this.props.rows != undefined) {
+      return this.props.rows
     } else {
-      $Provider_Tick._unsubscribe(this)
-    }
-  }
-
-  componentDidMount () {
-    if (true) {
-      $Provider_Tick._subscribe(this, new Record({
-      ticks: (() => {
-      return new Promise((_resolve) => {
-        this.setState(new Record({
-        now: $Time.now()
-      }), _resolve)
-      })
-      })
-    }))
-    } else {
-      $Provider_Tick._unsubscribe(this)
+      return []
     }
   }
 
   render() {
-    return _createElement("div", {
-      title: $Time.toIso(this.date),
-      className: `ui-time-base`,
-      style: {
-
-      }
-    }, [$Time.relative(this.date, this.state.now)])
+    return _createElement("table", {}, [_createElement("thead", {}, [this.headers])])
   }
 }
 
-$Ui_Time.displayName = "Ui.Time"
+$Ui_Table.displayName = "Ui.Table"
 
-$Ui_Time.defaultProps = {
-  date: $Time.now()
+$Ui_Table.defaultProps = {
+  headers: [],rows: []
 }
 
 class $Ui_Form_Field extends Component {
@@ -7051,6 +6939,128 @@ $Ui_Form_Field.defaultProps = {
   orientation: `vertical`,children: [],label: ``
 }
 
+class $Ui_Breadcrumb extends Component {
+  get children () {
+    if (this.props.children != undefined) {
+      return this.props.children
+    } else {
+      return []
+    }
+  }
+
+  get target () {
+    if (this.props.target != undefined) {
+      return this.props.target
+    } else {
+      return ``
+    }
+  }
+
+  get label () {
+    if (this.props.label != undefined) {
+      return this.props.label
+    } else {
+      return ``
+    }
+  }
+
+  get type () {
+    if (this.props.type != undefined) {
+      return this.props.type
+    } else {
+      return ``
+    }
+  }
+
+  get href () {
+    if (this.props.href != undefined) {
+      return this.props.href
+    } else {
+      return ``
+    }
+  }
+
+  get theme () { return $Ui.theme }
+
+  componentWillUnmount () {
+    $Ui._unsubscribe(this)
+  }
+
+  componentDidMount () {
+    $Ui._subscribe(this)
+  }
+
+  render() {
+    return _createElement("div", {
+      className: `ui-breadcrumb-base`,
+      style: {
+        [`--ui-breadcrumb-base-hover-color`]: this.theme.hover.color,
+        [`--ui-breadcrumb-base-a-focus-color`]: this.theme.hover.color
+      }
+    }, [_createElement($Ui_Link, { children: this.children, target: this.target, type: `inherit`, label: this.label, href: this.href })])
+  }
+}
+
+$Ui_Breadcrumb.displayName = "Ui.Breadcrumb"
+
+$Ui_Breadcrumb.defaultProps = {
+  children: [],target: ``,label: ``,type: ``,href: ``
+}
+
+class $Ui_Breadcrumbs extends Component {
+  get span() {
+    return _createElement("span", {
+      className: `ui-breadcrumbs-separator`,
+      style: {
+
+      }
+    }, [this.separator])
+  }
+
+  get children () {
+    if (this.props.children != undefined) {
+      return this.props.children
+    } else {
+      return []
+    }
+  }
+
+  get separator () {
+    if (this.props.separator != undefined) {
+      return this.props.separator
+    } else {
+      return `|`
+    }
+  }
+
+  get theme () { return $Ui.theme }
+
+  componentWillUnmount () {
+    $Ui._unsubscribe(this)
+  }
+
+  componentDidMount () {
+    $Ui._subscribe(this)
+  }
+
+  render() {
+    return _createElement("div", {
+      className: `ui-breadcrumbs-base`,
+      style: {
+        [`--ui-breadcrumbs-base-background`]: this.theme.colors.inputSecondary.background,
+        [`--ui-breadcrumbs-base-color`]: this.theme.colors.inputSecondary.text,
+        [`--ui-breadcrumbs-base-font-family`]: this.theme.fontFamily
+      }
+    }, [$Array.intersperse(this.span, this.children)])
+  }
+}
+
+$Ui_Breadcrumbs.displayName = "Ui.Breadcrumbs"
+
+$Ui_Breadcrumbs.defaultProps = {
+  children: [],separator: `|`
+}
+
 class $Html_Portals_Body extends Component {
   get children () {
     if (this.props.children != undefined) {
@@ -7072,6 +7082,137 @@ $Html_Portals_Body.defaultProps = {
 }
 
 _insertStyles(`
+  .title-base {
+    font-family: Amiko;
+    font-weight: 600;
+    font-size: 32px;
+    line-height: 1;
+    color: #222;
+  }
+
+  .users-table-table {
+    border: var(--users-table-table-border);
+    color: var(--users-table-table-color);
+    font-family: var(--users-table-table-font-family);
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    table-layout: fixed;
+    width: 100%;
+  }
+
+  .users-table-left {
+    text-align: left;
+  }
+
+  .users-table-header {
+    justify-content: space-between;
+    margin-bottom: 20px;
+    align-items: center;
+    display: flex;
+  }
+
+  .users-table-title {
+    font-weight: bold;
+    font-size: 24px;
+  }
+
+  .users-table-empty {
+    justify-content: center;
+    align-items: center;
+    min-height: 550px;
+    display: flex;
+  }
+
+  .sub-title-base {
+    margin: 10px 0;
+  }
+
+  .example-frame {
+    border: 1px solid #DDD;
+    min-height: 500px;
+    background: #FFF;
+    margin-top: 20px;
+  }
+
+  .logo-base {
+    height: var(--logo-base-height);
+    width: var(--logo-base-width);
+  }
+
+  .user-row-tr {
+
+  }
+
+  .user-row-tr a {
+    text-decoration: var(--user-row-tr-a-text-decoration);
+  }
+
+  .user-row-tr:nth-child(odd) {
+    background: #f9f9f9;
+  }
+
+  .user-row-checkbox {
+    text-align: center;
+  }
+
+  .footer-base {
+    min-height: 200px;
+    background: #222;
+    margin-top: auto;
+    color: #BBB;
+  }
+
+  .footer-wrapper {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-gap: 20px 50px;
+    display: grid;
+    padding: 30px 20px;
+    max-width: 1040px;
+    margin: 0 auto;
+  }
+
+  .footer-column {
+    width: 200px;
+  }
+
+  .footer-column > a {
+    margin-top: 5px;
+    display: block;
+    color: inherit;
+  }
+
+  .footer-column > a:hover {
+    color: inherit;
+  }
+
+  .footer-column > a:focus {
+    color: inherit;
+  }
+
+  .footer-title {
+    border-bottom: 1px dashed #444;
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+    font-family: Amiko;
+    font-weight: 600;
+    color: #EEE;
+  }
+
+  .counter-base {
+    background: var(--counter-base-background);
+    border-radius: 5px;
+    transition: 320ms;
+    display: flex;
+    padding: 20px;
+    margin: 20px;
+  }
+
+  .counter-counter {
+    font-family: sans;
+    font-size: 20px;
+    padding: 0 20px;
+  }
+
   .layout-base {
     font-family: Open Sans;
     flex-direction: column;
@@ -7091,25 +7232,100 @@ _insertStyles(`
     fill: white;
   }
 
-  .sub-title-base {
-    margin: 10px 0;
+  .examples-example-base {
+    border: 1px solid #EEE;
+    background: #FFF;
+    cursor: pointer;
+    padding: 20px;
+    color: #444;
   }
 
-  .user-form-title {
-    border-bottom: 2px solid #CCC;
-    padding-bottom: 10px;
-    margin-bottom: 15px;
+  .examples-example-description {
+    line-height: 1.5;
+    font-size: 14px;
+  }
+
+  .examples-example-title {
+    border-bottom: 1px solid #EEE;
+    padding-bottom: 7px;
+    margin-bottom: 7px;
     font-weight: bold;
-    font-size: 20px;
-    opacity: 0.8;
+    font-size: 18px;
   }
 
-  .user-form-form {
-
+  .examples-example-title > a {
+    color: inherit;
   }
 
-  .user-form-form > * {
-    margin-bottom: 15px;
+  .examples-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-gap: 20px 20px;
+    display: grid;
+  }
+
+  .examples-hr {
+    margin: 20px 0;
+    border: 0;
+    border-top: 1px solid #EEE;
+  }
+
+  .header-base {
+    background: #222;
+    color: #EEE;
+  }
+
+  .header-wrapper {
+    align-items: center;
+    max-width: 1040px;
+    padding: 0 20px;
+    margin: 0 auto;
+    display: flex;
+    height: 50px;
+  }
+
+  .header-desktop {
+    align-items: center;
+    display: none;
+  }
+
+  .header-desktop > a {
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: 14px;
+    color: inherit;
+  }
+
+  .header-desktop > a:focus {
+    color: inherit;
+  }
+
+  .header-desktop > a:hover {
+    color: inherit;
+  }
+
+  .users-layout-wrapper {
+    max-width: 1040px;
+    padding: 0 20px;
+    margin: 0 auto;
+  }
+
+  .users-layout-content {
+    padding: 24px 0;
+  }
+
+  .drag-base {
+    transform: var(--drag-base-transform);
+    justify-content: center;
+    background: orangered;
+    align-items: center;
+    border-radius: 10px;
+    position: absolute;
+    display: flex;
+    height: 100px;
+    width: 100px;
+    cursor: move;
+    color: white;
+    z-index: 10;
   }
 
   .install-hr {
@@ -7140,6 +7356,50 @@ _insertStyles(`
 
   .install-files li {
     margin-top: 10px;
+  }
+
+  .home-hero {
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    display: flex;
+    height: 500px;
+  }
+
+  .home-slogan {
+    font-weight: normal;
+    margin-top: 20px;
+    font-size: 18px;
+    color: #666;
+  }
+
+  .home-buttons {
+    margin-top: 30px;
+  }
+
+  .home-buttons > a:hover {
+    text-decoration: none;
+  }
+
+  .home-buttons > * + * {
+    margin-left: 15px;
+  }
+
+  .home-base {
+    color: #333;
+  }
+
+  .home-features {
+    padding: 0 20px 50px 20px;
+    max-width: 1040px;
+    margin: 0 auto;
+  }
+
+  .home-features h3 {
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    margin-top: 50px;
+    font-size: 26px;
   }
 
   .roadmap-feature-base {
@@ -7199,58 +7459,59 @@ _insertStyles(`
     margin-top: 20px;
   }
 
-  .home-hero {
-    justify-content: center;
+  .call-to-action-base {
+    background-image: url(/cta.png);
+    background-size: 54px 54px;
     flex-direction: column;
     align-items: center;
     display: flex;
-    height: 500px;
+    color: #FFF;
+    padding: 75px 0;
+    padding-bottom: 90px;
   }
 
-  .home-slogan {
-    font-weight: normal;
-    margin-top: 20px;
-    font-size: 18px;
-    color: #666;
+  .call-to-action-buttons {
+    display: flex;
   }
 
-  .home-buttons {
-    margin-top: 30px;
-  }
-
-  .home-buttons > a:hover {
+  .call-to-action-buttons > a:hover {
     text-decoration: none;
   }
 
-  .home-buttons > * + * {
+  .call-to-action-buttons > * + * {
     margin-left: 15px;
   }
 
-  .home-base {
-    color: #333;
-  }
-
-  .home-features {
-    padding: 0 20px 50px 20px;
-    max-width: 1040px;
-    margin: 0 auto;
-  }
-
-  .home-features h3 {
-    text-transform: uppercase;
+  .call-to-action-text {
     margin-bottom: 20px;
-    margin-top: 50px;
-    font-size: 26px;
+    font-size: 30px;
   }
 
-  .showcase-block-base {
+  .showcase-highlight-base {
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+    background: var(--showcase-highlight-base-background);
     border-radius: 2px;
+    border: var(--showcase-highlight-base-border);
+    padding: 3px 5px;
     cursor: pointer;
-    padding: 0 5px;
+    display: inline;
+    color: var(--showcase-highlight-base-color);
   }
 
-  .showcase-block-content {
-    padding-left: 20px;
+  .showcase-highlight-block-base {
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    background: var(--showcase-highlight-block-base-background);
+    padding: var(--showcase-highlight-block-base-padding);
+    border-radius: 2px;
+    border: var(--showcase-highlight-block-base-border);
+    cursor: pointer;
+    color: var(--showcase-highlight-block-base-color);
+  }
+
+  .showcase-highlight-block-content {
+    padding-left: 15px;
   }
 
   .showcase-row {
@@ -7334,125 +7595,31 @@ _insertStyles(`
     font-size: 22px;
   }
 
-  .showcase-highlight-base {
-    -webkit-tap-highlight-color: rgba(0,0,0,0);
-    -webkit-box-decoration-break: clone;
-    box-decoration-break: clone;
-    background: var(--showcase-highlight-base-background);
+  .showcase-block-base {
     border-radius: 2px;
-    border: var(--showcase-highlight-base-border);
-    padding: 3px 5px;
     cursor: pointer;
-    display: inline;
-    color: var(--showcase-highlight-base-color);
+    padding: 0 5px;
   }
 
-  .call-to-action-base {
-    background-image: url(/cta.png);
-    background-size: 54px 54px;
-    flex-direction: column;
-    align-items: center;
-    display: flex;
-    color: #FFF;
-    padding: 75px 0;
-    padding-bottom: 90px;
+  .showcase-block-content {
+    padding-left: 20px;
   }
 
-  .call-to-action-buttons {
-    display: flex;
-  }
-
-  .call-to-action-buttons > a:hover {
-    text-decoration: none;
-  }
-
-  .call-to-action-buttons > * + * {
-    margin-left: 15px;
-  }
-
-  .call-to-action-text {
-    margin-bottom: 20px;
-    font-size: 30px;
-  }
-
-  .showcase-highlight-block-base {
-    -webkit-tap-highlight-color: rgba(0,0,0,0);
-    background: var(--showcase-highlight-block-base-background);
-    padding: var(--showcase-highlight-block-base-padding);
-    border-radius: 2px;
-    border: var(--showcase-highlight-block-base-border);
-    cursor: pointer;
-    color: var(--showcase-highlight-block-base-color);
-  }
-
-  .showcase-highlight-block-content {
-    padding-left: 15px;
-  }
-
-  .logo-base {
-    height: var(--logo-base-height);
-    width: var(--logo-base-width);
-  }
-
-  .examples-example-base {
-    border: 1px solid #EEE;
-    background: #FFF;
-    cursor: pointer;
-    padding: 20px;
-    color: #444;
-  }
-
-  .examples-example-description {
-    line-height: 1.5;
-    font-size: 14px;
-  }
-
-  .examples-example-title {
-    border-bottom: 1px solid #EEE;
-    padding-bottom: 7px;
-    margin-bottom: 7px;
+  .user-form-title {
+    border-bottom: 2px solid #CCC;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
     font-weight: bold;
-    font-size: 18px;
+    font-size: 20px;
+    opacity: 0.8;
   }
 
-  .examples-example-title > a {
-    color: inherit;
-  }
-
-  .examples-grid {
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    grid-gap: 20px 20px;
-    display: grid;
-  }
-
-  .examples-hr {
-    margin: 20px 0;
-    border: 0;
-    border-top: 1px solid #EEE;
-  }
-
-  .title-base {
-    font-family: Amiko;
-    font-weight: 600;
-    font-size: 32px;
-    line-height: 1;
-    color: #222;
-  }
-
-  .user-row-tr {
+  .user-form-form {
 
   }
 
-  .user-row-tr a {
-    text-decoration: var(--user-row-tr-a-text-decoration);
-  }
-
-  .user-row-tr:nth-child(odd) {
-    background: #f9f9f9;
-  }
-
-  .user-row-checkbox {
-    text-align: center;
+  .user-form-form > * {
+    margin-bottom: 15px;
   }
 
   .page-base {
@@ -7464,333 +7631,6 @@ _insertStyles(`
     padding-bottom: 100px;
   }
 
-  .users-layout-wrapper {
-    max-width: 1040px;
-    padding: 0 20px;
-    margin: 0 auto;
-  }
-
-  .users-layout-content {
-    padding: 24px 0;
-  }
-
-  .users-table-table {
-    border: var(--users-table-table-border);
-    color: var(--users-table-table-color);
-    font-family: var(--users-table-table-font-family);
-    border-collapse: collapse;
-    margin-bottom: 20px;
-    table-layout: fixed;
-    width: 100%;
-  }
-
-  .users-table-left {
-    text-align: left;
-  }
-
-  .users-table-header {
-    justify-content: space-between;
-    margin-bottom: 20px;
-    align-items: center;
-    display: flex;
-  }
-
-  .users-table-title {
-    font-weight: bold;
-    font-size: 24px;
-  }
-
-  .users-table-empty {
-    justify-content: center;
-    align-items: center;
-    min-height: 550px;
-    display: flex;
-  }
-
-  .header-base {
-    background: #222;
-    color: #EEE;
-  }
-
-  .header-wrapper {
-    align-items: center;
-    max-width: 1040px;
-    padding: 0 20px;
-    margin: 0 auto;
-    display: flex;
-    height: 50px;
-  }
-
-  .header-desktop {
-    align-items: center;
-    display: none;
-  }
-
-  .header-desktop > a {
-    text-transform: uppercase;
-    font-weight: bold;
-    font-size: 14px;
-    color: inherit;
-  }
-
-  .header-desktop > a:focus {
-    color: inherit;
-  }
-
-  .header-desktop > a:hover {
-    color: inherit;
-  }
-
-  .footer-base {
-    min-height: 200px;
-    background: #222;
-    margin-top: auto;
-    color: #BBB;
-  }
-
-  .footer-wrapper {
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    grid-gap: 20px 50px;
-    display: grid;
-    padding: 30px 20px;
-    max-width: 1040px;
-    margin: 0 auto;
-  }
-
-  .footer-column {
-    width: 200px;
-  }
-
-  .footer-column > a {
-    margin-top: 5px;
-    display: block;
-    color: inherit;
-  }
-
-  .footer-column > a:hover {
-    color: inherit;
-  }
-
-  .footer-column > a:focus {
-    color: inherit;
-  }
-
-  .footer-title {
-    border-bottom: 1px dashed #444;
-    padding-bottom: 5px;
-    margin-bottom: 10px;
-    font-family: Amiko;
-    font-weight: 600;
-    color: #EEE;
-  }
-
-  .example-frame {
-    border: 1px solid #DDD;
-    min-height: 500px;
-    background: #FFF;
-    margin-top: 20px;
-  }
-
-  .counter-base {
-    background: var(--counter-base-background);
-    border-radius: 5px;
-    transition: 320ms;
-    display: flex;
-    padding: 20px;
-    margin: 20px;
-  }
-
-  .counter-counter {
-    font-family: sans;
-    font-size: 20px;
-    padding: 0 20px;
-  }
-
-  .drag-base {
-    transform: var(--drag-base-transform);
-    justify-content: center;
-    background: orangered;
-    align-items: center;
-    border-radius: 10px;
-    position: absolute;
-    display: flex;
-    height: 100px;
-    width: 100px;
-    cursor: move;
-    color: white;
-    z-index: 10;
-  }
-
-  .ui-table-td-td {
-    border: var(--ui-table-td-td-border);
-    border-bottom: var(--ui-table-td-td-border-bottom);
-    font-weight: var(--ui-table-td-td-font-weight);
-    text-align: var(--ui-table-td-td-text-align);
-    padding: 7px 10px;
-    width: var(--ui-table-td-td-width);
-  }
-
-  .ui-loader-base {
-    position: relative;
-  }
-
-  .ui-loader-loader {
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    left: 0;
-    top: 0;
-    background: rgba(255,255,255,0.8);
-    transition-delay: 320ms;
-    transition: 320ms;
-    pointer-events: var(--ui-loader-loader-pointer-events);
-    opacity: var(--ui-loader-loader-opacity);
-    justify-content: center;
-    align-items: center;
-    display: flex;
-  }
-
-  .ui-link-base {
-    color: var(--ui-link-base-color);
-    text-decoration: none;
-    outline: none;
-  }
-
-  .ui-link-base:hover {
-    text-decoration: underline;
-    color: var(--ui-link-base-hover-color);
-  }
-
-  .ui-link-base:focus {
-    text-decoration: underline;
-    color: var(--ui-link-base-focus-color);
-  }
-
-  .ui-checkbox-base {
-    -webkit-tap-highlight-color: rgba(0,0,0,0);
-    -webkit-touch-callout: none;
-    background-color: var(--ui-checkbox-base-background-color);
-    border: var(--ui-checkbox-base-border);
-    border-radius: var(--ui-checkbox-base-border-radius);
-    color: var(--ui-checkbox-base-color);
-    justify-content: center;
-    display: inline-flex;
-    align-items: center;
-    cursor: pointer;
-    outline: none;
-    height: 34px;
-    width: 34px;
-    padding: 0;
-  }
-
-  .ui-checkbox-base::-moz-focus-inner {
-    border: 0;
-  }
-
-  .ui-checkbox-base:focus {
-    box-shadow: var(--ui-checkbox-base-focus-box-shadow);
-    border-color: var(--ui-checkbox-base-focus-border-color);
-    color: var(--ui-checkbox-base-focus-color);
-  }
-
-  .ui-checkbox-base:disabled {
-    background: var(--ui-checkbox-base-disabled-background);
-    color: var(--ui-checkbox-base-disabled-color);
-    cursor: not-allowed;
-  }
-
-  .ui-checkbox-icon {
-    transform: var(--ui-checkbox-icon-transform);
-    opacity: var(--ui-checkbox-icon-opacity);
-    fill: currentColor;
-    transition: 200ms;
-    height: 16px;
-    width: 16px;
-  }
-
-  .ui-form-separator-base {
-    border-top: 1px solid #EEE;
-  }
-
-  .ui-calendar-base {
-    -moz-user-select: none;
-    user-select: none;
-    background: var(--ui-calendar-base-background);
-    border: var(--ui-calendar-base-border);
-    border-radius: var(--ui-calendar-base-border-radius);
-    color: var(--ui-calendar-base-color);
-    font-family: var(--ui-calendar-base-font-family);
-    padding: 10px;
-    width: 300px;
-  }
-
-  .ui-calendar-table {
-    grid-template-columns: repeat(7, 1fr);
-    grid-gap: 10px;
-    display: grid;
-    width: 100%;
-  }
-
-  .ui-calendar-header {
-    align-items: center;
-    display: flex;
-    height: 26px;
-  }
-
-  .ui-calendar-text {
-    text-align: center;
-    flex: 1;
-  }
-
-  .ui-calendar-day-name {
-    text-transform: uppercase;
-    text-align: center;
-    font-weight: bold;
-    font-size: 12px;
-    opacity: 0.5;
-    width: 34px;
-  }
-
-  .ui-calendar-day-names {
-    border-bottom: var(--ui-calendar-day-names-border-bottom);
-    border-top: var(--ui-calendar-day-names-border-top);
-    justify-content: space-between;
-    padding: 6px 0;
-    margin: 10px 0;
-    display: flex;
-  }
-
-  .ui-dropdown-panel {
-    position: fixed;
-    left: var(--ui-dropdown-panel-left);
-    top: var(--ui-dropdown-panel-top);
-  }
-
-  .ui-breadcrumb-base {
-    display: inline-block;
-  }
-
-  .ui-breadcrumb-base:hover {
-    color: var(--ui-breadcrumb-base-hover-color);
-  }
-
-  .ui-breadcrumb-base a:focus {
-    color: var(--ui-breadcrumb-base-a-focus-color);
-  }
-
-  .ui-breadcrumbs-separator {
-    display: inline-block;
-    margin: 0 12px;
-    opacity: 0.4;
-  }
-
-  .ui-breadcrumbs-base {
-    background: var(--ui-breadcrumbs-base-background);
-    color: var(--ui-breadcrumbs-base-color);
-    font-family: var(--ui-breadcrumbs-base-font-family);
-    padding: 14px 24px;
-  }
-
   .ui-toolbar-base {
     border-bottom: 2px solid rgba(0,0,0,0.1);
     background: var(--ui-toolbar-base-background);
@@ -7799,311 +7639,6 @@ _insertStyles(`
     padding: 0 24px;
     display: flex;
     height: 56px;
-  }
-
-  .ui-toggle-base {
-    -webkit-tap-highlight-color: rgba(0,0,0,0);
-    -webkit-touch-callout: none;
-    -webkit-appearance: none;
-    appearance: none;
-    background-color: var(--ui-toggle-base-background-color);
-    border: var(--ui-toggle-base-border);
-    border-radius: var(--ui-toggle-base-border-radius);
-    color: var(--ui-toggle-base-color);
-    font-family: var(--ui-toggle-base-font-family);
-    display: inline-flex;
-    position: relative;
-    font-weight: bold;
-    width: var(--ui-toggle-base-width);
-    cursor: pointer;
-    font-size: 14px;
-    outline: none;
-    height: 34px;
-    padding: 0;
-  }
-
-  .ui-toggle-base::-moz-focus-inner {
-    border: 0;
-  }
-
-  .ui-toggle-base:focus {
-    box-shadow: var(--ui-toggle-base-focus-box-shadow);
-    border-color: var(--ui-toggle-base-focus-border-color);
-    color: var(--ui-toggle-base-focus-color);
-  }
-
-  .ui-toggle-base:disabled {
-    background: var(--ui-toggle-base-disabled-background);
-    color: var(--ui-toggle-base-disabled-color);
-    cursor: not-allowed;
-  }
-
-  .ui-toggle-label {
-    text-align: center;
-    width: 50%;
-  }
-
-  .ui-toggle-overlay {
-    background: var(--ui-toggle-overlay-background);
-    border-radius: var(--ui-toggle-overlay-border-radius);
-    width: calc(50% - 2px);
-    position: absolute;
-    transition: 320ms;
-    left: var(--ui-toggle-overlay-left);
-    bottom: 2px;
-    top: 2px;
-  }
-
-  .ui-calendar-cell-style {
-    border-radius: var(--ui-calendar-cell-style-border-radius);
-    justify-content: center;
-    line-height: 34px;
-    cursor: pointer;
-    display: flex;
-    height: 34px;
-    width: 34px;
-    background: var(--ui-calendar-cell-style-background);
-    color: var(--ui-calendar-cell-style-color);
-    opacity: var(--ui-calendar-cell-style-opacity);
-  }
-
-  .ui-calendar-cell-style:hover {
-    background: var(--ui-calendar-cell-style-hover-background);
-    color: var(--ui-calendar-cell-style-hover-color);
-  }
-
-  .ui-input-input {
-    -webkit-tap-highlight-color: rgba(0,0,0,0);
-    -webkit-touch-callout: none;
-    background-color: var(--ui-input-input-background-color);
-    border: var(--ui-input-input-border);
-    border-radius: var(--ui-input-input-border-radius);
-    color: var(--ui-input-input-color);
-    font-family: var(--ui-input-input-font-family);
-    line-height: 14px;
-    font-size: 14px;
-    outline: none;
-    height: 34px;
-    width: 100%;
-    padding: 6px 9px;
-    padding-right: var(--ui-input-input-padding-right);
-  }
-
-  .ui-input-input:disabled {
-    background-color: var(--ui-input-input-disabled-background-color);
-    color: var(--ui-input-input-disabled-color);
-    border-color: transparent;
-    cursor: not-allowed;
-    user-select: none;
-  }
-
-  .ui-input-input:-moz-read-only::-moz-selection {
-    background: transparent;
-  }
-
-  .ui-input-input:read-only::selection {
-    background: transparent;
-  }
-
-  .ui-input-input::-webkit-input-placeholder {
-    opacity: 0.5;
-  }
-
-  .ui-input-input:-ms-input-placeholder {
-    opacity: 0.5;
-  }
-
-  .ui-input-input::-moz-placeholder {
-    opacity: 0.5;
-  }
-
-  .ui-input-input:-moz-placeholder {
-    opacity: 0.5;
-  }
-
-  .ui-input-input:focus {
-    box-shadow: var(--ui-input-input-focus-box-shadow);
-    border-color: var(--ui-input-input-focus-border-color);
-  }
-
-  .ui-input-base {
-    -webkit-tap-highlight-color: rgba(0,0,0,0);
-    -webkit-touch-callout: none;
-    display: inline-block;
-    position: relative;
-  }
-
-  .ui-input-icon {
-    fill: var(--ui-input-icon-fill);
-    position: absolute;
-    cursor: pointer;
-    height: 12px;
-    width: 12px;
-    right: 12px;
-    top: 11px;
-  }
-
-  .ui-input-icon:hover {
-    fill: var(--ui-input-icon-hover-fill);
-  }
-
-  .ui-card-base {
-    border: 1px solid #e4e4e4;
-    flex-direction: column;
-    border-radius: 4px;
-    display: flex;
-  }
-
-  .ui-card-image-base {
-    display: block;
-    width: 100%;
-    border: 0;
-  }
-
-  .ui-card-image-base:first-child {
-    border-top-right-radius: 4px;
-    border-top-left-radius: 4px;
-    width: calc(100% + 2px);
-    margin-left: -1px;
-    margin-top: -1px;
-  }
-
-  .ui-card-block-base {
-    padding: 1.25em;
-    flex: 1;
-  }
-
-  .ui-card-title-base {
-    margin-bottom: 0.75em;
-    font-size: 1.25em;
-    font-weight: bold;
-  }
-
-  .ui-card-text-base {
-    line-height: 1.5;
-  }
-
-  .ui-toolbar-separator-base {
-    border-left: 1px solid rgba(255, 255, 255, 0.1);
-    margin: 0 15px;
-    height: 30px;
-  }
-
-  .ui-form-label-base {
-    font-size: var(--ui-form-label-base-font-size);
-    font-family: var(--ui-form-label-base-font-family);
-    font-weight: bold;
-    opacity: 0.8;
-    color: #333;
-    flex: 1;
-  }
-
-  .ui-toolbar-title-base {
-    font-family: sans;
-    font-weight: bold;
-    font-size: 22px;
-  }
-
-  .ui-toolbar-title-base > a {
-    color: inherit;
-  }
-
-  .ui-toolbar-title-base:hover > a {
-    color: inherit;
-  }
-
-  .ui-toolbar-title-base > a:focus {
-    color: inherit;
-  }
-
-  .ui-toolbar-title-base:not(:first-child) {
-    margin-left: 15px;
-  }
-
-  .ui-icon-path-svg {
-    pointer-events: var(--ui-icon-path-svg-pointer-events);
-    fill: currentColor;
-  }
-
-  .ui-icon-path-svg:hover {
-    fill: var(--ui-icon-path-svg-hover-fill);
-    cursor: var(--ui-icon-path-svg-hover-cursor);
-  }
-
-  .ui-toolbar-link-base {
-    font-size: 18px;
-  }
-
-  .ui-toolbar-link-base a {
-    cursor: pointer;
-    display: block;
-    color: inherit;
-  }
-
-  .ui-toolbar-link-base a:focus {
-    color: inherit;
-  }
-
-  .ui-toolbar-link-base a:hover {
-    color: inherit;
-  }
-
-  .ui-toolbar-spacer-base {
-    flex: 1;
-  }
-
-  .ui-button-styles {
-    -webkit-tap-highlight-color: rgba(0,0,0,0);
-    -webkit-touch-callout: none;
-    -webkit-appearance: none;
-    appearance: none;
-    border-radius: var(--ui-button-styles-border-radius);
-    font-family: var(--ui-button-styles-font-family);
-    display: inline-flex;
-    white-space: nowrap;
-    font-weight: bold;
-    user-select: none;
-    cursor: pointer;
-    outline: none;
-    height: var(--ui-button-styles-height);
-    flexDirection: var(--ui-button-styles-flexDirection);
-    padding: var(--ui-button-styles-padding);
-    background: var(--ui-button-styles-background);
-    color: var(--ui-button-styles-color);
-    font-size: var(--ui-button-styles-font-size);
-    border: var(--ui-button-styles-border);
-  }
-
-  .ui-button-styles::-moz-focus-inner {
-    border: 0;
-  }
-
-  .ui-button-styles:focus {
-    box-shadow: var(--ui-button-styles-focus-box-shadow);
-    background: var(--ui-button-styles-focus-background);
-    border: var(--ui-button-styles-focus-border);
-    color: var(--ui-button-styles-focus-color);
-  }
-
-  .ui-button-styles:disabled {
-    background: var(--ui-button-styles-disabled-background);
-    color: var(--ui-button-styles-disabled-color);
-    cursor: not-allowed;
-  }
-
-  .ui-button-label {
-    text-overflow: ellipsis;
-    grid-area: label;
-    overflow: hidden;
-  }
-
-  .ui-button-icon {
-    height: var(--ui-button-icon-height);
-    width: var(--ui-button-icon-width);
-  }
-
-  .ui-button-gutter {
-    width: var(--ui-button-gutter-width);
   }
 
   .ui-slider-base {
@@ -8200,23 +7735,20 @@ _insertStyles(`
     border: 0;
   }
 
-  .ui-pager-page-base {
-    transition: var(--ui-pager-page-base-transition);
-    pointer-events: var(--ui-pager-page-base-pointer-events);
-    transform: var(--ui-pager-page-base-transform);
-    position: absolute;
-    opacity: var(--ui-pager-page-base-opacity);
-    display: grid;
-    bottom: 0;
-    right: 0;
-    left: 0;
-    top: 0;
+  .ui-icon-path-svg {
+    pointer-events: var(--ui-icon-path-svg-pointer-events);
+    fill: currentColor;
   }
 
-  .ui-pager-base {
-    position: relative;
-    overflow: hidden;
-    flex: 1;
+  .ui-icon-path-svg:hover {
+    fill: var(--ui-icon-path-svg-hover-fill);
+    cursor: var(--ui-icon-path-svg-hover-cursor);
+  }
+
+  .ui-toolbar-separator-base {
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+    margin: 0 15px;
+    height: 30px;
   }
 
   .ui-pagination-base {
@@ -8237,8 +7769,461 @@ _insertStyles(`
     line-height: 8px;
   }
 
+  .ui-toolbar-title-base {
+    font-family: sans;
+    font-weight: bold;
+    font-size: 22px;
+  }
+
+  .ui-toolbar-title-base > a {
+    color: inherit;
+  }
+
+  .ui-toolbar-title-base:hover > a {
+    color: inherit;
+  }
+
+  .ui-toolbar-title-base > a:focus {
+    color: inherit;
+  }
+
+  .ui-toolbar-title-base:not(:first-child) {
+    margin-left: 15px;
+  }
+
+  .ui-input-input {
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    -webkit-touch-callout: none;
+    background-color: var(--ui-input-input-background-color);
+    border: var(--ui-input-input-border);
+    border-radius: var(--ui-input-input-border-radius);
+    color: var(--ui-input-input-color);
+    font-family: var(--ui-input-input-font-family);
+    line-height: 14px;
+    font-size: 14px;
+    outline: none;
+    height: 34px;
+    width: 100%;
+    padding: 6px 9px;
+    padding-right: var(--ui-input-input-padding-right);
+  }
+
+  .ui-input-input:disabled {
+    background-color: var(--ui-input-input-disabled-background-color);
+    color: var(--ui-input-input-disabled-color);
+    border-color: transparent;
+    cursor: not-allowed;
+    user-select: none;
+  }
+
+  .ui-input-input:-moz-read-only::-moz-selection {
+    background: transparent;
+  }
+
+  .ui-input-input:read-only::selection {
+    background: transparent;
+  }
+
+  .ui-input-input::-webkit-input-placeholder {
+    opacity: 0.5;
+  }
+
+  .ui-input-input:-ms-input-placeholder {
+    opacity: 0.5;
+  }
+
+  .ui-input-input::-moz-placeholder {
+    opacity: 0.5;
+  }
+
+  .ui-input-input:-moz-placeholder {
+    opacity: 0.5;
+  }
+
+  .ui-input-input:focus {
+    box-shadow: var(--ui-input-input-focus-box-shadow);
+    border-color: var(--ui-input-input-focus-border-color);
+  }
+
+  .ui-input-base {
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    -webkit-touch-callout: none;
+    display: inline-block;
+    position: relative;
+  }
+
+  .ui-input-icon {
+    fill: var(--ui-input-icon-fill);
+    position: absolute;
+    cursor: pointer;
+    height: 12px;
+    width: 12px;
+    right: 12px;
+    top: 11px;
+  }
+
+  .ui-input-icon:hover {
+    fill: var(--ui-input-icon-hover-fill);
+  }
+
+  .ui-pager-page-base {
+    transition: var(--ui-pager-page-base-transition);
+    pointer-events: var(--ui-pager-page-base-pointer-events);
+    transform: var(--ui-pager-page-base-transform);
+    position: absolute;
+    opacity: var(--ui-pager-page-base-opacity);
+    display: grid;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    top: 0;
+  }
+
+  .ui-pager-base {
+    position: relative;
+    overflow: hidden;
+    flex: 1;
+  }
+
+  .ui-link-base {
+    color: var(--ui-link-base-color);
+    text-decoration: none;
+    outline: none;
+  }
+
+  .ui-link-base:hover {
+    text-decoration: underline;
+    color: var(--ui-link-base-hover-color);
+  }
+
+  .ui-link-base:focus {
+    text-decoration: underline;
+    color: var(--ui-link-base-focus-color);
+  }
+
+  .ui-loader-base {
+    position: relative;
+  }
+
+  .ui-loader-loader {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    top: 0;
+    background: rgba(255,255,255,0.8);
+    transition-delay: 320ms;
+    transition: 320ms;
+    pointer-events: var(--ui-loader-loader-pointer-events);
+    opacity: var(--ui-loader-loader-opacity);
+    justify-content: center;
+    align-items: center;
+    display: flex;
+  }
+
+  .ui-toggle-base {
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    -webkit-touch-callout: none;
+    -webkit-appearance: none;
+    appearance: none;
+    background-color: var(--ui-toggle-base-background-color);
+    border: var(--ui-toggle-base-border);
+    border-radius: var(--ui-toggle-base-border-radius);
+    color: var(--ui-toggle-base-color);
+    font-family: var(--ui-toggle-base-font-family);
+    display: inline-flex;
+    position: relative;
+    font-weight: bold;
+    width: var(--ui-toggle-base-width);
+    cursor: pointer;
+    font-size: 14px;
+    outline: none;
+    height: 34px;
+    padding: 0;
+  }
+
+  .ui-toggle-base::-moz-focus-inner {
+    border: 0;
+  }
+
+  .ui-toggle-base:focus {
+    box-shadow: var(--ui-toggle-base-focus-box-shadow);
+    border-color: var(--ui-toggle-base-focus-border-color);
+    color: var(--ui-toggle-base-focus-color);
+  }
+
+  .ui-toggle-base:disabled {
+    background: var(--ui-toggle-base-disabled-background);
+    color: var(--ui-toggle-base-disabled-color);
+    cursor: not-allowed;
+  }
+
+  .ui-toggle-label {
+    text-align: center;
+    width: 50%;
+  }
+
+  .ui-toggle-overlay {
+    background: var(--ui-toggle-overlay-background);
+    border-radius: var(--ui-toggle-overlay-border-radius);
+    width: calc(50% - 2px);
+    position: absolute;
+    transition: 320ms;
+    left: var(--ui-toggle-overlay-left);
+    bottom: 2px;
+    top: 2px;
+  }
+
   .ui-time-base {
     display: inline-block;
+  }
+
+  .ui-table-td-td {
+    border: var(--ui-table-td-td-border);
+    border-bottom: var(--ui-table-td-td-border-bottom);
+    font-weight: var(--ui-table-td-td-font-weight);
+    text-align: var(--ui-table-td-td-text-align);
+    padding: 7px 10px;
+    width: var(--ui-table-td-td-width);
+  }
+
+  .ui-button-styles {
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    -webkit-touch-callout: none;
+    -webkit-appearance: none;
+    appearance: none;
+    border-radius: var(--ui-button-styles-border-radius);
+    font-family: var(--ui-button-styles-font-family);
+    display: inline-flex;
+    white-space: nowrap;
+    font-weight: bold;
+    user-select: none;
+    cursor: pointer;
+    outline: none;
+    height: var(--ui-button-styles-height);
+    flexDirection: var(--ui-button-styles-flexDirection);
+    padding: var(--ui-button-styles-padding);
+    background: var(--ui-button-styles-background);
+    color: var(--ui-button-styles-color);
+    font-size: var(--ui-button-styles-font-size);
+    border: var(--ui-button-styles-border);
+  }
+
+  .ui-button-styles::-moz-focus-inner {
+    border: 0;
+  }
+
+  .ui-button-styles:focus {
+    box-shadow: var(--ui-button-styles-focus-box-shadow);
+    background: var(--ui-button-styles-focus-background);
+    border: var(--ui-button-styles-focus-border);
+    color: var(--ui-button-styles-focus-color);
+  }
+
+  .ui-button-styles:disabled {
+    background: var(--ui-button-styles-disabled-background);
+    color: var(--ui-button-styles-disabled-color);
+    cursor: not-allowed;
+  }
+
+  .ui-button-label {
+    text-overflow: ellipsis;
+    grid-area: label;
+    overflow: hidden;
+  }
+
+  .ui-button-icon {
+    height: var(--ui-button-icon-height);
+    width: var(--ui-button-icon-width);
+  }
+
+  .ui-button-gutter {
+    width: var(--ui-button-gutter-width);
+  }
+
+  .ui-card-base {
+    border: 1px solid #e4e4e4;
+    flex-direction: column;
+    border-radius: 4px;
+    display: flex;
+  }
+
+  .ui-card-image-base {
+    display: block;
+    width: 100%;
+    border: 0;
+  }
+
+  .ui-card-image-base:first-child {
+    border-top-right-radius: 4px;
+    border-top-left-radius: 4px;
+    width: calc(100% + 2px);
+    margin-left: -1px;
+    margin-top: -1px;
+  }
+
+  .ui-card-block-base {
+    padding: 1.25em;
+    flex: 1;
+  }
+
+  .ui-card-title-base {
+    margin-bottom: 0.75em;
+    font-size: 1.25em;
+    font-weight: bold;
+  }
+
+  .ui-card-text-base {
+    line-height: 1.5;
+  }
+
+  .ui-calendar-cell-style {
+    border-radius: var(--ui-calendar-cell-style-border-radius);
+    justify-content: center;
+    line-height: 34px;
+    cursor: pointer;
+    display: flex;
+    height: 34px;
+    width: 34px;
+    background: var(--ui-calendar-cell-style-background);
+    color: var(--ui-calendar-cell-style-color);
+    opacity: var(--ui-calendar-cell-style-opacity);
+  }
+
+  .ui-calendar-cell-style:hover {
+    background: var(--ui-calendar-cell-style-hover-background);
+    color: var(--ui-calendar-cell-style-hover-color);
+  }
+
+  .ui-toolbar-link-base {
+    font-size: 18px;
+  }
+
+  .ui-toolbar-link-base a {
+    cursor: pointer;
+    display: block;
+    color: inherit;
+  }
+
+  .ui-toolbar-link-base a:focus {
+    color: inherit;
+  }
+
+  .ui-toolbar-link-base a:hover {
+    color: inherit;
+  }
+
+  .ui-dropdown-panel {
+    position: fixed;
+    left: var(--ui-dropdown-panel-left);
+    top: var(--ui-dropdown-panel-top);
+  }
+
+  .ui-form-label-base {
+    font-size: var(--ui-form-label-base-font-size);
+    font-family: var(--ui-form-label-base-font-family);
+    font-weight: bold;
+    opacity: 0.8;
+    color: #333;
+    flex: 1;
+  }
+
+  .ui-checkbox-base {
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    -webkit-touch-callout: none;
+    background-color: var(--ui-checkbox-base-background-color);
+    border: var(--ui-checkbox-base-border);
+    border-radius: var(--ui-checkbox-base-border-radius);
+    color: var(--ui-checkbox-base-color);
+    justify-content: center;
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    outline: none;
+    height: 34px;
+    width: 34px;
+    padding: 0;
+  }
+
+  .ui-checkbox-base::-moz-focus-inner {
+    border: 0;
+  }
+
+  .ui-checkbox-base:focus {
+    box-shadow: var(--ui-checkbox-base-focus-box-shadow);
+    border-color: var(--ui-checkbox-base-focus-border-color);
+    color: var(--ui-checkbox-base-focus-color);
+  }
+
+  .ui-checkbox-base:disabled {
+    background: var(--ui-checkbox-base-disabled-background);
+    color: var(--ui-checkbox-base-disabled-color);
+    cursor: not-allowed;
+  }
+
+  .ui-checkbox-icon {
+    transform: var(--ui-checkbox-icon-transform);
+    opacity: var(--ui-checkbox-icon-opacity);
+    fill: currentColor;
+    transition: 200ms;
+    height: 16px;
+    width: 16px;
+  }
+
+  .ui-toolbar-spacer-base {
+    flex: 1;
+  }
+
+  .ui-form-separator-base {
+    border-top: 1px solid #EEE;
+  }
+
+  .ui-calendar-base {
+    -moz-user-select: none;
+    user-select: none;
+    background: var(--ui-calendar-base-background);
+    border: var(--ui-calendar-base-border);
+    border-radius: var(--ui-calendar-base-border-radius);
+    color: var(--ui-calendar-base-color);
+    font-family: var(--ui-calendar-base-font-family);
+    padding: 10px;
+    width: 300px;
+  }
+
+  .ui-calendar-table {
+    grid-template-columns: repeat(7, 1fr);
+    grid-gap: 10px;
+    display: grid;
+    width: 100%;
+  }
+
+  .ui-calendar-header {
+    align-items: center;
+    display: flex;
+    height: 26px;
+  }
+
+  .ui-calendar-text {
+    text-align: center;
+    flex: 1;
+  }
+
+  .ui-calendar-day-name {
+    text-transform: uppercase;
+    text-align: center;
+    font-weight: bold;
+    font-size: 12px;
+    opacity: 0.5;
+    width: 34px;
+  }
+
+  .ui-calendar-day-names {
+    border-bottom: var(--ui-calendar-day-names-border-bottom);
+    border-top: var(--ui-calendar-day-names-border-top);
+    justify-content: space-between;
+    padding: 6px 0;
+    margin: 10px 0;
+    display: flex;
   }
 
   .ui-form-field-base {
@@ -8253,7 +8238,36 @@ _insertStyles(`
 
   .ui-form-field-base > *:last-child {
     margin-bottom: var(--ui-form-field-base-last-child-margin-bottom);
+  }
+
+  .ui-breadcrumb-base {
+    display: inline-block;
+  }
+
+  .ui-breadcrumb-base:hover {
+    color: var(--ui-breadcrumb-base-hover-color);
+  }
+
+  .ui-breadcrumb-base a:focus {
+    color: var(--ui-breadcrumb-base-a-focus-color);
+  }
+
+  .ui-breadcrumbs-separator {
+    display: inline-block;
+    margin: 0 12px;
+    opacity: 0.4;
+  }
+
+  .ui-breadcrumbs-base {
+    background: var(--ui-breadcrumbs-base-background);
+    color: var(--ui-breadcrumbs-base-color);
+    font-family: var(--ui-breadcrumbs-base-font-family);
+    padding: 14px 24px;
   }  @media (max-width: 600px)  {
+    .title-base-media-0 {
+      font-size: 24px;
+    }
+
     .sub-title-base-media-0 {
       font-size: 14px;
     }
@@ -8270,6 +8284,10 @@ _insertStyles(`
     .home-slogan-media-0 {
       margin-top: 10px;
       font-size: 13px;
+    }
+
+    .showcase-highlight-block-base-media-0 {
+      white-space: pre-wrap;
     }
 
     .showcase-base-media-0 {
@@ -8295,14 +8313,6 @@ _insertStyles(`
 
     .showcase-section-title-media-0 {
       font-size: 18px;
-    }
-
-    .showcase-highlight-block-base-media-0 {
-      white-space: pre-wrap;
-    }
-
-    .title-base-media-0 {
-      font-size: 24px;
     }
 
     .page-base-media-0 {
