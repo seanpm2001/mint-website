@@ -2381,24 +2381,22 @@ const $Versions = new (class extends Store {
               let object = _2.value
               
 
-     await this.versions
+    let _3 = $Version.decodeMany(object)
 
-    let _4 = $Version.decodeMany(object)
-
-              if (_4 instanceof Err) {
-                let _error = _4.value
+              if (_3 instanceof Err) {
+                let _error = _3.value
                 let error = _error;
      $Debug.log(error)
 
                 throw new DoError
               }
 
-               _4.value
+              let versions = _3.value
               
 
     let sortedVersions = await $Array.reverse($Array.sortBy(((version) => {
     return version.date
-    }), this.versions))
+    }), versions))
 
      await new Promise((_resolve) => {
       this.setState(_update(this.state, { versions: sortedVersions, stale: false }), _resolve)
