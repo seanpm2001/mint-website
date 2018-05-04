@@ -163,139 +163,177 @@ detach() {
 })
 
 _program.addRoutes([{
-       handler: (() => { (async () => {
-        try {  await $Application.setPage(`new`)
+  handler: (() => {
+    (async () => {
+  try {
+     await $Application.setPage(`new`)
 
- await $Users_List.resetUser() }
-        catch(_error) {
-          if (_error instanceof DoError) {
-          } else {
-            console.warn(`Unhandled error in do statement`)
-            console.log(_error)
-          }
-        } 
-      })() }),
-       mapping: [],
-       path: `/users/new`
-     }, {
-       handler: ((id) => { (async () => {
-        try {  await $Application.setPage(`user`)
+ await $Users_List.resetUser()
+  }
+  catch(_error) {
+    if (_error instanceof DoError) {
+    } else {
+      console.warn(`Unhandled error in do statement`)
+      console.log(_error)
+    }
+  } 
+})()
+  }),
+  mapping: [],
+  path: `/users/new`
+}, {
+  handler: ((id) => {
+    (async () => {
+  try {
+     await $Application.setPage(`user`)
 
  await $Users_List.resetUser()
 
- await $Users_List.getUser(id) }
-        catch(_error) {
-          if (_error instanceof DoError) {
-          } else {
-            console.warn(`Unhandled error in do statement`)
-            console.log(_error)
-          }
-        } 
-      })() }),
-       mapping: ['id'],
-       path: `/users/:id`
-     }, {
-       handler: ((page) => { (async () => {
-        try {  await $Application.setPage(`index`)
+ await $Users_List.getUser(id)
+  }
+  catch(_error) {
+    if (_error instanceof DoError) {
+    } else {
+      console.warn(`Unhandled error in do statement`)
+      console.log(_error)
+    }
+  } 
+})()
+  }),
+  mapping: ['id'],
+  path: `/users/:id`
+}, {
+  handler: ((page) => {
+    (async () => {
+  try {
+     await $Application.setPage(`index`)
 
  await $Users_List.refresh()
 
 let actualPage = await $Maybe.withDefault(0, $Number.fromString(page))
 
- await $Users_List.setPage(actualPage) }
-        catch(_error) {
-          if (_error instanceof DoError) {
-          } else {
-            console.warn(`Unhandled error in do statement`)
-            console.log(_error)
-          }
-        } 
-      })() }),
-       mapping: ['page'],
-       path: `/users?page=:page`
-     }, {
-       handler: (() => { (async () => {
-        try {  await $Application.setPage(`index`)
+ await $Users_List.setPage(actualPage)
+  }
+  catch(_error) {
+    if (_error instanceof DoError) {
+    } else {
+      console.warn(`Unhandled error in do statement`)
+      console.log(_error)
+    }
+  } 
+})()
+  }),
+  mapping: ['page'],
+  path: `/users?page=:page`
+}, {
+  handler: (() => {
+    (async () => {
+  try {
+     await $Application.setPage(`index`)
 
  await $Users_List.refresh()
 
- await $Users_List.setPage(0) }
-        catch(_error) {
-          if (_error instanceof DoError) {
-          } else {
-            console.warn(`Unhandled error in do statement`)
-            console.log(_error)
-          }
-        } 
-      })() }),
-       mapping: [],
-       path: `/users`
-     }, {
-       handler: (() => { $Application.setPage(`counter`) }),
-       mapping: [],
-       path: `/counter`
-     }, {
-       handler: (() => { $Application.setPage(`drag`) }),
-       mapping: [],
-       path: `/drag`
-     }, {
-       handler: (() => { $Application.setPage(`examples`) }),
-       mapping: [],
-       path: `/examples`
-     }, {
-       handler: (() => { $Application.setPage(`file-handling`) }),
-       mapping: [],
-       path: `/examples/file-handling`
-     }, {
-       handler: (() => { (async () => {
-        try {  await $Application.setPage(`install`)
+ await $Users_List.setPage(0)
+  }
+  catch(_error) {
+    if (_error instanceof DoError) {
+    } else {
+      console.warn(`Unhandled error in do statement`)
+      console.log(_error)
+    }
+  } 
+})()
+  }),
+  mapping: [],
+  path: `/users`
+}, {
+  handler: (() => {
+    $Application.setPage(`counter`)
+  }),
+  mapping: [],
+  path: `/counter`
+}, {
+  handler: (() => {
+    $Application.setPage(`drag`)
+  }),
+  mapping: [],
+  path: `/drag`
+}, {
+  handler: (() => {
+    $Application.setPage(`examples`)
+  }),
+  mapping: [],
+  path: `/examples`
+}, {
+  handler: (() => {
+    $Application.setPage(`file-handling`)
+  }),
+  mapping: [],
+  path: `/examples/file-handling`
+}, {
+  handler: (() => {
+    (async () => {
+  try {
+     await $Application.setPage(`install`)
 
- await $Versions.refresh() }
-        catch(_error) {
-          if (_error instanceof DoError) {
-          } else {
-            console.warn(`Unhandled error in do statement`)
-            console.log(_error)
-          }
-        } 
-      })() }),
-       mapping: [],
-       path: `/install`
-     }, {
-       handler: (() => { (async () => {
-        try {  await $Application.setPage(`roadmap`)
+ await $Versions.refresh()
+  }
+  catch(_error) {
+    if (_error instanceof DoError) {
+    } else {
+      console.warn(`Unhandled error in do statement`)
+      console.log(_error)
+    }
+  } 
+})()
+  }),
+  mapping: [],
+  path: `/install`
+}, {
+  handler: (() => {
+    (async () => {
+  try {
+     await $Application.setPage(`roadmap`)
 
- await $Versions.refresh() }
-        catch(_error) {
-          if (_error instanceof DoError) {
-          } else {
-            console.warn(`Unhandled error in do statement`)
-            console.log(_error)
-          }
-        } 
-      })() }),
-       mapping: [],
-       path: `/roadmap`
-     }, {
-       handler: (() => { (async () => {
-        try {  await $Application.setPage(`home`)
+ await $Versions.refresh()
+  }
+  catch(_error) {
+    if (_error instanceof DoError) {
+    } else {
+      console.warn(`Unhandled error in do statement`)
+      console.log(_error)
+    }
+  } 
+})()
+  }),
+  mapping: [],
+  path: `/roadmap`
+}, {
+  handler: (() => {
+    (async () => {
+  try {
+     await $Application.setPage(`home`)
 
- await $Showcase_Store.setActive(`store`) }
-        catch(_error) {
-          if (_error instanceof DoError) {
-          } else {
-            console.warn(`Unhandled error in do statement`)
-            console.log(_error)
-          }
-        } 
-      })() }),
-       mapping: [],
-       path: `/`
-     }, {
-       handler: (() => { $Application.setPage(`not_found`) }),
-       mapping: [],
-       path: `*`
-     }])
+ await $Showcase_Store.setActive(`store`)
+  }
+  catch(_error) {
+    if (_error instanceof DoError) {
+    } else {
+      console.warn(`Unhandled error in do statement`)
+      console.log(_error)
+    }
+  } 
+})()
+  }),
+  mapping: [],
+  path: `/`
+}, {
+  handler: (() => {
+    $Application.setPage(`not_found`)
+  }),
+  mapping: [],
+  path: `*`
+}])
 
 const $Version = new(class {
   empty() {
@@ -1844,7 +1882,7 @@ const $Maybe = new(class {
 })
 
 const $Users_List = new (class extends Store {
-  get users () {
+    get users () {
     if (this.props.users != undefined) {
       return this.props.users
     } else {
@@ -2004,51 +2042,53 @@ const $Users_List = new (class extends Store {
 
   load() {
     return (async () => {
-            try {  await new Promise((_resolve) => {
+      try {
+         await new Promise((_resolve) => {
       this.setState(_update(this.state, { loading: true }), _resolve)
     })
 
     let response = await (async ()=> {
-                try {
-                  return await $Http.send($Http.get($Users_List.endpoint() + `users`))
-                } catch(_error) {
-                  let error = _error;
+      try {
+        return await $Http.send($Http.get($Users_List.endpoint() + `users`))
+      } catch(_error) {
+        let error = _error;
      new Promise((_resolve) => {
       this.setState(_update(this.state, { error: `Error` }), _resolve)
     })
 
-                  throw new DoError
-                }})()
+        throw new DoError
+      }
+    })()
 
     let _2 = $Maybe.toResult(`Json error!`, $Json.parse(response.body))
 
-              if (_2 instanceof Err) {
-                let _error = _2.value
-                let error = _error;
+    if (_2 instanceof Err) {
+      let _error = _2.value
+
+      let error = _error;
      new Promise((_resolve) => {
       this.setState(_update(this.state, { error: error }), _resolve)
     })
 
-                throw new DoError
-              }
+      throw new DoError
+    }
 
-              let object = _2.value
-              
+    let object = _2.value
 
     let _3 = $Users_List.decodeUsers(object)
 
-              if (_3 instanceof Err) {
-                let _error = _3.value
-                let error = _error;
+    if (_3 instanceof Err) {
+      let _error = _3.value
+
+      let error = _error;
      new Promise((_resolve) => {
       this.setState(_update(this.state, { error: `Error` }), _resolve)
     })
 
-                throw new DoError
-              }
+      throw new DoError
+    }
 
-              let users = _3.value
-              
+    let users = _3.value
 
     let sortedUsers = await $Array.sort(((a, b) => {
     return a.id - b.id
@@ -2056,19 +2096,20 @@ const $Users_List = new (class extends Store {
 
      await new Promise((_resolve) => {
       this.setState(_update(this.state, { stale: false, users: sortedUsers, error: `` }), _resolve)
-    }) }
-            catch(_error) {
-              if (_error instanceof DoError) {
-              } else {
-                console.warn(`Unhandled error in do statement`)
-                console.log(_error)
-              }
-            } finally {
+    })
+      }
+      catch(_error) {
+        if (_error instanceof DoError) {
+        } else {
+          console.warn(`Unhandled error in do statement`)
+          console.log(_error)
+        }
+      } finally {
     new Promise((_resolve) => {
       this.setState(_update(this.state, { loading: false }), _resolve)
     })
     }
-          })()
+    })()
   }
 
   resetUser() {
@@ -2086,107 +2127,116 @@ const $Users_List = new (class extends Store {
 
   saveUser() {
     return (async () => {
-            try {  await new Promise((_resolve) => {
+      try {
+         await new Promise((_resolve) => {
       this.setState(_update(this.state, { loading: true }), _resolve)
     })
 
      await (async ()=> {
-                try {
-                  return await $Http.send($Http.stringBody($Users_List.stringifyUser(), $Http.header(`Content-Type`, `application/json`, $Http.put($Users_List.endpoint() + `users/` + $Number.toString(this.user.id)))))
-                } catch(_error) {
-                  let error = _error;
+      try {
+        return await $Http.send($Http.stringBody($Users_List.stringifyUser(), $Http.header(`Content-Type`, `application/json`, $Http.put($Users_List.endpoint() + `users/` + $Number.toString(this.user.id)))))
+      } catch(_error) {
+        let error = _error;
      new Promise((_resolve) => {
       this.setState(_update(this.state, { error: `Error` }), _resolve)
     })
 
-                  throw new DoError
-                }})()
+        throw new DoError
+      }
+    })()
 
      await new Promise((_resolve) => {
       this.setState(_update(this.state, { stale: true }), _resolve)
-    }) }
-            catch(_error) {
-              if (_error instanceof DoError) {
-              } else {
-                console.warn(`Unhandled error in do statement`)
-                console.log(_error)
-              }
-            } finally {
+    })
+      }
+      catch(_error) {
+        if (_error instanceof DoError) {
+        } else {
+          console.warn(`Unhandled error in do statement`)
+          console.log(_error)
+        }
+      } finally {
     new Promise((_resolve) => {
       this.setState(_update(this.state, { loading: false }), _resolve)
     })
     }
-          })()
+    })()
   }
 
   deleteUser() {
     return (async () => {
-            try {  await new Promise((_resolve) => {
+      try {
+         await new Promise((_resolve) => {
       this.setState(_update(this.state, { loading: true }), _resolve)
     })
 
      await (async ()=> {
-                try {
-                  return await $Http.send($Http.delete($Users_List.endpoint() + `users/` + $Number.toString(this.user.id)))
-                } catch(_error) {
-                  let error = _error;
+      try {
+        return await $Http.send($Http.delete($Users_List.endpoint() + `users/` + $Number.toString(this.user.id)))
+      } catch(_error) {
+        let error = _error;
      new Promise((_resolve) => {
       this.setState(_update(this.state, { error: `Error` }), _resolve)
     })
 
-                  throw new DoError
-                }})()
+        throw new DoError
+      }
+    })()
 
      await new Promise((_resolve) => {
       this.setState(_update(this.state, { stale: true }), _resolve)
-    }) }
-            catch(_error) {
-              if (_error instanceof DoError) {
-              } else {
-                console.warn(`Unhandled error in do statement`)
-                console.log(_error)
-              }
-            } finally {
+    })
+      }
+      catch(_error) {
+        if (_error instanceof DoError) {
+        } else {
+          console.warn(`Unhandled error in do statement`)
+          console.log(_error)
+        }
+      } finally {
     new Promise((_resolve) => {
       this.setState(_update(this.state, { loading: false }), _resolve)
     })
     }
-          })()
+    })()
   }
 
   createUser() {
     return (async () => {
-            try {  await new Promise((_resolve) => {
+      try {
+         await new Promise((_resolve) => {
       this.setState(_update(this.state, { loading: true }), _resolve)
     })
 
      await (async ()=> {
-                try {
-                  return await $Http.send($Http.stringBody($Users_List.stringifyUser(), $Http.header(`Content-Type`, `application/json`, $Http.post($Users_List.endpoint() + `users`))))
-                } catch(_error) {
-                  let error = _error;
+      try {
+        return await $Http.send($Http.stringBody($Users_List.stringifyUser(), $Http.header(`Content-Type`, `application/json`, $Http.post($Users_List.endpoint() + `users`))))
+      } catch(_error) {
+        let error = _error;
      new Promise((_resolve) => {
       this.setState(_update(this.state, { error: `Error` }), _resolve)
     })
 
-                  throw new DoError
-                }})()
+        throw new DoError
+      }
+    })()
 
      await new Promise((_resolve) => {
       this.setState(_update(this.state, { stale: true }), _resolve)
-    }) }
-            catch(_error) {
-              if (_error instanceof DoError) {
-              } else {
-                console.warn(`Unhandled error in do statement`)
-                console.log(_error)
-              }
-            } finally {
+    })
+      }
+      catch(_error) {
+        if (_error instanceof DoError) {
+        } else {
+          console.warn(`Unhandled error in do statement`)
+          console.log(_error)
+        }
+      } finally {
     new Promise((_resolve) => {
       this.setState(_update(this.state, { loading: false }), _resolve)
     })
     }
-          })()
+    })()
   }
 
   stringifyUser() {
@@ -2195,86 +2245,91 @@ const $Users_List = new (class extends Store {
 
   getUser(id) {
     return (async () => {
-            try {  await new Promise((_resolve) => {
+      try {
+         await new Promise((_resolve) => {
       this.setState(_update(this.state, { loading: true }), _resolve)
     })
 
     let response = await (async ()=> {
-                try {
-                  return await $Http.send($Http.get($Users_List.endpoint() + `users/` + $Number.toString(id)))
-                } catch(_error) {
-                  let error = _error;
+      try {
+        return await $Http.send($Http.get($Users_List.endpoint() + `users/` + $Number.toString(id)))
+      } catch(_error) {
+        let error = _error;
      new Promise((_resolve) => {
       this.setState(_update(this.state, { error: `error` }), _resolve)
     })
 
-                  throw new DoError
-                }})()
+        throw new DoError
+      }
+    })()
 
     let _2 = $Maybe.toResult(`Json Error`, $Json.parse(response.body))
 
-              if (_2 instanceof Err) {
-                let _error = _2.value
-                let error = _error;
+    if (_2 instanceof Err) {
+      let _error = _2.value
+
+      let error = _error;
      new Promise((_resolve) => {
       this.setState(_update(this.state, { error: error }), _resolve)
     })
 
-                throw new DoError
-              }
+      throw new DoError
+    }
 
-              let object = _2.value
-              
+    let object = _2.value
 
     let _3 = $Users_List.decodeUser(object)
 
-              if (_3 instanceof Err) {
-                let _error = _3.value
-                let error = _error;
+    if (_3 instanceof Err) {
+      let _error = _3.value
+
+      let error = _error;
      new Promise((_resolve) => {
       this.setState(_update(this.state, { error: `error` }), _resolve)
     })
 
-                throw new DoError
-              }
+      throw new DoError
+    }
 
-              let user = _3.value
-              
+    let user = _3.value
 
      await new Promise((_resolve) => {
       this.setState(_update(this.state, { user: user }), _resolve)
-    }) }
-            catch(_error) {
-              if (_error instanceof DoError) {
-              } else {
-                console.warn(`Unhandled error in do statement`)
-                console.log(_error)
-              }
-            } finally {
+    })
+      }
+      catch(_error) {
+        if (_error instanceof DoError) {
+        } else {
+          console.warn(`Unhandled error in do statement`)
+          console.log(_error)
+        }
+      } finally {
     new Promise((_resolve) => {
       this.setState(_update(this.state, { loading: false }), _resolve)
     })
     }
-          })()
+    })()
   }
 
   updateUserStatus(user, isLocked) {
     return (async () => {
-            try {  await $Users_List.setUser(user)
+      try {
+         await $Users_List.setUser(user)
 
      await $Users_List.setStatus(isLocked)
 
      await $Users_List.saveUser()
 
-     await $Users_List.refresh() }
-            catch(_error) {
-              if (_error instanceof DoError) {
-              } else {
-                console.warn(`Unhandled error in do statement`)
-                console.log(_error)
-              }
-            } 
-          })()
+     await $Users_List.refresh()
+      }
+      catch(_error) {
+        if (_error instanceof DoError) {
+        } else {
+          console.warn(`Unhandled error in do statement`)
+          console.log(_error)
+        }
+      } 
+    })()
   }
 
   setPage(page) {
@@ -2312,7 +2367,7 @@ const $Users_List = new (class extends Store {
 $Users_List.__displayName = `Users.List`
 
 const $Versions = new (class extends Store {
-  get versions () {
+    get versions () {
     if (this.props.versions != undefined) {
       return this.props.versions
     } else {
@@ -2354,45 +2409,47 @@ const $Versions = new (class extends Store {
 
   load() {
     return (async () => {
-            try {  await new Promise((_resolve) => {
+      try {
+         await new Promise((_resolve) => {
       this.setState(_update(this.state, { loading: true }), _resolve)
     })
 
     let response = await (async ()=> {
-                try {
-                  return await $Http.send($Http.get(`https://mint-website.herokuapp.com/releases`))
-                } catch(_error) {
-                  let error = _error;
+      try {
+        return await $Http.send($Http.get(`https://mint-website.herokuapp.com/releases`))
+      } catch(_error) {
+        let error = _error;
      $Debug.log(error)
 
-                  throw new DoError
-                }})()
+        throw new DoError
+      }
+    })()
 
     let _2 = $Maybe.toResult(`Json Error`, $Json.parse(response.body))
 
-              if (_2 instanceof Err) {
-                let _error = _2.value
-                let error = _error;
+    if (_2 instanceof Err) {
+      let _error = _2.value
+
+      let error = _error;
      $Debug.log(error)
 
-                throw new DoError
-              }
+      throw new DoError
+    }
 
-              let object = _2.value
-              
+    let object = _2.value
 
     let _3 = $Version.decodeMany(object)
 
-              if (_3 instanceof Err) {
-                let _error = _3.value
-                let error = _error;
+    if (_3 instanceof Err) {
+      let _error = _3.value
+
+      let error = _error;
      $Debug.log(error)
 
-                throw new DoError
-              }
+      throw new DoError
+    }
 
-              let versions = _3.value
-              
+    let versions = _3.value
 
     let sortedVersions = await $Array.reverse($Array.sortBy(((version) => {
     return version.date
@@ -2400,25 +2457,26 @@ const $Versions = new (class extends Store {
 
      await new Promise((_resolve) => {
       this.setState(_update(this.state, { versions: sortedVersions, stale: false }), _resolve)
-    }) }
-            catch(_error) {
-              if (_error instanceof DoError) {
-              } else {
-                console.warn(`Unhandled error in do statement`)
-                console.log(_error)
-              }
-            } finally {
+    })
+      }
+      catch(_error) {
+        if (_error instanceof DoError) {
+        } else {
+          console.warn(`Unhandled error in do statement`)
+          console.log(_error)
+        }
+      } finally {
     new Promise((_resolve) => {
       this.setState(_update(this.state, { loading: false }), _resolve)
     })
     }
-          })()
+    })()
   }
 })
 $Versions.__displayName = `Versions`
 
 const $Counter_Store = new (class extends Store {
-  get counter () {
+    get counter () {
     if (this.props.counter != undefined) {
       return this.props.counter
     } else {
@@ -2447,7 +2505,7 @@ const $Counter_Store = new (class extends Store {
 $Counter_Store.__displayName = `Counter.Store`
 
 const $Examples_Store = new (class extends Store {
-  get userManagement () {
+    get userManagement () {
     if (this.props.userManagement != undefined) {
       return this.props.userManagement
     } else {
@@ -2507,7 +2565,7 @@ const $Examples_Store = new (class extends Store {
 $Examples_Store.__displayName = `Examples.Store`
 
 const $DragStore = new (class extends Store {
-  get position () {
+    get position () {
     if (this.props.position != undefined) {
       return this.props.position
     } else {
@@ -2533,7 +2591,7 @@ const $DragStore = new (class extends Store {
 $DragStore.__displayName = `DragStore`
 
 const $Application = new (class extends Store {
-  get page () {
+    get page () {
     if (this.props.page != undefined) {
       return this.props.page
     } else {
@@ -2549,25 +2607,27 @@ const $Application = new (class extends Store {
 
   setPage(a) {
     return (async () => {
-            try {  await $Http.abortAll()
+      try {
+         await $Http.abortAll()
 
      await new Promise((_resolve) => {
       this.setState(_update(this.state, { page: a }), _resolve)
-    }) }
-            catch(_error) {
-              if (_error instanceof DoError) {
-              } else {
-                console.warn(`Unhandled error in do statement`)
-                console.log(_error)
-              }
-            } 
-          })()
+    })
+      }
+      catch(_error) {
+        if (_error instanceof DoError) {
+        } else {
+          console.warn(`Unhandled error in do statement`)
+          console.log(_error)
+        }
+      } 
+    })()
   }
 })
 $Application.__displayName = `Application`
 
 const $Showcase_Store = new (class extends Store {
-  get active () {
+    get active () {
     if (this.props.active != undefined) {
       return this.props.active
     } else {
@@ -2605,7 +2665,7 @@ const $Showcase_Store = new (class extends Store {
 $Showcase_Store.__displayName = `Showcase.Store`
 
 const $Ui = new (class extends Store {
-  get theme () {
+    get theme () {
     if (this.props.theme != undefined) {
       return this.props.theme
     } else {
@@ -2787,15 +2847,17 @@ class $Main extends Component {
     $Examples_Store._subscribe(this);$Application._subscribe(this);$Ui._subscribe(this)
 
     return (async () => {
-            try {  await $Ui.setFontFamily(`Open Sans`) }
-            catch(_error) {
-              if (_error instanceof DoError) {
-              } else {
-                console.warn(`Unhandled error in do statement`)
-                console.log(_error)
-              }
-            } 
-          })()
+      try {
+         await $Ui.setFontFamily(`Open Sans`)
+      }
+      catch(_error) {
+        if (_error instanceof DoError) {
+        } else {
+          console.warn(`Unhandled error in do statement`)
+          console.log(_error)
+        }
+      } 
+    })()
   }
 
   render() {
@@ -3178,35 +3240,39 @@ class $Examples_FileHandling extends Component {
 
   openDialog() {
     return (async () => {
-            try { let file = await (async ()=> {
-                try {
-                  return await $File.select(`application/json`)
-                } catch(_error) {
-                  
+      try {
+        let file = await (async ()=> {
+      try {
+        return await $File.select(`application/json`)
+      } catch(_error) {
+        
 
-                  throw new DoError
-                }})()
+        throw new DoError
+      }
+    })()
 
     let contents = await (async ()=> {
-                try {
-                  return await $File.readAsDataURL(file)
-                } catch(_error) {
-                  
+      try {
+        return await $File.readAsDataURL(file)
+      } catch(_error) {
+        
 
-                  throw new DoError
-                }})()
+        throw new DoError
+      }
+    })()
 
      await new Promise((_resolve) => {
       this.setState(_update(this.state, { contents: contents, file: $Maybe.just(file) }), _resolve)
-    }) }
-            catch(_error) {
-              if (_error instanceof DoError) {
-              } else {
-                console.warn(`Unhandled error in do statement`)
-                console.log(_error)
-              }
-            } 
-          })()
+    })
+      }
+      catch(_error) {
+        if (_error instanceof DoError) {
+        } else {
+          console.warn(`Unhandled error in do statement`)
+          console.log(_error)
+        }
+      } 
+    })()
   }
 
   upload() {
@@ -3223,23 +3289,26 @@ class $Examples_FileHandling extends Component {
     return $FormData.addFile(`file`, file, $FormData.empty()) })()
 
     return (async () => {
-            try { let response = await (async ()=> {
-                try {
-                  return await $Http.send($Http.formDataBody(formData, $Http.post(``)))
-                } catch(_error) {
-                  let error = _error;
+      try {
+        let response = await (async ()=> {
+      try {
+        return await $Http.send($Http.formDataBody(formData, $Http.post(``)))
+      } catch(_error) {
+        let error = _error;
      $Debug.log(error)
 
-                  throw new DoError
-                }})() }
-            catch(_error) {
-              if (_error instanceof DoError) {
-              } else {
-                console.warn(`Unhandled error in do statement`)
-                console.log(_error)
-              }
-            } 
-          })()
+        throw new DoError
+      }
+    })()
+      }
+      catch(_error) {
+        if (_error instanceof DoError) {
+        } else {
+          console.warn(`Unhandled error in do statement`)
+          console.log(_error)
+        }
+      } 
+    })()
   }
 
   render() {
@@ -3529,19 +3598,21 @@ class $Drag extends Component {
     })
 
     return (async () => {
-            try {  await $Html_Event.preventDefault(event)
+      try {
+         await $Html_Event.preventDefault(event)
 
      await new Promise((_resolve) => {
       this.setState(_update(this.state, { mousePosition: mousePosition, startPosition: startPosition, dragging: true }), _resolve)
-    }) }
-            catch(_error) {
-              if (_error instanceof DoError) {
-              } else {
-                console.warn(`Unhandled error in do statement`)
-                console.log(_error)
-              }
-            } 
-          })()
+    })
+      }
+      catch(_error) {
+        if (_error instanceof DoError) {
+        } else {
+          console.warn(`Unhandled error in do statement`)
+          console.log(_error)
+        }
+      } 
+    })()
   }
 
   render() {
@@ -3922,32 +3993,36 @@ class $Showcase_Highlight extends Component {
 
   handleClick(event) {
     return (async () => {
-            try {  await $Html_Event.stopPropagation(event)
+      try {
+         await $Html_Event.stopPropagation(event)
 
-     await this.setActive.bind(this)(this.name) }
-            catch(_error) {
-              if (_error instanceof DoError) {
-              } else {
-                console.warn(`Unhandled error in do statement`)
-                console.log(_error)
-              }
-            } 
-          })()
+     await this.setActive.bind(this)(this.name)
+      }
+      catch(_error) {
+        if (_error instanceof DoError) {
+        } else {
+          console.warn(`Unhandled error in do statement`)
+          console.log(_error)
+        }
+      } 
+    })()
   }
 
   handleMouseEnter(event) {
     return (async () => {
-            try {  await $Html_Event.stopPropagation(event)
+      try {
+         await $Html_Event.stopPropagation(event)
 
-     await this.setOver.bind(this)(this.name) }
-            catch(_error) {
-              if (_error instanceof DoError) {
-              } else {
-                console.warn(`Unhandled error in do statement`)
-                console.log(_error)
-              }
-            } 
-          })()
+     await this.setOver.bind(this)(this.name)
+      }
+      catch(_error) {
+        if (_error instanceof DoError) {
+        } else {
+          console.warn(`Unhandled error in do statement`)
+          console.log(_error)
+        }
+      } 
+    })()
   }
 
   handleMouseLeave(event) {
@@ -4054,32 +4129,36 @@ class $Showcase_HighlightBlock extends Component {
 
   handleClick(event) {
     return (async () => {
-            try {  await $Html_Event.stopPropagation(event)
+      try {
+         await $Html_Event.stopPropagation(event)
 
-     await this.setActive.bind(this)(this.name) }
-            catch(_error) {
-              if (_error instanceof DoError) {
-              } else {
-                console.warn(`Unhandled error in do statement`)
-                console.log(_error)
-              }
-            } 
-          })()
+     await this.setActive.bind(this)(this.name)
+      }
+      catch(_error) {
+        if (_error instanceof DoError) {
+        } else {
+          console.warn(`Unhandled error in do statement`)
+          console.log(_error)
+        }
+      } 
+    })()
   }
 
   handleMouseEnter(event) {
     return (async () => {
-            try {  await $Html_Event.stopPropagation(event)
+      try {
+         await $Html_Event.stopPropagation(event)
 
-     await this.setOver.bind(this)(this.name) }
-            catch(_error) {
-              if (_error instanceof DoError) {
-              } else {
-                console.warn(`Unhandled error in do statement`)
-                console.log(_error)
-              }
-            } 
-          })()
+     await this.setOver.bind(this)(this.name)
+      }
+      catch(_error) {
+        if (_error instanceof DoError) {
+        } else {
+          console.warn(`Unhandled error in do statement`)
+          console.log(_error)
+        }
+      } 
+    })()
   }
 
   handleMouseLeave(event) {
@@ -4440,7 +4519,8 @@ class $UserForm extends Component {
 
   create() {
     return (async () => {
-            try {  await new Promise((_resolve) => {
+      try {
+         await new Promise((_resolve) => {
       this.setState(_update(this.state, { saving: true }), _resolve)
     })
 
@@ -4450,20 +4530,22 @@ class $UserForm extends Component {
       this.setState(_update(this.state, { saving: false }), _resolve)
     })
 
-     await $Window.navigate(`/users`) }
-            catch(_error) {
-              if (_error instanceof DoError) {
-              } else {
-                console.warn(`Unhandled error in do statement`)
-                console.log(_error)
-              }
-            } 
-          })()
+     await $Window.navigate(`/users`)
+      }
+      catch(_error) {
+        if (_error instanceof DoError) {
+        } else {
+          console.warn(`Unhandled error in do statement`)
+          console.log(_error)
+        }
+      } 
+    })()
   }
 
   save() {
     return (async () => {
-            try {  await new Promise((_resolve) => {
+      try {
+         await new Promise((_resolve) => {
       this.setState(_update(this.state, { saving: true }), _resolve)
     })
 
@@ -4475,30 +4557,33 @@ class $UserForm extends Component {
       this.setState(_update(this.state, { saving: false }), _resolve)
     })
 
-     await $Window.navigate(`/users?page=` + $Number.toString(this.page)) }
-            catch(_error) {
-              if (_error instanceof DoError) {
-              } else {
-                console.warn(`Unhandled error in do statement`)
-                console.log(_error)
-              }
-            } 
-          })()
+     await $Window.navigate(`/users?page=` + $Number.toString(this.page))
+      }
+      catch(_error) {
+        if (_error instanceof DoError) {
+        } else {
+          console.warn(`Unhandled error in do statement`)
+          console.log(_error)
+        }
+      } 
+    })()
   }
 
   handleDelete() {
     return (async () => {
-            try {  await this.deleteUser.bind(this)()
+      try {
+         await this.deleteUser.bind(this)()
 
-     await $Window.navigate(`/users?page=` + $Number.toString(this.page)) }
-            catch(_error) {
-              if (_error instanceof DoError) {
-              } else {
-                console.warn(`Unhandled error in do statement`)
-                console.log(_error)
-              }
-            } 
-          })()
+     await $Window.navigate(`/users?page=` + $Number.toString(this.page))
+      }
+      catch(_error) {
+        if (_error instanceof DoError) {
+        } else {
+          console.warn(`Unhandled error in do statement`)
+          console.log(_error)
+        }
+      } 
+    })()
   }
 
   onClick(event) {
@@ -5349,30 +5434,33 @@ class $Ui_Pager extends Component {
 
   switchPages() {
     return (async () => {
-            try {  await new Promise((_resolve) => {
+      try {
+         await new Promise((_resolve) => {
       this.setState(_update(this.state, { left: this.state.center, center: this.active, transitioning: true }), _resolve)
     })
 
      await (async ()=> {
-                try {
-                  return await $Timer.timeout(this.duration, `a`)
-                } catch(_error) {
-                  
+      try {
+        return await $Timer.timeout(this.duration, `a`)
+      } catch(_error) {
+        
 
-                  throw new DoError
-                }})()
+        throw new DoError
+      }
+    })()
 
      await new Promise((_resolve) => {
       this.setState(_update(this.state, { transitioning: false, left: `` }), _resolve)
-    }) }
-            catch(_error) {
-              if (_error instanceof DoError) {
-              } else {
-                console.warn(`Unhandled error in do statement`)
-                console.log(_error)
-              }
-            } 
-          })()
+    })
+      }
+      catch(_error) {
+        if (_error instanceof DoError) {
+        } else {
+          console.warn(`Unhandled error in do statement`)
+          console.log(_error)
+        }
+      } 
+    })()
   }
 
   renderPage(item) {
@@ -5505,19 +5593,21 @@ class $Ui_Link extends Component {
 
   onClick(event) {
     return (event.ctrlKey || _compare(event.button, 1) || this.sameOrigin.bind(this)() ? null : ($String.isEmpty(this.href) ? $Html_Event.preventDefault(event) : (async () => {
-            try {  await $Html_Event.preventDefault(event)
+      try {
+         await $Html_Event.preventDefault(event)
 
      await $Window.navigate(this.href)
 
-     await (this.scrollToTop ? $Window.setScrollTop(0) : null) }
-            catch(_error) {
-              if (_error instanceof DoError) {
-              } else {
-                console.warn(`Unhandled error in do statement`)
-                console.log(_error)
-              }
-            } 
-          })()))
+     await (this.scrollToTop ? $Window.setScrollTop(0) : null)
+      }
+      catch(_error) {
+        if (_error instanceof DoError) {
+        } else {
+          console.warn(`Unhandled error in do statement`)
+          console.log(_error)
+        }
+      } 
+    })()))
   }
 
   render() {
@@ -6706,17 +6796,19 @@ class $Ui_Calendar extends Component {
 
   onCellClick(day) {
     return (!_compare($Time.month(day), $Time.month(this.month)) && this.changeMonthOnSelect ? (async () => {
-            try {  await this.onMonthChange(day)
+      try {
+         await this.onMonthChange(day)
 
-     await this.onChange(day) }
-            catch(_error) {
-              if (_error instanceof DoError) {
-              } else {
-                console.warn(`Unhandled error in do statement`)
-                console.log(_error)
-              }
-            } 
-          })() : this.onChange(day))
+     await this.onChange(day)
+      }
+      catch(_error) {
+        if (_error instanceof DoError) {
+        } else {
+          console.warn(`Unhandled error in do statement`)
+          console.log(_error)
+        }
+      } 
+    })() : this.onChange(day))
   }
 
   cells() {
