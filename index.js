@@ -2871,6 +2871,8 @@ class $Main extends Component {
   }
 }
 
+$Main.displayName = "Main"
+
 class $Examples_FileHandling extends Component {
   constructor(props) {
     super(props)
@@ -3002,6 +3004,8 @@ class $Layout extends Component {
   }
 }
 
+$Layout.displayName = "Layout"
+
 $Layout.defaultProps = {
   children: []
 }
@@ -3024,6 +3028,8 @@ class $SubTitle extends Component {
     }, [this.children])
   }
 }
+
+$SubTitle.displayName = "SubTitle"
 
 $SubTitle.defaultProps = {
   children: []
@@ -3193,6 +3199,8 @@ class $UserForm extends Component {
   }
 }
 
+$UserForm.displayName = "UserForm"
+
 $UserForm.defaultProps = {
   isNew: false
 }
@@ -3335,6 +3343,8 @@ class $Install extends Component {
   }
 }
 
+$Install.displayName = "Install"
+
 class $Roadmap_Feature extends Component {
   get children () {
     if (this.props.children != undefined) {
@@ -3472,6 +3482,8 @@ class $Roadmap extends Component {
   }
 }
 
+$Roadmap.displayName = "Roadmap"
+
 class $Home extends Component {
   get theme () { return $Ui.theme }
 
@@ -3520,6 +3532,8 @@ class $Home extends Component {
     }, [_createElement($Ui_Button, { size: 22, type: `secondary`, label: `Learn` })])])]), _createElement($Showcase, {  }), _createElement($CallToAction, {  })])
   }
 }
+
+$Home.displayName = "Home"
 
 class $Showcase_Block extends Component {
   get children () {
@@ -3780,6 +3794,8 @@ class $Showcase extends Component {
   }
 }
 
+$Showcase.displayName = "Showcase"
+
 class $Showcase_Highlight extends Component {
   get border() {
     return (_compare(this.over, this.name) ? `1px dashed rgba(0,0,0,0.6)` : `1px dashed rgba(0,0,0,0.1)`)
@@ -3933,6 +3949,8 @@ class $CallToAction extends Component {
     }, [_createElement($Ui_Button, { size: 20, type: `secondary`, label: `Learn` })])])])
   }
 }
+
+$CallToAction.displayName = "CallToAction"
 
 $CallToAction.defaultProps = {
   children: [],text: ``
@@ -4151,6 +4169,8 @@ class $Logo extends Component {
   }
 }
 
+$Logo.displayName = "Logo"
+
 $Logo.defaultProps = {
   textFill: `#000`,fill: `#000`,height: 90,width: 370,mobileHeight: 90,mobileWidth: 370
 }
@@ -4241,6 +4261,8 @@ class $Examples extends Component {
   }
 }
 
+$Examples.displayName = "Examples"
+
 class $Title extends Component {
   get children () {
     if (this.props.children != undefined) {
@@ -4259,6 +4281,8 @@ class $Title extends Component {
     }, [this.children])
   }
 }
+
+$Title.displayName = "Title"
 
 $Title.defaultProps = {
   children: []
@@ -4318,6 +4342,8 @@ class $UserRow extends Component {
   }
 }
 
+$UserRow.displayName = "UserRow"
+
 $UserRow.defaultProps = {
   user: new Record({
     createdAt: $Time.now(),
@@ -4347,6 +4373,8 @@ class $Page extends Component {
     }, [this.children])
   }
 }
+
+$Page.displayName = "Page"
 
 $Page.defaultProps = {
   children: []
@@ -4502,6 +4530,8 @@ class $Header extends Component {
   }
 }
 
+$Header.displayName = "Header"
+
 class $Footer extends Component {
   render() {
     return _createElement("div", {
@@ -4559,6 +4589,8 @@ class $Footer extends Component {
   }
 }
 
+$Footer.displayName = "Footer"
+
 class $Example extends Component {
   get children () {
     if (this.props.children != undefined) {
@@ -4593,6 +4625,8 @@ class $Example extends Component {
     }, [this.children])))
   }
 }
+
+$Example.displayName = "Example"
 
 $Example.defaultProps = {
   children: [],subTitle: ``,title: ``
@@ -4649,6 +4683,8 @@ class $Counter extends Component {
     }, [`Increment`])])
   }
 }
+
+$Counter.displayName = "Counter"
 
 $Counter.defaultProps = {
   disabled: false
@@ -4775,6 +4811,8 @@ class $Drag extends Component {
     }, [`DragMe`])
   }
 }
+
+$Drag.displayName = "Drag"
 
 class $Ui_Table_Td extends Component {
   get borderBottom() {
