@@ -1905,7 +1905,14 @@ const $Time = new(class {
 })
 
 const $Application = new (class extends Store {
-    get page () {
+    constructor() {
+    super()
+    this.props = {
+        page: ``
+    }
+  }
+
+  get page () {
     if (this.props.page != undefined) {
       return this.props.page
     } else {
@@ -1941,7 +1948,21 @@ const $Application = new (class extends Store {
 $Application.__displayName = `Application`
 
 const $Users_List = new (class extends Store {
-    get users () {
+    constructor() {
+    super()
+    this.props = {
+        users: [],user: new Record({
+      createdAt: $Time.now(),
+      updatedAt: $Time.now(),
+      firstName: ``,
+      lastName: ``,
+      status: ``,
+      id: 0
+    }),loading: false,stale: true,error: ``,perPage: 10,page: 0
+    }
+  }
+
+  get users () {
     if (this.props.users != undefined) {
       return this.props.users
     } else {
@@ -2426,7 +2447,14 @@ const $Users_List = new (class extends Store {
 $Users_List.__displayName = `Users.List`
 
 const $Showcase_Store = new (class extends Store {
-    get active () {
+    constructor() {
+    super()
+    this.props = {
+        active: `store`,over: ``
+    }
+  }
+
+  get active () {
     if (this.props.active != undefined) {
       return this.props.active
     } else {
@@ -2464,7 +2492,30 @@ const $Showcase_Store = new (class extends Store {
 $Showcase_Store.__displayName = `Showcase.Store`
 
 const $Examples_Store = new (class extends Store {
-    get userManagement () {
+    constructor() {
+    super()
+    this.props = {
+        userManagement: new Record({
+      title: `User Management`,
+      href: `/users`,
+      description: `This example contains an implementation of a table of users with client side pagination and forms for creating new users and editing existsing ones through an HTTP API.`
+    }),drag: new Record({
+      title: `Drag and Drop`,
+      href: `/drag`,
+      description: `This example shows how to drag and drop an HTML element on the page.`
+    }),fileHandling: new Record({
+      title: `File Handling`,
+      href: `/examples/file-handling`,
+      description: `This example shows how to implement a component which loads and shows a file from the users computer and then uploads it to a server via HTTP.`
+    }),counter: new Record({
+      title: `Counter`,
+      href: `/counter`,
+      description: `This example shows a counter which stored in a store with two buttons one for incrementing th counter and one for decrementing it.`
+    })
+    }
+  }
+
+  get userManagement () {
     if (this.props.userManagement != undefined) {
       return this.props.userManagement
     } else {
@@ -2524,7 +2575,14 @@ const $Examples_Store = new (class extends Store {
 $Examples_Store.__displayName = `Examples.Store`
 
 const $Versions = new (class extends Store {
-    get versions () {
+    constructor() {
+    super()
+    this.props = {
+        versions: [],loading: true,stale: true
+    }
+  }
+
+  get versions () {
     if (this.props.versions != undefined) {
       return this.props.versions
     } else {
@@ -2633,7 +2691,14 @@ const $Versions = new (class extends Store {
 $Versions.__displayName = `Versions`
 
 const $Counter_Store = new (class extends Store {
-    get counter () {
+    constructor() {
+    super()
+    this.props = {
+        counter: 0
+    }
+  }
+
+  get counter () {
     if (this.props.counter != undefined) {
       return this.props.counter
     } else {
@@ -2662,7 +2727,17 @@ const $Counter_Store = new (class extends Store {
 $Counter_Store.__displayName = `Counter.Store`
 
 const $DragStore = new (class extends Store {
-    get position () {
+    constructor() {
+    super()
+    this.props = {
+        position: new Record({
+      top: 0,
+      left: 0
+    })
+    }
+  }
+
+  get position () {
     if (this.props.position != undefined) {
       return this.props.position
     } else {
@@ -2688,7 +2763,69 @@ const $DragStore = new (class extends Store {
 $DragStore.__displayName = `DragStore`
 
 const $Ui = new (class extends Store {
-    get theme () {
+    constructor() {
+    super()
+    this.props = {
+        theme: new Record({
+      fontFamily: `-apple-system, system-ui, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif`,
+      colors: new Record({
+        warning: new Record({
+          background: `#FF9730`,
+          focus: `#ffb163`,
+          text: `#FFF`
+        }),
+        danger: new Record({
+          background: `#E04141`,
+          focus: `#e76d6d`,
+          text: `#FFF`
+        }),
+        success: new Record({
+          background: `#3fb543`,
+          focus: `#60c863`,
+          text: `#FFF`
+        }),
+        secondary: new Record({
+          background: `#222`,
+          focus: `#333`,
+          text: `#FFF`
+        }),
+        primary: new Record({
+          background: `#3aad57`,
+          focus: `#0fa334`,
+          text: `#FFF`
+        }),
+        disabled: new Record({
+          background: `#D7D7D7`,
+          text: `#9A9A9A`,
+          focus: ``
+        }),
+        inputSecondary: new Record({
+          background: `#F3F3F3`,
+          text: `#616161`,
+          focus: ``
+        }),
+        input: new Record({
+          background: `#FDFDFD`,
+          text: `#606060`,
+          focus: `#FFF`
+        })
+      }),
+      hover: new Record({
+        color: `#26e200`
+      }),
+      outline: new Record({
+        fadedColor: `hsla(110, 100%, 44%, 0.5)`,
+        color: `hsla(110, 100%, 44%, 1)`
+      }),
+      border: new Record({
+        color: `#DDD`,
+        radius: `2px`
+      })
+    })
+    }
+  }
+
+  get theme () {
     if (this.props.theme != undefined) {
       return this.props.theme
     } else {
@@ -2803,22 +2940,22 @@ class $Main extends Component {
       contents: _createElement($Roadmap, {  })
     }), new Record({
       name: `file-handling`,
-      contents: _createElement($Example, { subTitle: this.fileHandling.description, title: this.fileHandling.title }, _array(_createElement($Examples_FileHandling, {  })))
+      contents: _createElement($Example, { "subTitle": this.fileHandling.description, "title": this.fileHandling.title }, _array(_createElement($Examples_FileHandling, {  })))
     }), new Record({
       name: `counter`,
-      contents: _createElement($Example, { subTitle: this.counter.description, title: this.counter.title }, _array(_createElement($Counter, {  })))
+      contents: _createElement($Example, { "subTitle": this.counter.description, "title": this.counter.title }, _array(_createElement($Counter, {  })))
     }), new Record({
       name: `drag`,
-      contents: _createElement($Example, { subTitle: this.drag.description, title: this.drag.title }, _array(_createElement($Drag, {  })))
+      contents: _createElement($Example, { "subTitle": this.drag.description, "title": this.drag.title }, _array(_createElement($Drag, {  })))
     }), new Record({
       name: `index`,
-      contents: _createElement($Example, { subTitle: this.userManagement.description, title: this.userManagement.title }, _array(_createElement($Users_Layout, {  }, _array(_createElement($Users_Table, {  })))))
+      contents: _createElement($Example, { "subTitle": this.userManagement.description, "title": this.userManagement.title }, _array(_createElement($Users_Layout, {  }, _array(_createElement($Users_Table, {  })))))
     }), new Record({
       name: `new`,
-      contents: _createElement($Example, { subTitle: this.userManagement.description, title: this.userManagement.title }, _array(_createElement($Users_Layout, {  }, _array(_createElement($UserForm, { isNew: true })))))
+      contents: _createElement($Example, { "subTitle": this.userManagement.description, "title": this.userManagement.title }, _array(_createElement($Users_Layout, {  }, _array(_createElement($UserForm, { "isNew": true })))))
     }), new Record({
       name: `user`,
-      contents: _createElement($Example, { subTitle: this.userManagement.description, title: this.userManagement.title }, _array(_createElement($Users_Layout, {  }, _array(_createElement($UserForm, { isNew: false })))))
+      contents: _createElement($Example, { "subTitle": this.userManagement.description, "title": this.userManagement.title }, _array(_createElement($Users_Layout, {  }, _array(_createElement($UserForm, { "isNew": false })))))
     }), new Record({
       name: `not_found`,
       contents: _createElement("div", {}, [`404`])
@@ -2960,11 +3097,11 @@ class $Examples_FileHandling extends Component {
     return _createElement("div", {}, [$File.name(file)])
     }), this.state.file))
 
-    return _createElement("div", {}, [_createElement($Ui_Button, { onClick: ((event) => {
+    return _createElement("div", {}, [_createElement($Ui_Button, { "onClick": ((event) => {
     return this.openDialog.bind(this)()
-    }), label: `Open Browse Dialog` }), _createElement($Ui_Button, { onClick: ((event) => {
+    }), "label": `Open Browse Dialog` }), _createElement($Ui_Button, { "onClick": ((event) => {
     return this.upload.bind(this)()
-    }), label: `Upload`, disabled: $Maybe.isNothing(this.state.file) }), file, _createElement("pre", {
+    }), "label": `Upload`, "disabled": $Maybe.isNothing(this.state.file) }), file, _createElement("pre", {
       className: `examples-file-handling-pre`,
       style: {
 
@@ -3056,9 +3193,9 @@ class $UserForm extends Component {
   }
 
   get deleteField() {
-    return (this.isNew ? [] : [_createElement($Ui_Form_Separator, {  }), _createElement($Ui_Button, { onClick: ((event) => {
+    return (this.isNew ? [] : [_createElement($Ui_Form_Separator, {  }), _createElement($Ui_Button, { "onClick": ((event) => {
     return this.handleDelete.bind(this)()
-    }), type: `danger`, label: `Delete` })])
+    }), "type": `danger`, "label": `Delete` })])
   }
 
   get isNew () {
@@ -3183,8 +3320,8 @@ class $UserForm extends Component {
   }
 
   render() {
-    return _createElement($Ui_Loader, { shown: this.loading }, _array(_createElement("div", {
-      key: $Number.toString(this.user.id)
+    return _createElement($Ui_Loader, { "shown": this.loading }, _array(_createElement("div", {
+      "key": $Number.toString(this.user.id)
     }, [_createElement("div", {
       className: `user-form-title`,
       style: {
@@ -3195,7 +3332,7 @@ class $UserForm extends Component {
       style: {
 
       }
-    }, [_createElement($Ui_Form_Field, { label: `First Name` }, _array(_createElement($Ui_Input, { value: this.user.firstName, onInput: this.setFirstName.bind(this), onClear: this.onClearFirstName.bind(this), placeholder: `John` }))), _createElement($Ui_Form_Field, { label: `Last Name` }, _array(_createElement($Ui_Input, { value: this.user.lastName, onInput: this.setLastName.bind(this), onClear: this.onClearLastName.bind(this), placeholder: `Doe` }))), _createElement($Ui_Form_Field, { label: `Status` }, _array(_createElement($Ui_Toggle, { checked: _compare(this.user.status, `locked`), onChange: this.setStatus.bind(this), offLabel: `Locked`, onLabel: `Active`, width: 150 }))), _createElement($Ui_Button, { label: this.buttonLabel, onClick: this.onClick.bind(this), disabled: this.disabled }), this.deleteField])])))
+    }, [_createElement($Ui_Form_Field, { "label": `First Name` }, _array(_createElement($Ui_Input, { "value": this.user.firstName, "onInput": this.setFirstName.bind(this), "onClear": this.onClearFirstName.bind(this), "placeholder": `John` }))), _createElement($Ui_Form_Field, { "label": `Last Name` }, _array(_createElement($Ui_Input, { "value": this.user.lastName, "onInput": this.setLastName.bind(this), "onClear": this.onClearLastName.bind(this), "placeholder": `Doe` }))), _createElement($Ui_Form_Field, { "label": `Status` }, _array(_createElement($Ui_Toggle, { "checked": _compare(this.user.status, `locked`), "onChange": this.setStatus.bind(this), "offLabel": `Locked`, "onLabel": `Active`, "width": 150 }))), _createElement($Ui_Button, { "label": this.buttonLabel, "onClick": this.onClick.bind(this), "disabled": this.disabled }), this.deleteField])])))
   }
 }
 
@@ -3244,7 +3381,7 @@ class $Install extends Component {
 
   renderFile(asset) {
     return _createElement("li", {}, [_createElement("a", {
-      href: asset.url,
+      "href": asset.url,
       className: `install-link`,
       style: {
         [`--install-link-color`]: this.theme.colors.primary.background
@@ -3284,15 +3421,15 @@ class $Install extends Component {
 
       }
     }, [_createElement("li", {}, [`Install the `, _createElement("a", {
-      href: `https://crystal-lang.org/docs/installation/`,
-      target: `_blank`,
+      "href": `https://crystal-lang.org/docs/installation/`,
+      "target": `_blank`,
       className: `install-link`,
       style: {
         [`--install-link-color`]: this.theme.colors.primary.background
       }
     }, [`Crystal programming language`])]), _createElement("li", {}, [`Download and extract the source files from Github:`, _createElement("br", {}), _createElement("a", {
-      href: `https://github.com/mint-lang/mint`,
-      target: `_blank`,
+      "href": `https://github.com/mint-lang/mint`,
+      "target": `_blank`,
       className: `install-link`,
       style: {
         [`--install-link-color`]: this.theme.colors.primary.background
@@ -3328,13 +3465,13 @@ class $Install extends Component {
 
       }
     }, [_createElement("li", {}, [_createElement("a", {
-      href: `https://s3-eu-west-1.amazonaws.com/mint-lang/mint-latest-linux`,
+      "href": `https://s3-eu-west-1.amazonaws.com/mint-lang/mint-latest-linux`,
       className: `install-link`,
       style: {
         [`--install-link-color`]: this.theme.colors.primary.background
       }
     }, [`mint-latest-linux`])]), _createElement("li", {}, [_createElement("a", {
-      href: `https://s3-eu-west-1.amazonaws.com/mint-lang/mint-latest-osx`,
+      "href": `https://s3-eu-west-1.amazonaws.com/mint-lang/mint-latest-osx`,
       className: `install-link`,
       style: {
         [`--install-link-color`]: this.theme.colors.primary.background
@@ -3455,30 +3592,30 @@ $Roadmap_Version.defaultProps = {
 class $Roadmap extends Component {
   get checkmark() {
     return _createElement("svg", {
-      xmlns: `http://www.w3.org/2000/svg`,
-      width: `24`,
-      height: `24`,
-      viewBox: `0 0 24 24`
+      "xmlns": `http://www.w3.org/2000/svg`,
+      "width": `24`,
+      "height": `24`,
+      "viewBox": `0 0 24 24`
     }, [_createElement("path", {
-      d: `M20.285 2l-11.285 11.567-5.286-5.011-3.714 3.716 9 8.728 15-15.285z`
+      "d": `M20.285 2l-11.285 11.567-5.286-5.011-3.714 3.716 9 8.728 15-15.285z`
     })])
   }
 
   get diamond() {
     return _createElement("svg", {
-      xmlns: `http://www.w3.org/2000/svg`,
-      viewBox: `0 0 24 24`,
-      fillRule: `evenodd`,
-      clipRule: `evenodd`,
-      height: `24`,
-      width: `24`
+      "xmlns": `http://www.w3.org/2000/svg`,
+      "viewBox": `0 0 24 24`,
+      "fillRule": `evenodd`,
+      "clipRule": `evenodd`,
+      "height": `24`,
+      "width": `24`
     }, [_createElement("path", {
-      d: `M12 0l-12 12.001 12 11.999 12.001-11.999-12.001-12.001zm-9.171 12.001l9.171-9.172 9.172 9.172-9.172 9.172-9.171-9.172z`
+      "d": `M12 0l-12 12.001 12 11.999 12.001-11.999-12.001-12.001zm-9.171 12.001l9.171-9.172 9.172 9.172-9.172 9.172-9.171-9.172z`
     })])
   }
 
   render() {
-    return _createElement($Page, {  }, _array(_createElement($Title, {  }, _array(`Roadmap`)), _createElement($SubTitle, {  }, _array(`This page contains planned and shipped high level features up to the stable release (1.0.0).`)), _createElement($Roadmap_Version, { version: `Planned Features` }, _array(_createElement($Roadmap_Feature, { name: `CSS Type Checking`, icon: this.diamond, description: `Check the values of known CSS properties and warn the developer if it's not matches the available values.` }), _createElement($Roadmap_Feature, { name: `HTML Attribute Checking`, icon: this.diamond, description: `Check the values of HTML attributes based on the tag they belong to (for example check alt attributes for <img> tags).` }), _createElement($Roadmap_Feature, { name: `Progressive Web Application Support`, icon: this.diamond, description: `Automatically generate files for basic PWA features (service-worker, manifest, icons).` }), _createElement($Roadmap_Feature, { description: `A package for monitoring the state of the application.`, name: `Devtools`, icon: this.diamond }), _createElement($Roadmap_Feature, { name: `Documentation Generator`, icon: this.diamond, description: `Generate beautiful documentation for your project, including dependencies.` }), _createElement($Roadmap_Feature, { name: `Selective Compilation`, icon: this.diamond, description: `Only compile the entities that are being used.` }), _createElement($Roadmap_Feature, { name: `Hot Reloading`, icon: this.diamond, description: `In development mode replace entities that changed without losing state. ` }), _createElement($Roadmap_Feature, { name: `Language Server Protocol`, icon: this.diamond, description: `Implement a language server to expose the AST for code editors.` }), _createElement($Roadmap_Feature, { name: `Website for Packages`, icon: this.diamond, description: `A website to browse, find and rate community packages.` }), _createElement($Roadmap_Feature, { name: `Image Optimization`, icon: this.diamond, description: `During the build process optimize images automatically.` }), _createElement($Roadmap_Feature, { name: `Application Structure Diagram`, icon: this.diamond, description: `Construct an interactive diagram of application structure containing routes, stores, providers and components. ` }))), _createElement($Roadmap_Version, { version: `0.1` }, _array(_createElement($Roadmap_Feature, { description: `The language itself.`, name: `Language Basics`, icon: this.checkmark }, _array(_createElement($Roadmap_Feature, { name: `Parser`, description: `Converts source code to an AST.` }), _createElement($Roadmap_Feature, { name: `Formatter`, description: `Reproduces source code from an AST.` }), _createElement($Roadmap_Feature, { name: `Type Checker`, description: `Walks the AST and type checks the application.` }), _createElement($Roadmap_Feature, { name: `Compiler`, description: `Compiles an application to JavaScript.` }))), _createElement($Roadmap_Feature, { description: `The features of the language.`, name: `Language Features`, icon: this.checkmark }, _array(_createElement($Roadmap_Feature, { name: `Components`, description: `Define components with type checked properties and state.` }), _createElement($Roadmap_Feature, { name: `Styling`, description: `Styling HTML tags in a dynamic way without conflicts.` }), _createElement($Roadmap_Feature, { name: `Routing`, description: `Define routes in a declarative way.` }), _createElement($Roadmap_Feature, { name: `Computations`, description: `Handle synchronous (JSON decoding) and asynchronous (HTTP Request) computations that might fail.` }), _createElement($Roadmap_Feature, { name: `State`, description: `Manage global state with Stores.` }), _createElement($Roadmap_Feature, { name: `Subscriptions`, description: `Subscribe to global events (mouse, window) using providers.` }), _createElement($Roadmap_Feature, { name: `JavaScript Interopability`, description: `Simply call out the JavaScript when you need to.` }))), _createElement($Roadmap_Feature, { name: `Production Builder`, icon: this.checkmark, description: `The process of building the production version of the application.` }, _array(_createElement($Roadmap_Feature, { name: `Icon Generator`, description: `Generate icons for most common use cases (favicon, application icons).` }), _createElement($Roadmap_Feature, { name: `Bundling and Minification`, description: `Compile and minify the application into a single JavaScript file.` }))), _createElement($Roadmap_Feature, { name: `Development Server`, icon: this.checkmark, description: `A server that automatically formats code and reloads the application when any of the source files change.` }), _createElement($Roadmap_Feature, { name: `Package Manager`, icon: this.checkmark, description: `Install external sources (packages) directly from Git repositories.` }), _createElement($Roadmap_Feature, { name: `Testing`, icon: this.checkmark, description: `Language feature for easily testing modules, packages, components or the whole application.` }), _createElement($Roadmap_Feature, { name: `Command Line Interface`, icon: this.checkmark, description: `A binary that allows to access the features of the language.` })))))
+    return _createElement($Page, {  }, _array(_createElement($Title, {  }, _array(`Roadmap`)), _createElement($SubTitle, {  }, _array(`This page contains planned and shipped high level features up to the stable release (1.0.0).`)), _createElement($Roadmap_Version, { "version": `Planned Features` }, _array(_createElement($Roadmap_Feature, { "name": `CSS Type Checking`, "icon": this.diamond, "description": `Check the values of known CSS properties and warn the developer if it's not matches the available values.` }), _createElement($Roadmap_Feature, { "name": `HTML Attribute Checking`, "icon": this.diamond, "description": `Check the values of HTML attributes based on the tag they belong to (for example check alt attributes for <img> tags).` }), _createElement($Roadmap_Feature, { "name": `Progressive Web Application Support`, "icon": this.diamond, "description": `Automatically generate files for basic PWA features (service-worker, manifest, icons).` }), _createElement($Roadmap_Feature, { "description": `A package for monitoring the state of the application.`, "name": `Devtools`, "icon": this.diamond }), _createElement($Roadmap_Feature, { "name": `Documentation Generator`, "icon": this.diamond, "description": `Generate beautiful documentation for your project, including dependencies.` }), _createElement($Roadmap_Feature, { "name": `Selective Compilation`, "icon": this.diamond, "description": `Only compile the entities that are being used.` }), _createElement($Roadmap_Feature, { "name": `Hot Reloading`, "icon": this.diamond, "description": `In development mode replace entities that changed without losing state. ` }), _createElement($Roadmap_Feature, { "name": `Language Server Protocol`, "icon": this.diamond, "description": `Implement a language server to expose the AST for code editors.` }), _createElement($Roadmap_Feature, { "name": `Website for Packages`, "icon": this.diamond, "description": `A website to browse, find and rate community packages.` }), _createElement($Roadmap_Feature, { "name": `Image Optimization`, "icon": this.diamond, "description": `During the build process optimize images automatically.` }), _createElement($Roadmap_Feature, { "name": `Application Structure Diagram`, "icon": this.diamond, "description": `Construct an interactive diagram of application structure containing routes, stores, providers and components. ` }))), _createElement($Roadmap_Version, { "version": `0.1` }, _array(_createElement($Roadmap_Feature, { "description": `The language itself.`, "name": `Language Basics`, "icon": this.checkmark }, _array(_createElement($Roadmap_Feature, { "name": `Parser`, "description": `Converts source code to an AST.` }), _createElement($Roadmap_Feature, { "name": `Formatter`, "description": `Reproduces source code from an AST.` }), _createElement($Roadmap_Feature, { "name": `Type Checker`, "description": `Walks the AST and type checks the application.` }), _createElement($Roadmap_Feature, { "name": `Compiler`, "description": `Compiles an application to JavaScript.` }))), _createElement($Roadmap_Feature, { "description": `The features of the language.`, "name": `Language Features`, "icon": this.checkmark }, _array(_createElement($Roadmap_Feature, { "name": `Components`, "description": `Define components with type checked properties and state.` }), _createElement($Roadmap_Feature, { "name": `Styling`, "description": `Styling HTML tags in a dynamic way without conflicts.` }), _createElement($Roadmap_Feature, { "name": `Routing`, "description": `Define routes in a declarative way.` }), _createElement($Roadmap_Feature, { "name": `Computations`, "description": `Handle synchronous (JSON decoding) and asynchronous (HTTP Request) computations that might fail.` }), _createElement($Roadmap_Feature, { "name": `State`, "description": `Manage global state with Stores.` }), _createElement($Roadmap_Feature, { "name": `Subscriptions`, "description": `Subscribe to global events (mouse, window) using providers.` }), _createElement($Roadmap_Feature, { "name": `JavaScript Interopability`, "description": `Simply call out the JavaScript when you need to.` }))), _createElement($Roadmap_Feature, { "name": `Production Builder`, "icon": this.checkmark, "description": `The process of building the production version of the application.` }, _array(_createElement($Roadmap_Feature, { "name": `Icon Generator`, "description": `Generate icons for most common use cases (favicon, application icons).` }), _createElement($Roadmap_Feature, { "name": `Bundling and Minification`, "description": `Compile and minify the application into a single JavaScript file.` }))), _createElement($Roadmap_Feature, { "name": `Development Server`, "icon": this.checkmark, "description": `A server that automatically formats code and reloads the application when any of the source files change.` }), _createElement($Roadmap_Feature, { "name": `Package Manager`, "icon": this.checkmark, "description": `Install external sources (packages) directly from Git repositories.` }), _createElement($Roadmap_Feature, { "name": `Testing`, "icon": this.checkmark, "description": `Language feature for easily testing modules, packages, components or the whole application.` }), _createElement($Roadmap_Feature, { "name": `Command Line Interface`, "icon": this.checkmark, "description": `A binary that allows to access the features of the language.` })))))
   }
 }
 
@@ -3506,7 +3643,17 @@ class $Home extends Component {
       style: {
 
       }
-    }, [_createElement($Logo, { fill: this.theme.colors.primary.background, mobileHeight: 60, mobileWidth: 250, textFill: `#222` }), _createElement("h2", {
+    }, [_createElement("div", {
+      className: `home-logo`,
+      style: {
+
+      }
+    }, [_createElement($Logo, { "size": 180, "mobileSize": 60 }), _createElement("h1", {
+      className: `home-h1`,
+      style: {
+
+      }
+    }, [`mint`])]), _createElement("h2", {
       className: `home-slogan-media-0 home-slogan`,
       style: {
 
@@ -3516,20 +3663,7 @@ class $Home extends Component {
       style: {
 
       }
-    }, [_createElement("a", {
-      href: `/install`,
-      className: `home-link`,
-      style: {
-
-      }
-    }, [_createElement($Ui_Button, { size: 22, label: `Install` })]), _createElement("a", {
-      href: `https://guide.mint-lang.com`,
-      target: `_blank`,
-      className: `home-link`,
-      style: {
-
-      }
-    }, [_createElement($Ui_Button, { size: 22, type: `secondary`, label: `Learn` })])])]), _createElement($Showcase, {  }), _createElement($CallToAction, {  })])
+    }, [_createElement($Button, { "href": `/install` }, _array(`Install`)), _createElement($Button, { "href": `https://guide.mint-lang.com`, "target": `_blank` }, _array(`Learn`))])]), _createElement($Showcase, {  }), _createElement($Pages_Home_Github, {  })])
   }
 }
 
@@ -3715,47 +3849,47 @@ class $Showcase extends Component {
       style: {
 
       }
-    }, [_createElement($Showcase_HighlightBlock, { line: `store Counter.Store`, padding: `5px 10px`, name: `store` }, _array(_createElement($Showcase_Highlight, { text: `property counter : Number = 0`, name: `store-property` }), _createElement("div", {
+    }, [_createElement($Showcase_HighlightBlock, { "line": `store Counter.Store`, "padding": `5px 10px`, "name": `store` }, _array(_createElement($Showcase_Highlight, { "text": `property counter : Number = 0`, "name": `store-property` }), _createElement("div", {
       className: `showcase-spacer`,
       style: {
 
       }
-    }), _createElement($Showcase_HighlightBlock, { line: `fun increment : Void`, name: `function` }, _array(_createElement($Showcase_Highlight, { text: `next { state | counter = counter + 1 }`, name: `next` }))), _createElement("div", {
+    }), _createElement($Showcase_HighlightBlock, { "line": `fun increment : Void`, "name": `function` }, _array(_createElement($Showcase_Highlight, { "text": `next { state | counter = counter + 1 }`, "name": `next` }))), _createElement("div", {
       className: `showcase-spacer`,
       style: {
 
       }
-    }), _createElement($Showcase_Block, { line: `fun decrement : Void` }, _array(`next { state | counter = counter - 1 }`)))), _createElement("div", {
+    }), _createElement($Showcase_Block, { "line": `fun decrement : Void` }, _array(`next { state | counter = counter - 1 }`)))), _createElement("div", {
       className: `showcase-spacer`,
       style: {
 
       }
-    }), _createElement($Showcase_HighlightBlock, { line: `component Counter`, name: `component`, padding: `5px 10px` }, _array(_createElement($Showcase_Highlight, { text: `connect Counter.Store exposing { increment, decrement, counter }`, name: `connect` }), _createElement("div", {
+    }), _createElement($Showcase_HighlightBlock, { "line": `component Counter`, "name": `component`, "padding": `5px 10px` }, _array(_createElement($Showcase_Highlight, { "text": `connect Counter.Store exposing { increment, decrement, counter }`, "name": `connect` }), _createElement("div", {
       className: `showcase-spacer`,
       style: {
 
       }
-    }), _createElement($Showcase_Highlight, { text: `property disabled : Bool = false`, name: `component-property` }), _createElement("div", {
+    }), _createElement($Showcase_Highlight, { "text": `property disabled : Bool = false`, "name": `component-property` }), _createElement("div", {
       className: `showcase-spacer`,
       style: {
 
       }
-    }), _createElement($Showcase_HighlightBlock, { line: `style base`, name: `style` }, _array(`background: `, _createElement($Showcase_Highlight, { text: `{background}`, name: `css-interpolation` }), `;\n`, _createElement($Showcase_Highlight, { text: `border-radius: 5px;`, name: `css-declaration` }), `\ntransition: 320ms;`, `\ndisplay: flex;`, `\npadding: 20px;`, `\nmargin: 20px; `)), _createElement("div", {
+    }), _createElement($Showcase_HighlightBlock, { "line": `style base`, "name": `style` }, _array(`background: `, _createElement($Showcase_Highlight, { "text": `{background}`, "name": `css-interpolation` }), `;\n`, _createElement($Showcase_Highlight, { "text": `border-radius: 5px;`, "name": `css-declaration` }), `\ntransition: 320ms;`, `\ndisplay: flex;`, `\npadding: 20px;`, `\nmargin: 20px; `)), _createElement("div", {
       className: `showcase-spacer`,
       style: {
 
       }
-    }), _createElement($Showcase_Block, { line: `style counter` }, _array(`font-family: sans;`, `\nfont-size: 20px;`, `\npadding: 0 20px;`)), _createElement("div", {
+    }), _createElement($Showcase_Block, { "line": `style counter` }, _array(`font-family: sans;`, `\nfont-size: 20px;`, `\npadding: 0 20px;`)), _createElement("div", {
       className: `showcase-spacer`,
       style: {
 
       }
-    }), _createElement($Showcase_HighlightBlock, { line: `get background : String`, name: `get` }, _array(`if (counter >= 10) {\n`, `  "lightgreen"\n`, `} else {\n`, `  if (counter < 0) {\n`, `    "orangered"\n`, `  } else {\n`, `    "#F2F2F2"\n`, `  }\n`, `}`)), _createElement("div", {
+    }), _createElement($Showcase_HighlightBlock, { "line": `get background : String`, "name": `get` }, _array(`if (counter >= 10) {\n`, `  "lightgreen"\n`, `} else {\n`, `  if (counter < 0) {\n`, `    "orangered"\n`, `  } else {\n`, `    "#F2F2F2"\n`, `  }\n`, `}`)), _createElement("div", {
       className: `showcase-spacer`,
       style: {
 
       }
-    }), _createElement($Showcase_HighlightBlock, { line: `fun render : Html`, name: `render` }, _array(_createElement($Showcase_Block, { closingChar: `</div>`, openingChar: ``, line: `<div::base>` }, _array(_createElement($Showcase_HighlightBlock, { closingChar: `</button>`, openingChar: ``, line: `<button`, name: `html-element` }, _array(_createElement($Showcase_Highlight, { text: `onClick={\\event : Html.Event => decrement()}`, name: `event` }), `\ndisabled={disabled}>`, _createElement("div", {
+    }), _createElement($Showcase_HighlightBlock, { "line": `fun render : Html`, "name": `render` }, _array(_createElement($Showcase_Block, { "closingChar": `</div>`, "openingChar": ``, "line": `<div::base>` }, _array(_createElement($Showcase_HighlightBlock, { "closingChar": `</button>`, "openingChar": ``, "line": `<button`, "name": `html-element` }, _array(_createElement($Showcase_Highlight, { "text": `onClick={\\event : Html.Event => decrement()}`, "name": `event` }), `\ndisabled={disabled}>`, _createElement("div", {
       className: `showcase-spacer`,
       style: {
 
@@ -3770,17 +3904,17 @@ class $Showcase extends Component {
       style: {
 
       }
-    }), _createElement($Showcase_Block, { closingChar: `</span>`, openingChar: ``, line: `<span::counter>` }, _array(`<{ Number.toString(counter) }>`)), _createElement("div", {
+    }), _createElement($Showcase_Block, { "closingChar": `</span>`, "openingChar": ``, "line": `<span::counter>` }, _array(`<{ Number.toString(counter) }>`)), _createElement("div", {
       className: `showcase-spacer`,
       style: {
 
       }
-    }), _createElement($Showcase_Block, { closingChar: `</button>`, openingChar: ``, line: `<button` }, _array(`onClick={\\event : Html.Event => increment()}\n`, `disabled=`, _createElement($Showcase_Highlight, { text: `{disabled}`, name: `attribute` }), `>\n`, _createElement($Showcase_Highlight, { text: `<{ "Increment" }>`, name: `html-expression` }))))))))), _createElement("div", {
+    }), _createElement($Showcase_Block, { "closingChar": `</button>`, "openingChar": ``, "line": `<button` }, _array(`onClick={\\event : Html.Event => increment()}\n`, `disabled=`, _createElement($Showcase_Highlight, { "text": `{disabled}`, "name": `attribute` }), `>\n`, _createElement($Showcase_Highlight, { "text": `<{ "Increment" }>`, "name": `html-expression` }))))))))), _createElement("div", {
       className: `showcase-spacer`,
       style: {
 
       }
-    }), _createElement($Showcase_HighlightBlock, { line: `component Main`, name: `main`, padding: `5px 10px` }, _array(_createElement($Showcase_Block, { line: `fun render : Html` }, _array(_createElement($Showcase_Highlight, { text: `<Counter disabled={false}/>`, name: `html-component` })))))]), _createElement("div", {
+    }), _createElement($Showcase_HighlightBlock, { "line": `component Main`, "name": `main`, "padding": `5px 10px` }, _array(_createElement($Showcase_Block, { "line": `fun render : Html` }, _array(_createElement($Showcase_Highlight, { "text": `<Counter disabled={false}/>`, "name": `html-component` })))))]), _createElement("div", {
       className: `showcase-description-media-0 showcase-description`,
       style: {
 
@@ -3796,6 +3930,35 @@ class $Showcase extends Component {
 
 $Showcase.displayName = "Showcase"
 
+class $Pages_Home_Github extends Component {
+  render() {
+    return _createElement("div", {
+      className: `pages-home-github-base`,
+      style: {
+
+      }
+    }, [_createElement("img", {
+      "src": `https://octodex.github.com/images/daftpunktocat-thomas.gif`,
+      className: `pages-home-github-image`,
+      style: {
+
+      }
+    }), _createElement("div", {
+      className: `pages-home-github-title`,
+      style: {
+
+      }
+    }, [`Fork the project on GitHub`]), _createElement("div", {
+      className: `pages-home-github-text`,
+      style: {
+
+      }
+    }, [_createElement("b", {}, [`Mint`]), ` is open source! `, _createElement("br", {}), `It’s hosted, developed, and maintained on GitHub by folks like you.`]), _createElement($Button, { "target": `_blank`, "href": `` }, _array(`Contribute on Github`))])
+  }
+}
+
+$Pages_Home_Github.displayName = "Pages.Home.Github"
+
 class $Showcase_Highlight extends Component {
   get border() {
     return (_compare(this.over, this.name) ? `1px dashed rgba(0,0,0,0.6)` : `1px dashed rgba(0,0,0,0.1)`)
@@ -3806,7 +3969,7 @@ class $Showcase_Highlight extends Component {
   }
 
   get background() {
-    return (_compare(this.active, this.name) ? `#3aad57` : (_compare(this.over, this.name) ? `rgba(0,0,0,0.15)` : `rgba(0,0,0,0.07)`))
+    return (_compare(this.active, this.name) ? `#2f9e59` : (_compare(this.over, this.name) ? `rgba(0,0,0,0.15)` : `rgba(0,0,0,0.07)`))
   }
 
   get text () {
@@ -3881,9 +4044,9 @@ class $Showcase_Highlight extends Component {
 
   render() {
     return _createElement("div", {
-      onMouseLeave: (event => (this.handleMouseLeave.bind(this))(_normalizeEvent(event))),
-      onMouseOver: (event => (this.handleMouseEnter.bind(this))(_normalizeEvent(event))),
-      onClick: (event => (this.handleClick.bind(this))(_normalizeEvent(event))),
+      "onMouseLeave": (event => (this.handleMouseLeave.bind(this))(_normalizeEvent(event))),
+      "onMouseOver": (event => (this.handleMouseEnter.bind(this))(_normalizeEvent(event))),
+      "onClick": (event => (this.handleClick.bind(this))(_normalizeEvent(event))),
       className: `showcase-highlight-base`,
       style: {
         [`--showcase-highlight-base-background`]: this.background,
@@ -3934,19 +4097,19 @@ class $CallToAction extends Component {
 
       }
     }, [_createElement("a", {
-      href: `/install`,
+      "href": `/install`,
       className: `call-to-action-link`,
       style: {
 
       }
-    }, [_createElement($Ui_Button, { size: 20, type: `secondary`, label: `Install` })]), _createElement("a", {
-      href: `https://guide.mint-lang.com`,
-      target: `_blank`,
+    }, [_createElement($Ui_Button, { "size": 20, "type": `secondary`, "label": `Install` })]), _createElement("a", {
+      "href": `https://guide.mint-lang.com`,
+      "target": `_blank`,
       className: `call-to-action-link`,
       style: {
 
       }
-    }, [_createElement($Ui_Button, { size: 20, type: `secondary`, label: `Learn` })])])])
+    }, [_createElement($Ui_Button, { "size": 20, "type": `secondary`, "label": `Learn` })])])])
   }
 }
 
@@ -3966,7 +4129,7 @@ class $Showcase_HighlightBlock extends Component {
   }
 
   get background() {
-    return (_compare(this.active, this.name) ? `#3aad57` : (_compare(this.over, this.name) ? `rgba(0,0,0,0.15)` : `rgba(0,0,0,0.07)`))
+    return (_compare(this.active, this.name) ? `#2f9e59` : (_compare(this.over, this.name) ? `rgba(0,0,0,0.15)` : `rgba(0,0,0,0.07)`))
   }
 
   get children () {
@@ -4073,9 +4236,9 @@ class $Showcase_HighlightBlock extends Component {
 
   render() {
     return _createElement("div", {
-      onMouseLeave: (event => (this.handleMouseLeave.bind(this))(_normalizeEvent(event))),
-      onMouseOver: (event => (this.handleMouseEnter.bind(this))(_normalizeEvent(event))),
-      onClick: (event => (this.handleClick.bind(this))(_normalizeEvent(event))),
+      "onMouseLeave": (event => (this.handleMouseLeave.bind(this))(_normalizeEvent(event))),
+      "onMouseOver": (event => (this.handleMouseEnter.bind(this))(_normalizeEvent(event))),
+      "onClick": (event => (this.handleClick.bind(this))(_normalizeEvent(event))),
       className: `showcase-highlight-block-base-media-0 showcase-highlight-block-base`,
       style: {
         [`--showcase-highlight-block-base-background`]: this.background,
@@ -4099,72 +4262,73 @@ $Showcase_HighlightBlock.defaultProps = {
 }
 
 class $Logo extends Component {
-  get textFill () {
-    if (this.props.textFill != undefined) {
-      return this.props.textFill
-    } else {
-      return `#000`
-    }
+  get bottomColor() {
+    return (this.invert ? `#FFF` : `#247e3d`)
   }
 
-  get fill () {
-    if (this.props.fill != undefined) {
-      return this.props.fill
-    } else {
-      return `#000`
-    }
+  get topColor() {
+    return (this.invert ? `#FFF` : `#56cf86`)
   }
 
-  get height () {
-    if (this.props.height != undefined) {
-      return this.props.height
+  get id() {
+    return (this.invert ? `a` : `b`)
+  }
+
+  get mobileSize () {
+    if (this.props.mobileSize != undefined) {
+      return this.props.mobileSize
     } else {
       return 90
     }
   }
 
-  get width () {
-    if (this.props.width != undefined) {
-      return this.props.width
+  get invert () {
+    if (this.props.invert != undefined) {
+      return this.props.invert
     } else {
-      return 370
+      return false
     }
   }
 
-  get mobileHeight () {
-    if (this.props.mobileHeight != undefined) {
-      return this.props.mobileHeight
+  get size () {
+    if (this.props.size != undefined) {
+      return this.props.size
     } else {
       return 90
-    }
-  }
-
-  get mobileWidth () {
-    if (this.props.mobileWidth != undefined) {
-      return this.props.mobileWidth
-    } else {
-      return 370
     }
   }
 
   render() {
     return _createElement("svg", {
-      viewBox: `0 0 370 90`,
-      height: `90`,
-      width: `370`,
+      "viewBox": `0 0 256 256`,
+      "height": `256`,
+      "width": `256`,
       className: `logo-base-media-0 logo-base`,
       style: {
-        [`--logo-base-height`]: this.height + `px`,
-        [`--logo-base-width`]: this.width + `px`,
-        [`--logo-base-media-0-height`]: this.mobileHeight + `px`,
-        [`--logo-base-media-0-width`]: this.mobileWidth + `px`
+        [`--logo-base-height`]: this.size + `px`,
+        [`--logo-base-width`]: this.size + `px`,
+        [`--logo-base-media-0-height`]: this.size + `px`,
+        [`--logo-base-media-0-width`]: this.size + `px`
       }
-    }, [_createElement("path", {
-      d: `M84.082 87.484C78.584 68.76 61.48 49.421 41.624 42.668c19.855 6.446 33.906 16.269 43.375 35.914C85.304 15.348 27.268 31.617 1.304 0-10.304 80.424 58.73 97.307 84.082 87.484z`,
-      fill: this.fill
-    }), _createElement("path", {
-      d: `M177.222 25.537q6.198 0 11.529 2.603 5.454 2.48 8.801 7.81 3.347 5.331 3.347 13.14v39.67h-9.917V50.083q0-8.058-4.09-11.901-3.968-3.967-10.538-3.967-4.959 0-9.174 2.48-4.09 2.355-6.694 7.065-2.48 4.587-2.48 11.033V88.76h-9.917V50.083q0-8.058-4.09-11.901-3.967-3.967-10.538-3.967-4.462 0-8.677 2.355-4.215 2.232-6.942 7.066-2.728 4.835-2.728 12.025v33.1h-9.917V26.776h8.678l.62 9.67q3.223-5.455 8.43-8.183 5.33-2.727 11.404-2.727 6.818 0 12.52 3.1 5.827 3.099 8.802 9.049 2.728-5.95 8.926-9.05 6.198-3.099 12.645-3.099zM228.312 14.876q-3.348 0-5.455-1.983-1.983-2.108-1.983-5.455t1.983-5.33Q224.964 0 228.312 0q3.347 0 5.33 2.107 2.108 1.984 2.108 5.331 0 3.347-2.108 5.455-1.983 1.983-5.33 1.983zm4.958 73.884h-9.917V26.777h9.917V88.76zM286.406 25.537q10.537 0 17.355 6.075 6.818 6.074 6.818 17.479v39.67h-9.917V52.561q0-9.67-4.215-14.008-4.091-4.34-11.033-4.34-4.959 0-9.298 2.232-4.338 2.108-7.19 7.066-2.727 4.835-2.727 12.273V88.76h-9.917V26.777h8.677l.62 9.67q3.1-5.58 8.554-8.183 5.454-2.727 12.273-2.727zM370 84.421Q363.802 90 354.008 90q-7.562 0-12.396-4.09-4.711-4.092-4.835-12.522V35.331H324.38v-8.554h12.397V11.9l9.917-2.727v17.603h22.934v8.554h-22.934v36.322q0 4.463 2.48 6.818 2.603 2.231 6.818 2.231 5.95 0 10.537-4.586L370 84.42z`,
-      fill: this.textFill
+    }, [_createElement("defs", {}, [_createElement("linearGradient", {
+      "gradientUnits": `userSpaceOnUse`,
+      "y2": `435.85`,
+      "x2": `260.59`,
+      "y1": `665.136`,
+      "x1": `260.59`,
+      "id": this.id,
+      "gradientTransform": `translate(-132.333 374.602)`
+    }, [_createElement("stop", {
+      "offset": `0`,
+      "stop-color": this.bottomColor
+    }), _createElement("stop", {
+      "offset": `1`,
+      "stop-color": this.topColor
+    })])]), _createElement("path", {
+      "d": `M127.999 810.452c-2.961 11.304-28.25 18.524-30 32.857l-2.855-8.57c-14.89 18.963-13.573 28.57-13.573 28.57l-1.25-6.875c-10.869 18.17-8.567 27.072-7.312 29.786l.527.93s-.235-.3-.527-.93l-2.865-5.053c-11.286 31.219-1.43 40.803-1.43 40.803l-6.07-7.053c-2.683 23.92 4.285 33.75 4.285 33.75l-4.375-4.108c-.557 16.247 10.09 25.893 10.09 25.893l-7.018-4.812c13.505 58.995 40.317 60.584 43.775 60.539l-10.687.345c7.127 7.63 16.225 10.59 22.379 11.748 3.356-17.796 6.44-60.887 6.906-173.808.466 112.912 3.552 156.005 6.908 173.805 6.155-1.16 15.253-4.12 22.38-11.748l-10.686-.344c3.463.044 30.27-1.552 43.773-60.54l-7.018 4.813s10.647-9.646 10.09-25.893l-4.375 4.108s6.968-9.83 4.285-33.75l-6.07 7.053s9.856-9.584-1.43-40.803l-2.863 5.047c-.293.634-.53.933-.53.933l.53-.933c1.256-2.72 3.548-11.62-7.314-29.78l-1.25 6.875s1.318-9.609-13.573-28.572L158 843.307c-1.75-14.332-27.037-21.552-30-32.855z`,
+      "fill": `url(#` + this.id + `)`,
+      "fill-rule": `evenodd`,
+      "transform": `translate(0 -796.362)`
     })])
   }
 }
@@ -4172,7 +4336,7 @@ class $Logo extends Component {
 $Logo.displayName = "Logo"
 
 $Logo.defaultProps = {
-  textFill: `#000`,fill: `#000`,height: 90,width: 370,mobileHeight: 90,mobileWidth: 370
+  mobileSize: 90,invert: false,size: 90
 }
 
 class $Examples_Example extends Component {
@@ -4202,7 +4366,7 @@ class $Examples_Example extends Component {
 
   render() {
     return _createElement("div", {
-      onClick: (event => (((event) => {
+      "onClick": (event => (((event) => {
       return $Window.navigate(this.href)
       }))(_normalizeEvent(event))),
       className: `examples-example-base`,
@@ -4257,7 +4421,7 @@ class $Examples extends Component {
       style: {
 
       }
-    }, [_createElement($Examples_Example, { description: this.userManagement.description, title: this.userManagement.title, href: this.userManagement.href }), _createElement($Examples_Example, { description: this.drag.description, title: this.drag.title, href: this.drag.href }), _createElement($Examples_Example, { description: this.counter.description, title: this.counter.title, href: this.counter.href }), _createElement($Examples_Example, { description: this.fileHandling.description, title: this.fileHandling.title, href: this.fileHandling.href })])))
+    }, [_createElement($Examples_Example, { "description": this.userManagement.description, "title": this.userManagement.title, "href": this.userManagement.href }), _createElement($Examples_Example, { "description": this.drag.description, "title": this.drag.title, "href": this.drag.href }), _createElement($Examples_Example, { "description": this.counter.description, "title": this.counter.title, "href": this.counter.href }), _createElement($Examples_Example, { "description": this.fileHandling.description, "title": this.fileHandling.title, "href": this.fileHandling.href })])))
   }
 }
 
@@ -4338,7 +4502,7 @@ class $UserRow extends Component {
       style: {
         [`--user-row-tr-a-text-decoration`]: this.textDecoration
       }
-    }, [_createElement($Ui_Table_Td, {  }, _array(_createElement($Ui_Link, { href: `/users/` + $Number.toString(this.user.id) }, _array($Number.toString(this.user.id))))), _createElement($Ui_Table_Td, {  }, _array(_createElement($Ui_Link, { href: `/users/` + $Number.toString(this.user.id) }, _array(this.user.firstName + ` ` + this.user.lastName)))), _createElement($Ui_Table_Td, {  }, _array($String.capitalize(this.user.status))), _createElement($Ui_Table_Td, {  }, _array(_createElement($Ui_Time, { date: this.user.updatedAt }))), _createElement($Ui_Table_Td, { align: `center` }, _array(_createElement($Ui_Checkbox, { checked: _compare(this.user.status, `locked`), onChange: this.onChange.bind(this) })))])
+    }, [_createElement($Ui_Table_Td, {  }, _array(_createElement($Ui_Link, { "href": `/users/` + $Number.toString(this.user.id) }, _array($Number.toString(this.user.id))))), _createElement($Ui_Table_Td, {  }, _array(_createElement($Ui_Link, { "href": `/users/` + $Number.toString(this.user.id) }, _array(this.user.firstName + ` ` + this.user.lastName)))), _createElement($Ui_Table_Td, {  }, _array($String.capitalize(this.user.status))), _createElement($Ui_Table_Td, {  }, _array(_createElement($Ui_Time, { "date": this.user.updatedAt }))), _createElement($Ui_Table_Td, { "align": `center` }, _array(_createElement($Ui_Checkbox, { "checked": _compare(this.user.status, `locked`), "onChange": this.onChange.bind(this) })))])
   }
 }
 
@@ -4390,7 +4554,7 @@ class $Users_Layout extends Component {
   }
 
   render() {
-    return _createElement("div", {}, [_createElement($Ui_Breadcrumbs, { separator: `|` }, _array(_createElement($Ui_Breadcrumb, { label: `Home`, href: `/users` }), _createElement($Ui_Breadcrumb, { label: `New User`, href: `/users/new` }))), _createElement("div", {
+    return _createElement("div", {}, [_createElement($Ui_Breadcrumbs, { "separator": `|` }, _array(_createElement($Ui_Breadcrumb, { "label": `Home`, "href": `/users` }), _createElement($Ui_Breadcrumb, { "label": `New User`, "href": `/users/new` }))), _createElement("div", {
       className: `users-layout-wrapper`,
       style: {
 
@@ -4436,14 +4600,14 @@ class $Users_Table extends Component {
   }
 
   renderItem(item) {
-    return _createElement($UserRow, { key: $Number.toString(item.id), user: item })
+    return _createElement($UserRow, { "key": $Number.toString(item.id), "user": item })
   }
 
   render() {
     let slicedUsers = $Array.slice(this.page * this.perPage, (this.page + 1) * this.perPage, this.users)
 
     let rows = ($Array.isEmpty(slicedUsers) ? [_createElement("tr", {}, [_createElement("td", {
-      colspan: `5`
+      "colspan": `5`
     }, [_createElement("div", {
       className: `users-table-empty`,
       style: {
@@ -4451,7 +4615,7 @@ class $Users_Table extends Component {
       }
     }, [`There are no users to display!`])])])] : $Array.map(this.renderItem.bind(this), slicedUsers))
 
-    return _createElement($Ui_Loader, { shown: this.loading }, _array(_createElement("div", {}, [_createElement("div", {
+    return _createElement($Ui_Loader, { "shown": this.loading }, _array(_createElement("div", {}, [_createElement("div", {
       className: `users-table-header`,
       style: {
 
@@ -4468,23 +4632,13 @@ class $Users_Table extends Component {
         [`--users-table-table-color`]: this.theme.colors.input.text,
         [`--users-table-table-font-family`]: this.theme.fontFamily
       }
-    }, [_createElement("thead", {}, [_createElement("tr", {}, [_createElement($Ui_Table_Th, { width: `40px` }, _array(`Id`)), _createElement($Ui_Table_Th, {  }, _array(`Name`)), _createElement($Ui_Table_Th, {  }, _array(`Status`)), _createElement($Ui_Table_Th, {  }, _array(`Last Updated`)), _createElement($Ui_Table_Th, { align: `center`, width: `70px` }, _array(`Active`))])]), _createElement("tbody", {}, [rows])]), _createElement($Ui_Pagination, { onChange: this.setPage.bind(this), page: this.page, total: $Array.size(this.users) })])))
+    }, [_createElement("thead", {}, [_createElement("tr", {}, [_createElement($Ui_Table_Th, { "width": `40px` }, _array(`Id`)), _createElement($Ui_Table_Th, {  }, _array(`Name`)), _createElement($Ui_Table_Th, {  }, _array(`Status`)), _createElement($Ui_Table_Th, {  }, _array(`Last Updated`)), _createElement($Ui_Table_Th, { "align": `center`, "width": `70px` }, _array(`Active`))])]), _createElement("tbody", {}, [rows])]), _createElement($Ui_Pagination, { "onChange": this.setPage.bind(this), "page": this.page, "total": $Array.size(this.users) })])))
   }
 }
 
 $Users_Table.displayName = "Users.Table"
 
 class $Header extends Component {
-  get theme () { return $Ui.theme }
-
-  componentWillUnmount () {
-    $Ui._unsubscribe(this)
-  }
-
-  componentDidMount () {
-    $Ui._subscribe(this)
-  }
-
   render() {
     return _createElement("div", {
       className: `header-base`,
@@ -4496,32 +4650,38 @@ class $Header extends Component {
       style: {
 
       }
-    }, [_createElement($Ui_Toolbar_Title, { href: `/` }, _array(_createElement($Logo, { fill: this.theme.colors.primary.background, mobileHeight: 20, mobileWidth: 82, textFill: `#FFF`, height: 20, width: 82 }))), _createElement($Ui_Toolbar_Spacer, {  }), _createElement("div", {
+    }, [_createElement("a", {
+      "href": `/`,
+      className: `header-brand`,
+      style: {
+
+      }
+    }, [_createElement($Logo, { "mobileSize": 20, "invert": true, "size": 20 }), `mint`]), _createElement($Ui_Toolbar_Spacer, {  }), _createElement("div", {
       className: `header-desktop-media-0 header-desktop`,
       style: {
 
       }
     }, [_createElement("a", {
-      href: `/install`,
+      "href": `/install`,
       className: `header-link`,
       style: {
 
       }
     }, [`Install`]), _createElement($Ui_Toolbar_Separator, {  }), _createElement("a", {
-      href: `https://guide.mint-lang.com`,
-      target: `_blank`,
+      "href": `https://guide.mint-lang.com`,
+      "target": `_blank`,
       className: `header-link`,
       style: {
 
       }
     }, [`Learn`]), _createElement($Ui_Toolbar_Separator, {  }), _createElement("a", {
-      href: `/examples`,
+      "href": `/examples`,
       className: `header-link`,
       style: {
 
       }
     }, [`Examples`]), _createElement($Ui_Toolbar_Separator, {  }), _createElement("a", {
-      href: `/roadmap`,
+      "href": `/roadmap`,
       className: `header-link`,
       style: {
 
@@ -4555,15 +4715,15 @@ class $Footer extends Component {
 
       }
     }, [`Source`]), _createElement("a", {
-      href: `https://github.com/mint-lang/mint`,
-      target: `_blank`,
+      "href": `https://github.com/mint-lang/mint`,
+      "target": `_blank`,
       className: `footer-link`,
       style: {
 
       }
     }, [`Github Repository`]), _createElement("a", {
-      href: `https://github.com/mint-lang/mint/releases`,
-      target: `_blank`,
+      "href": `https://github.com/mint-lang/mint/releases`,
+      "target": `_blank`,
       className: `footer-link`,
       style: {
 
@@ -4579,8 +4739,8 @@ class $Footer extends Component {
 
       }
     }, [`Community`]), _createElement("a", {
-      href: `https://gitter.im/mint-lang/Lobby`,
-      target: `_blank`,
+      "href": `https://gitter.im/mint-lang/Lobby`,
+      "target": `_blank`,
       className: `footer-link`,
       style: {
 
@@ -4590,6 +4750,49 @@ class $Footer extends Component {
 }
 
 $Footer.displayName = "Footer"
+
+class $Button extends Component {
+  get children () {
+    if (this.props.children != undefined) {
+      return this.props.children
+    } else {
+      return []
+    }
+  }
+
+  get target () {
+    if (this.props.target != undefined) {
+      return this.props.target
+    } else {
+      return ``
+    }
+  }
+
+  get href () {
+    if (this.props.href != undefined) {
+      return this.props.href
+    } else {
+      return ``
+    }
+  }
+
+  render() {
+    return _createElement("a", {
+      "target": this.target,
+      "href": this.href,
+      className: `button-base`,
+      style: {
+
+      }
+    }, [this.children])
+  }
+}
+
+$Button.displayName = "Button"
+
+$Button.defaultProps = {
+  children: [],target: ``,href: ``
+}
 
 class $Example extends Component {
   get children () {
@@ -4666,20 +4869,20 @@ class $Counter extends Component {
         [`--counter-base-background`]: this.background
       }
     }, [_createElement("button", {
-      onClick: (event => (((event) => {
+      "onClick": (event => (((event) => {
       return this.decrement.bind(this)()
       }))(_normalizeEvent(event))),
-      disabled: this.disabled
+      "disabled": this.disabled
     }, [`Decrement`]), _createElement("span", {
       className: `counter-counter`,
       style: {
 
       }
     }, [$Number.toString(this.counter)]), _createElement("button", {
-      onClick: (event => (((event) => {
+      "onClick": (event => (((event) => {
       return this.increment.bind(this)()
       }))(_normalizeEvent(event))),
-      disabled: this.disabled
+      "disabled": this.disabled
     }, [`Increment`])])
   }
 }
@@ -4801,7 +5004,7 @@ class $Drag extends Component {
 
   render() {
     return _createElement("div", {
-      onMouseDown: (event => (((event) => {
+      "onMouseDown": (event => (((event) => {
       return this.start.bind(this)(event)
       }))(_normalizeEvent(event))),
       className: `drag-base`,
@@ -4911,7 +5114,7 @@ class $Ui_Table_Th extends Component {
   }
 
   render() {
-    return _createElement($Ui_Table_Td, { children: this.children, header: true, align: this.align, width: this.width })
+    return _createElement($Ui_Table_Td, { "children": this.children, "header": true, "align": this.align, "width": this.width })
   }
 }
 
@@ -5058,8 +5261,8 @@ class $Ui_Link extends Component {
 
   render() {
     return _createElement("a", {
-      target: this.target,
-      href: this.href,
+      "target": this.target,
+      "href": this.href,
       className: `ui-link-base`,
       style: {
         [`--ui-link-base-color`]: this.colors.background,
@@ -5135,8 +5338,8 @@ class $Ui_Checkbox extends Component {
 
   render() {
     return _createElement("button", {
-      disabled: this.disabled,
-      onClick: (event => (((event) => {
+      "disabled": this.disabled,
+      "onClick": (event => (((event) => {
       return this.toggle.bind(this)()
       }))(_normalizeEvent(event))),
       className: `ui-checkbox-base`,
@@ -5153,14 +5356,14 @@ class $Ui_Checkbox extends Component {
         [`--ui-checkbox-base-disabled-color`]: this.theme.colors.disabled.text
       }
     }, [_createElement("svg", {
-      viewBox: `0 0 36 36`,
+      "viewBox": `0 0 36 36`,
       className: `ui-checkbox-icon`,
       style: {
         [`--ui-checkbox-icon-transform`]: this.transform,
         [`--ui-checkbox-icon-opacity`]: this.opacity
       }
     }, [_createElement("path", {
-      d: `M35.792 5.332L31.04 1.584c-.147-.12-.33-.208-.537-.208-.207 0-.398.087-.545.217l-17.286 22.21S5.877 17.27 5.687 17.08c-.19-.19-.442-.51-.822-.51-.38 0-.554.268-.753.467-.148.156-2.57 2.7-3.766 3.964-.07.077-.112.12-.173.18-.104.148-.173.313-.173.494 0 .19.07.347.173.494l.242.225s12.058 11.582 12.257 11.78c.2.2.442.45.797.45.345 0 .63-.37.795-.536l21.562-27.7c.104-.146.173-.31.173-.5 0-.217-.087-.4-.208-.555z`
+      "d": `M35.792 5.332L31.04 1.584c-.147-.12-.33-.208-.537-.208-.207 0-.398.087-.545.217l-17.286 22.21S5.877 17.27 5.687 17.08c-.19-.19-.442-.51-.822-.51-.38 0-.554.268-.753.467-.148.156-2.57 2.7-3.766 3.964-.07.077-.112.12-.173.18-.104.148-.173.313-.173.494 0 .19.07.347.173.494l.242.225s12.058 11.582 12.257 11.78c.2.2.442.45.797.45.345 0 .63-.37.795-.536l21.562-27.7c.104-.146.173-.31.173-.5 0-.217-.087-.4-.208-.555z`
     })])])
   }
 }
@@ -5188,15 +5391,15 @@ $Ui_Form_Separator.displayName = "Ui.Form.Separator"
 
 class $Ui_Calendar extends Component {
   get nextMonthIcon() {
-    return _createElement($Ui_Icon_Path, { onClick: ((event) => {
+    return _createElement($Ui_Icon_Path, { "onClick": ((event) => {
     return this.nextMonth.bind(this)()
-    }), viewbox: `0 0 9 16`, height: `16px`, width: `9px`, path: `M6 8L.1 1.78c-.14-.16-.14-.4.02-.57L1.17.13c.15-.16.4-.16.54 0l7.2 7.6c.07.07.1.18.1.28 0 .1-.03.2-.1.3l-7.2 7.6c-.14.14-.38.14-.53-.02l-1.05-1.1c-.16-.15-.16-.4 0-.56L5.98 8z` })
+    }), "viewbox": `0 0 9 16`, "height": `16px`, "width": `9px`, "path": `M6 8L.1 1.78c-.14-.16-.14-.4.02-.57L1.17.13c.15-.16.4-.16.54 0l7.2 7.6c.07.07.1.18.1.28 0 .1-.03.2-.1.3l-7.2 7.6c-.14.14-.38.14-.53-.02l-1.05-1.1c-.16-.15-.16-.4 0-.56L5.98 8z` })
   }
 
   get previousMonthIcon() {
-    return _createElement($Ui_Icon_Path, { onClick: ((event) => {
+    return _createElement($Ui_Icon_Path, { "onClick": ((event) => {
     return this.previousMonth.bind(this)()
-    }), viewbox: `0 0 9 16`, height: `16px`, width: `9px`, path: `M3 8l5.9-6.22c.14-.16.14-.4-.02-.57L7.83.13c-.15-.16-.4-.16-.54 0L.1 7.7c-.07.07-.1.17-.1.28 0 .1.03.2.1.3l7.2 7.6c.14.14.38.14.53-.02l1.05-1.1c.16-.15.16-.4 0-.56L3.02 8z` })
+    }), "viewbox": `0 0 9 16`, "height": `16px`, "width": `9px`, "path": `M3 8l5.9-6.22c.14-.16.14-.4-.02-.57L7.83.13c-.15-.16-.4-.16-.54 0L.1 7.7c-.07.07-.1.17-.1.28 0 .1.03.2.1.3l7.2 7.6c.14.14.38.14.53-.02l1.05-1.1c.16-.15.16-.4 0-.56L3.02 8z` })
   }
 
   get onMonthChange () {
@@ -5290,9 +5493,9 @@ class $Ui_Calendar extends Component {
     let range = $Time.range($Time.startOf(`month`, this.month), $Time.endOf(`month`, this.month))
 
     return $Array.map(((day) => {
-    return _createElement($Ui_Calendar_Cell, { active: $Array.any(((item) => {
+    return _createElement($Ui_Calendar_Cell, { "active": $Array.any(((item) => {
     return _compare(day, item)
-    }), range), selected: _compare(this.date, day), onClick: this.onCellClick.bind(this), day: day })
+    }), range), "selected": _compare(this.date, day), "onClick": this.onCellClick.bind(this), "day": day })
     }), this.days.bind(this)())
   }
 
@@ -5374,7 +5577,7 @@ class $Ui_Dropdown extends Component {
 
   get panel() {
     return _createElement("div", {
-      id: this.state.uid,
+      "id": this.state.uid,
       className: `ui-dropdown-panel`,
       style: {
         [`--ui-dropdown-panel-left`]: this.state.left + `px`,
@@ -5552,7 +5755,7 @@ class $Ui_Breadcrumb extends Component {
         [`--ui-breadcrumb-base-hover-color`]: this.theme.hover.color,
         [`--ui-breadcrumb-base-a-focus-color`]: this.theme.hover.color
       }
-    }, [_createElement($Ui_Link, { children: this.children, target: this.target, type: `inherit`, label: this.label, href: this.href })])
+    }, [_createElement($Ui_Link, { "children": this.children, "target": this.target, "type": `inherit`, "label": this.label, "href": this.href })])
   }
 }
 
@@ -5755,7 +5958,7 @@ class $Ui_Toggle extends Component {
 
   render() {
     return _createElement("button", {
-      onClick: (event => (((event) => {
+      "onClick": (event => (((event) => {
       return this.toggle.bind(this)()
       }))(_normalizeEvent(event))),
       className: `ui-toggle-base`,
@@ -5857,8 +6060,8 @@ class $Ui_Calendar_Cell extends Component {
 
   render() {
     return _createElement("div", {
-      title: $Time.format(`YYYY-MM-DD HH:mm:ss`, this.day),
-      onClick: (event => (((event) => {
+      "title": $Time.format(`YYYY-MM-DD HH:mm:ss`, this.day),
+      "onClick": (event => (((event) => {
       return this.onClick(this.day)
       }))(_normalizeEvent(event))),
       className: `ui-calendar-cell-style`,
@@ -5893,19 +6096,19 @@ class $Ui_Input extends Component {
 
   get closeIcon() {
     return (this.showCloseIcon ? _createElement("svg", {
-      onClick: (event => (((event) => {
+      "onClick": (event => (((event) => {
       return this.onClear()
       }))(_normalizeEvent(event))),
-      viewBox: `0 0 36 36`,
-      height: `36`,
-      width: `36`,
+      "viewBox": `0 0 36 36`,
+      "height": `36`,
+      "width": `36`,
       className: `ui-input-icon`,
       style: {
         [`--ui-input-icon-fill`]: this.theme.colors.input.text,
         [`--ui-input-icon-hover-fill`]: this.theme.hover.color
       }
     }, [_createElement("path", {
-      d: `M35.592 30.256l-12.3-12.34L35.62 5.736c.507-.507.507-1.332 0-1.838L32.114.375C31.87.13 31.542 0 31.194 0c-.346 0-.674.14-.917.375L18.005 12.518 5.715.384C5.47.14 5.14.01 4.794.01c-.347 0-.675.14-.918.374L.38 3.907c-.507.506-.507 1.33 0 1.837l12.328 12.18L.418 30.257c-.245.244-.385.572-.385.918 0 .347.13.675.384.92l3.506 3.522c.254.253.582.384.92.384.327 0 .665-.122.918-.384l12.245-12.294 12.253 12.284c.253.253.58.385.92.385.327 0 .664-.12.917-.384l3.507-3.523c.243-.243.384-.57.384-.918-.01-.337-.15-.665-.394-.91z`
+      "d": `M35.592 30.256l-12.3-12.34L35.62 5.736c.507-.507.507-1.332 0-1.838L32.114.375C31.87.13 31.542 0 31.194 0c-.346 0-.674.14-.917.375L18.005 12.518 5.715.384C5.47.14 5.14.01 4.794.01c-.347 0-.675.14-.918.374L.38 3.907c-.507.506-.507 1.33 0 1.837l12.328 12.18L.418 30.257c-.245.244-.385.572-.385.918 0 .347.13.675.384.92l3.506 3.522c.254.253.582.384.92.384.327 0 .665-.122.918-.384l12.245-12.294 12.253 12.284c.253.253.58.385.92.385.327 0 .664-.12.917-.384l3.507-3.523c.243-.243.384-.57.384-.918-.01-.337-.15-.665-.394-.91z`
     })]) : $Html.empty())
   }
 
@@ -6014,20 +6217,20 @@ class $Ui_Input extends Component {
 
       }
     }, [_createElement("input", {
-      onChange: (event => (((event) => {
+      "onChange": (event => (((event) => {
       return this.onChange($Dom.getValue(event.target))
       }))(_normalizeEvent(event))),
-      onInput: (event => (((event) => {
+      "onInput": (event => (((event) => {
       return this.onInput($Dom.getValue(event.target))
       }))(_normalizeEvent(event))),
-      onFocus: (event => (((event) => {
+      "onFocus": (event => (((event) => {
       return this.onFocus()
       }))(_normalizeEvent(event))),
-      placeholder: this.placeholder,
-      disabled: this.disabled,
-      readonly: this.readonly,
-      value: this.value,
-      type: this.type,
+      "placeholder": this.placeholder,
+      "disabled": this.disabled,
+      "readonly": this.readonly,
+      "value": this.value,
+      "type": this.type,
       className: `ui-input-input`,
       style: {
         [`--ui-input-input-background-color`]: this.theme.colors.input.background,
@@ -6096,7 +6299,7 @@ class $Ui_Card_Image extends Component {
 
   render() {
     return _createElement("img", {
-      src: this.src,
+      "src": this.src,
       className: `ui-card-image-base`,
       style: {
 
@@ -6294,7 +6497,7 @@ class $Ui_Toolbar_Title extends Component {
       style: {
 
       }
-    }, [_createElement($Ui_Link, { href: this.href }, _array(this.children))])
+    }, [_createElement($Ui_Link, { "href": this.href }, _array(this.children))])
   }
 }
 
@@ -6381,10 +6584,10 @@ class $Ui_Icon_Path extends Component {
 
   render() {
     return _createElement("svg", {
-      onClick: (event => (this.handler)(_normalizeEvent(event))),
-      viewBox: this.viewbox,
-      height: this.height,
-      width: this.width,
+      "onClick": (event => (this.handler)(_normalizeEvent(event))),
+      "viewBox": this.viewbox,
+      "height": this.height,
+      "width": this.width,
       className: `ui-icon-path-svg`,
       style: {
         [`--ui-icon-path-svg-pointer-events`]: this.pointerEvents,
@@ -6392,7 +6595,7 @@ class $Ui_Icon_Path extends Component {
         [`--ui-icon-path-svg-hover-cursor`]: this.cursor
       }
     }, [_createElement("path", {
-      d: this.path
+      "d": this.path
     })])
   }
 }
@@ -6436,7 +6639,7 @@ class $Ui_Toolbar_Link extends Component {
       style: {
 
       }
-    }, [_createElement($Ui_Link, { target: this.target, label: this.label, href: this.href })])
+    }, [_createElement($Ui_Link, { "target": this.target, "label": this.label, "href": this.href })])
   }
 }
 
@@ -6638,10 +6841,10 @@ class $Ui_Button extends Component {
 
   render() {
     return _createElement("button", {
-      onMouseDown: (event => (this.onMouseDown)(_normalizeEvent(event))),
-      disabled: this.disabled,
-      readonly: this.readonly,
-      onClick: (event => (this.onClick)(_normalizeEvent(event))),
+      "onMouseDown": (event => (this.onMouseDown)(_normalizeEvent(event))),
+      "disabled": this.disabled,
+      "readonly": this.readonly,
+      "onClick": (event => (this.onClick)(_normalizeEvent(event))),
       className: `ui-button-styles`,
       style: {
         [`--ui-button-styles-border-radius`]: this.theme.border.radius,
@@ -6747,13 +6950,13 @@ class $Ui_Slider extends Component {
 
   render() {
     return _createElement("input", {
-      value: $Number.toString(this.value),
-      step: $Number.toString(this.step),
-      max: $Number.toString(this.max),
-      min: $Number.toString(this.min),
-      disabled: this.disabled,
-      onChange: (event => (this.changed.bind(this))(_normalizeEvent(event))),
-      type: `range`,
+      "value": $Number.toString(this.value),
+      "step": $Number.toString(this.step),
+      "max": $Number.toString(this.max),
+      "min": $Number.toString(this.min),
+      "disabled": this.disabled,
+      "onChange": (event => (this.changed.bind(this))(_normalizeEvent(event))),
+      "type": `range`,
       className: `ui-slider-base`,
       style: {
         [`--ui-slider-base-webkit-slider-thumb-background-color`]: this.theme.colors.primary.background,
@@ -6968,7 +7171,7 @@ class $Ui_Pager extends Component {
 
     let position = (_compare(this.state.left, item.name) ? -100 : (_compare(this.state.center, item.name) ? 0 : 100))
 
-    return _createElement($Ui_Pager_Page, { transitioning: transitioning, transition: this.transition, position: position, duration: this.duration }, _array(item.contents))
+    return _createElement($Ui_Pager_Page, { "transitioning": transitioning, "transition": this.transition, "position": position, "duration": this.duration }, _array(item.contents))
   }
 
   render() {
@@ -6998,22 +7201,22 @@ class $Ui_Pagination extends Component {
 
   get buttons() {
     return $Array.map(((index) => {
-    return _createElement($Ui_Button, { onClick: ((event) => {
+    return _createElement($Ui_Button, { "onClick": ((event) => {
     return this.onChange(index)
-    }), label: $Number.toString(index + 1), key: $Number.toString(index), outline: !_compare(index, this.page) })
+    }), "label": $Number.toString(index + 1), "key": $Number.toString(index), "outline": !_compare(index, this.page) })
     }), this.buttonRange)
   }
 
   get previousButton() {
-    return (!_compare(this.page, 0) && this.pages > 0 ? _createElement($Ui_Button, { onClick: ((event) => {
+    return (!_compare(this.page, 0) && this.pages > 0 ? _createElement($Ui_Button, { "onClick": ((event) => {
     return this.onChange(this.page - 1)
-    }), outline: true, label: `Prev` }) : $Html.empty())
+    }), "outline": true, "label": `Prev` }) : $Html.empty())
   }
 
   get nextButton() {
-    return (!_compare(this.page, this.pages) && this.pages > 0 ? _createElement($Ui_Button, { onClick: ((event) => {
+    return (!_compare(this.page, this.pages) && this.pages > 0 ? _createElement($Ui_Button, { "onClick": ((event) => {
     return this.onChange(this.page + 1)
-    }), outline: true, label: `Next` }) : $Html.empty())
+    }), "outline": true, "label": `Next` }) : $Html.empty())
   }
 
   get leftDots() {
@@ -7035,15 +7238,15 @@ class $Ui_Pagination extends Component {
   }
 
   get rightButton() {
-    return (this.pages > 1 ? _createElement($Ui_Button, { onClick: ((event) => {
+    return (this.pages > 1 ? _createElement($Ui_Button, { "onClick": ((event) => {
     return this.onChange(this.pages)
-    }), label: $Number.toString(this.pages + 1), outline: !_compare(this.page, this.pages) }) : $Html.empty())
+    }), "label": $Number.toString(this.pages + 1), "outline": !_compare(this.page, this.pages) }) : $Html.empty())
   }
 
   get leftButton() {
-    return (this.pages >= 1 ? _createElement($Ui_Button, { onClick: ((event) => {
+    return (this.pages >= 1 ? _createElement($Ui_Button, { "onClick": ((event) => {
     return this.onChange(0)
-    }), outline: !_compare(this.page, 0), label: `1` }) : $Html.empty())
+    }), "outline": !_compare(this.page, 0), "label": `1` }) : $Html.empty())
   }
 
   get onChange () {
@@ -7160,7 +7363,7 @@ class $Ui_Time extends Component {
 
   render() {
     return _createElement("div", {
-      title: $Time.toIso(this.date),
+      "title": $Time.toIso(this.date),
       className: `ui-time-base`,
       style: {
 
@@ -7279,7 +7482,7 @@ class $Ui_Form_Field extends Component {
         [`--ui-form-field-base-first-child-margin-right`]: this.marginRight,
         [`--ui-form-field-base-last-child-margin-bottom`]: this.marginBottom
       }
-    }, [this.children, _createElement($Ui_Form_Label, { text: this.label, fontSize: this.labelSize })])
+    }, [this.children, _createElement($Ui_Form_Label, { "text": this.label, "fontSize": this.labelSize })])
   }
 }
 
@@ -7452,18 +7655,20 @@ _insertStyles(`
   }
 
   .home-hero {
+    background: url(hero.png);
     justify-content: center;
     flex-direction: column;
     align-items: center;
     display: flex;
-    height: 500px;
+    height: 80vh;
   }
 
   .home-slogan {
     font-weight: normal;
-    margin-top: 20px;
     font-size: 18px;
-    color: #666;
+    opacity: 0.75;
+    margin: 0;
+    margin-bottom: 20px;
   }
 
   .home-buttons {
@@ -7482,6 +7687,12 @@ _insertStyles(`
     color: #333;
   }
 
+  .home-logo {
+    flex-direction: column;
+    align-items: center;
+    display: flex;
+  }
+
   .home-features {
     padding: 0 20px 50px 20px;
     max-width: 1040px;
@@ -7493,6 +7704,15 @@ _insertStyles(`
     margin-bottom: 20px;
     margin-top: 50px;
     font-size: 26px;
+  }
+
+  .home-h1 {
+    font-family: Josefin Sans;
+    line-height: 1;
+    font-weight: 300;
+    font-size: 80px;
+    margin: 0;
+    margin-top: 20px;
   }
 
   .showcase-block-base {
@@ -7566,6 +7786,7 @@ _insertStyles(`
 
   .showcase-title {
     text-transform: uppercase;
+    font-family: Josefin Sans;
     margin-bottom: 5px;
     text-align: center;
     font-weight: bold;
@@ -7586,6 +7807,34 @@ _insertStyles(`
     font-size: 22px;
   }
 
+  .pages-home-github-base {
+    flex-direction: column;
+    align-items: center;
+    display: flex;
+    padding: 80px 0;
+    padding-bottom: 140px;
+  }
+
+  .pages-home-github-image {
+    width: 300px;
+  }
+
+  .pages-home-github-title {
+    font-family: Josefin Sans;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-top: 30px;
+    font-size: 26px;
+  }
+
+  .pages-home-github-text {
+    margin-bottom: 50px;
+    text-align: center;
+    line-height: 1.5em;
+    margin-top: 20px;
+    font-size: 18px;
+  }
+
   .showcase-highlight-base {
     -webkit-tap-highlight-color: rgba(0,0,0,0);
     -webkit-box-decoration-break: clone;
@@ -7600,8 +7849,8 @@ _insertStyles(`
   }
 
   .call-to-action-base {
-    background-image: url(/cta.png);
-    background-size: 54px 54px;
+    background-color: #2f9e59;
+    background-image: url(cta.png);
     flex-direction: column;
     align-items: center;
     display: flex;
@@ -7684,9 +7933,10 @@ _insertStyles(`
   }
 
   .title-base {
-    font-family: Amiko;
+    font-family: Josefin Sans;
+    text-transform: uppercase;
     font-weight: 600;
-    font-size: 32px;
+    font-size: 26px;
     line-height: 1;
     color: #222;
   }
@@ -7760,8 +8010,9 @@ _insertStyles(`
   }
 
   .header-base {
-    background: #222;
-    color: #EEE;
+    border-bottom: 3px solid #29894e;
+    background: #2f9e59;
+    color: #FFF;
   }
 
   .header-wrapper {
@@ -7778,12 +8029,24 @@ _insertStyles(`
     display: none;
   }
 
+  .header-brand {
+    font-family: Josefin Sans;
+    text-decoration: none;
+    align-items: center;
+    font-weight: 200;
+    font-size: 26px;
+    display: flex;
+    color: #FFF;
+  }
+
   .header-link {
     text-transform: uppercase;
+    font-family: Josefin Sans;
     text-decoration: none;
-    font-weight: bold;
+    font-weight: 400;
     font-size: 14px;
     color: inherit;
+    height: 10px;
   }
 
   .footer-base {
@@ -7820,6 +8083,23 @@ _insertStyles(`
     font-family: Amiko;
     font-weight: 600;
     color: #EEE;
+  }
+
+  .button-base {
+    border: 2px solid #2f9e59;
+    text-decoration: none;
+    border-radius: 30px;
+    font-weight: 600;
+    font-size: 20px;
+    line-height: 1;
+    color: #2f9e59;
+    padding: 15px 40px;
+    padding-bottom: 16px;
+  }
+
+  .button-base:hover {
+    background: #2f9e59;
+    color: #FFF;
   }
 
   .example-frame {
