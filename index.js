@@ -1905,7 +1905,21 @@ const $Maybe = new(class {
 })
 
 const $Users_List = new (class extends Store {
-    get users () {
+    constructor() {
+    super()
+    this.props = {
+        users: [],user: new Record({
+      createdAt: $Time.now(),
+      updatedAt: $Time.now(),
+      firstName: ``,
+      lastName: ``,
+      status: ``,
+      id: 0
+    }),loading: false,stale: true,error: ``,perPage: 10,page: 0
+    }
+  }
+
+  get users () {
     if (this.props.users != undefined) {
       return this.props.users
     } else {
@@ -2390,7 +2404,14 @@ const $Users_List = new (class extends Store {
 $Users_List.__displayName = `Users.List`
 
 const $Versions = new (class extends Store {
-    get versions () {
+    constructor() {
+    super()
+    this.props = {
+        versions: [],loading: true,stale: true
+    }
+  }
+
+  get versions () {
     if (this.props.versions != undefined) {
       return this.props.versions
     } else {
@@ -2499,7 +2520,14 @@ const $Versions = new (class extends Store {
 $Versions.__displayName = `Versions`
 
 const $Counter_Store = new (class extends Store {
-    get counter () {
+    constructor() {
+    super()
+    this.props = {
+        counter: 0
+    }
+  }
+
+  get counter () {
     if (this.props.counter != undefined) {
       return this.props.counter
     } else {
@@ -2528,7 +2556,30 @@ const $Counter_Store = new (class extends Store {
 $Counter_Store.__displayName = `Counter.Store`
 
 const $Examples_Store = new (class extends Store {
-    get userManagement () {
+    constructor() {
+    super()
+    this.props = {
+        userManagement: new Record({
+      title: `User Management`,
+      href: `/users`,
+      description: `This example contains an implementation of a table of users with client side pagination and forms for creating new users and editing existsing ones through an HTTP API.`
+    }),drag: new Record({
+      title: `Drag and Drop`,
+      href: `/drag`,
+      description: `This example shows how to drag and drop an HTML element on the page.`
+    }),fileHandling: new Record({
+      title: `File Handling`,
+      href: `/examples/file-handling`,
+      description: `This example shows how to implement a component which loads and shows a file from the users computer and then uploads it to a server via HTTP.`
+    }),counter: new Record({
+      title: `Counter`,
+      href: `/counter`,
+      description: `This example shows a counter which stored in a store with two buttons one for incrementing th counter and one for decrementing it.`
+    })
+    }
+  }
+
+  get userManagement () {
     if (this.props.userManagement != undefined) {
       return this.props.userManagement
     } else {
@@ -2588,7 +2639,17 @@ const $Examples_Store = new (class extends Store {
 $Examples_Store.__displayName = `Examples.Store`
 
 const $DragStore = new (class extends Store {
-    get position () {
+    constructor() {
+    super()
+    this.props = {
+        position: new Record({
+      top: 0,
+      left: 0
+    })
+    }
+  }
+
+  get position () {
     if (this.props.position != undefined) {
       return this.props.position
     } else {
@@ -2614,7 +2675,14 @@ const $DragStore = new (class extends Store {
 $DragStore.__displayName = `DragStore`
 
 const $Showcase_Store = new (class extends Store {
-    get active () {
+    constructor() {
+    super()
+    this.props = {
+        active: `store`,over: ``
+    }
+  }
+
+  get active () {
     if (this.props.active != undefined) {
       return this.props.active
     } else {
@@ -2652,7 +2720,14 @@ const $Showcase_Store = new (class extends Store {
 $Showcase_Store.__displayName = `Showcase.Store`
 
 const $Application = new (class extends Store {
-    get page () {
+    constructor() {
+    super()
+    this.props = {
+        page: ``
+    }
+  }
+
+  get page () {
     if (this.props.page != undefined) {
       return this.props.page
     } else {
@@ -2688,7 +2763,69 @@ const $Application = new (class extends Store {
 $Application.__displayName = `Application`
 
 const $Ui = new (class extends Store {
-    get theme () {
+    constructor() {
+    super()
+    this.props = {
+        theme: new Record({
+      fontFamily: `-apple-system, system-ui, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif`,
+      colors: new Record({
+        warning: new Record({
+          background: `#FF9730`,
+          focus: `#ffb163`,
+          text: `#FFF`
+        }),
+        danger: new Record({
+          background: `#E04141`,
+          focus: `#e76d6d`,
+          text: `#FFF`
+        }),
+        success: new Record({
+          background: `#3fb543`,
+          focus: `#60c863`,
+          text: `#FFF`
+        }),
+        secondary: new Record({
+          background: `#222`,
+          focus: `#333`,
+          text: `#FFF`
+        }),
+        primary: new Record({
+          background: `#3aad57`,
+          focus: `#0fa334`,
+          text: `#FFF`
+        }),
+        disabled: new Record({
+          background: `#D7D7D7`,
+          text: `#9A9A9A`,
+          focus: ``
+        }),
+        inputSecondary: new Record({
+          background: `#F3F3F3`,
+          text: `#616161`,
+          focus: ``
+        }),
+        input: new Record({
+          background: `#FDFDFD`,
+          text: `#606060`,
+          focus: `#FFF`
+        })
+      }),
+      hover: new Record({
+        color: `#26e200`
+      }),
+      outline: new Record({
+        fadedColor: `hsla(110, 100%, 44%, 0.5)`,
+        color: `hsla(110, 100%, 44%, 1)`
+      }),
+      border: new Record({
+        color: `#DDD`,
+        radius: `2px`
+      })
+    })
+    }
+  }
+
+  get theme () {
     if (this.props.theme != undefined) {
       return this.props.theme
     } else {
@@ -4421,13 +4558,13 @@ class $Install extends Component {
 
       }
     }, [_createElement("li", {}, [_createElement("a", {
-      "href": `https://s3-eu-west-1.amazonaws.com/mint-lang/mint-latest-linux`,
+      "href": `https://bintray.com/mint-lang/mint/download_file?file_path=mint-latest-linux`,
       className: `install-link`,
       style: {
 
       }
     }, [`mint-latest-linux`])]), _createElement("li", {}, [_createElement("a", {
-      "href": `https://s3-eu-west-1.amazonaws.com/mint-lang/mint-latest-osx`,
+      "href": `https://bintray.com/mint-lang/mint/download_file?file_path=mint-latest-osx`,
       className: `install-link`,
       style: {
 
