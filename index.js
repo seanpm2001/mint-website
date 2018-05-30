@@ -3657,7 +3657,31 @@ class $Footer extends Component {
       style: {
 
       }
-    }, [`Gitter`])])])])
+    }, [`Gitter`]), _createElement("a", {
+      "href": `https://spectrum.chat/mint-lang`,
+      "target": `_blank`,
+      className: `footer-link`,
+      style: {
+
+      }
+    }, [`Spectrum`])]), _createElement("div", {
+      className: `footer-column`,
+      style: {
+
+      }
+    }, [_createElement("div", {
+      className: `footer-title`,
+      style: {
+
+      }
+    }, [`Social`]), _createElement("a", {
+      "href": `https://twitter.com/mint_lang`,
+      "target": `_blank`,
+      className: `footer-link`,
+      style: {
+
+      }
+    }, [`Twitter`])])])])
   }
 }
 
@@ -7893,7 +7917,7 @@ _insertStyles(`
   }
 
   .footer-wrapper {
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fill, 220px);
     grid-gap: 20px 50px;
     display: grid;
     padding: 30px 20px;
