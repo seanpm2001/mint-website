@@ -3909,7 +3909,7 @@ class $Button extends Component {
     return _createElement("a", {
       "target": this.target,
       "href": this.href,
-      className: `button-base`,
+      className: `button-base-media-0 button-base`,
       style: {
 
       }
@@ -4528,7 +4528,7 @@ $Showcase_HighlightBlock.defaultProps = {
 class $Github extends Component {
   render() {
     return _createElement("div", {
-      className: `github-base`,
+      className: `github-base-media-0 github-base`,
       style: {
 
       }
@@ -5009,11 +5009,21 @@ class $Home extends Component {
 
       }
     }, [`A refreshing language for the front-end web.`]), _createElement("div", {
-      className: `home-buttons`,
+      className: `home-buttons-media-0 home-buttons`,
       style: {
 
       }
-    }, [_createElement($Button, { "href": `/try` }, _array(`Try`)), _createElement($Button, { "href": `/install` }, _array(`Install`)), _createElement($Button, { "href": `https://guide.mint-lang.com`, "target": `_blank` }, _array(`Learn`))])]), _createElement($Showcase, {  }), _createElement($Github, {  })])
+    }, [_createElement($Button, { "href": `/try` }, _array(`Try`)), _createElement("div", {
+      className: `home-separator-media-1 home-separator-media-0 home-separator`,
+      style: {
+
+      }
+    }), _createElement($Button, { "href": `/install` }, _array(`Install`)), _createElement("div", {
+      className: `home-separator-media-1 home-separator-media-0 home-separator`,
+      style: {
+
+      }
+    }), _createElement($Button, { "href": `https://guide.mint-lang.com`, "target": `_blank` }, _array(`Learn`))])]), _createElement($Showcase, {  }), _createElement($Github, {  })])
   }
 }
 
@@ -7987,6 +7997,7 @@ _insertStyles(`
     border: 2px solid #2f9e59;
     text-decoration: none;
     border-radius: 30px;
+    text-align: center;
     font-weight: 600;
     font-size: 20px;
     line-height: 1;
@@ -8159,6 +8170,7 @@ _insertStyles(`
   .github-title {
     font-family: Josefin Sans;
     text-transform: uppercase;
+    text-align: center;
     font-weight: 600;
     margin-top: 30px;
     font-size: 26px;
@@ -8372,10 +8384,11 @@ _insertStyles(`
 
   .home-buttons {
     margin-top: 30px;
+    display: flex;
   }
 
-  .home-buttons > * + * {
-    margin-left: 30px;
+  .home-separator {
+
   }
 
   .home-base {
@@ -9121,8 +9134,16 @@ _insertStyles(`
       font-size: 14px;
     }
 
+    .button-base-media-0 {
+      padding: 15px 30px;
+    }
+
     .showcase-highlight-block-base-media-0 {
       white-space: pre-wrap;
+    }
+
+    .github-base-media-0 {
+      padding: 60px 20px;
     }
 
     .showcase-base-media-0 {
@@ -9156,12 +9177,21 @@ _insertStyles(`
     }
 
     .home-hero-media-0 {
-      height: 300px;
+      padding: 50px 20px;
+      height: auto;
     }
 
     .home-slogan-media-0 {
       margin-top: 10px;
       font-size: 13px;
+    }
+
+    .home-buttons-media-0 {
+      flex-direction: column;
+    }
+
+    .home-separator-media-1 {
+      margin-top: 15px;
     }
 
     .page-base-media-0 {
@@ -9178,6 +9208,10 @@ _insertStyles(`
   @media (min-width: 600px)  {
     .header-desktop-media-0 {
       display: flex;
+    }
+
+    .home-separator-media-0 {
+      margin-left: 30px;
     }}
 `)
 _program.render($Main)
