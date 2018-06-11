@@ -81,15 +81,15 @@ const $$User = (input) => {
 }
 
 const $$Asset = (input) => {
+  let url = Decoder.field(`browser_download_url`, Decoder.string)(input)
+  if (url instanceof Err) { return url }
+
   let name = Decoder.field(`name`, Decoder.string)(input)
   if (name instanceof Err) { return name }
 
-  let url = Decoder.field(`url`, Decoder.string)(input)
-  if (url instanceof Err) { return url }
-
   return new Ok({
-    name: name.value,
-    url: url.value
+    url: url.value,
+    name: name.value
   })
 }
 
