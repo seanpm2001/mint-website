@@ -32,7 +32,12 @@ var Mint=function(){"use strict";function e(e,t){return e(t={exports:{}},t.expor
 
   class DoError extends Error {}
 
-  $Storage_Error_SecurityError = Symbol.for(`Storage_Error_SecurityError`)
+  $Http_Error_NetworkError = Symbol.for(`Http_Error_NetworkError`)
+$Http_Error_Aborted = Symbol.for(`Http_Error_Aborted`)
+$Http_Error_Timeout = Symbol.for(`Http_Error_Timeout`)
+$Http_Error_BadUrl = Symbol.for(`Http_Error_BadUrl`)
+
+$Storage_Error_SecurityError = Symbol.for(`Storage_Error_SecurityError`)
 $Storage_Error_QuotaExceeded = Symbol.for(`Storage_Error_QuotaExceeded`)
 $Storage_Error_NotFound = Symbol.for(`Storage_Error_NotFound`)
 $Storage_Error_Unkown = Symbol.for(`Storage_Error_Unkown`)
@@ -45,11 +50,6 @@ $Object_Error_NotANumber = Symbol.for(`Object_Error_NotANumber`)
 $Object_Error_NotAString = Symbol.for(`Object_Error_NotAString`)
 $Object_Error_NotAnArray = Symbol.for(`Object_Error_NotAnArray`)
 $Object_Error_Unkown = Symbol.for(`Object_Error_Unkown`)
-
-$Http_Error_NetworkError = Symbol.for(`Http_Error_NetworkError`)
-$Http_Error_Aborted = Symbol.for(`Http_Error_Aborted`)
-$Http_Error_Timeout = Symbol.for(`Http_Error_Timeout`)
-$Http_Error_BadUrl = Symbol.for(`Http_Error_BadUrl`)
 
 const $$User = (input) => {
   let firstName = Decoder.field(`first_name`, Decoder.string)(input)
@@ -118,81 +118,6 @@ const $$Version = (input) => {
   })
 }
 
-const $Provider_Scroll = new (class extends Provider {
-scrolls(event) {
-  return $Array.do($Array.map(((subscription) => {
-  return subscription(event)
-  }), $Array.map(((subscription) => {
-  return subscription.scrolls
-  }), this._subscriptions)))
-}
-
-attach() {
-  return (() => {
-        const scrolls = this._scrolls || (this._scrolls = this.scrolls.bind(this))
-
-        window.addEventListener("scroll", scrolls)
-      })()
-}
-
-detach() {
-  return (() => {
-        window.removeEventListener("mousemove", this._scrolls)
-      })()
-}
-})
-
-const $Provider_Tick = new (class extends Provider {
-update() {
-  return $Array.do($Array.map(((func) => {
-  return func()
-  }), $Array.map(((item) => {
-  return item.ticks
-  }), this._subscriptions)))
-}
-
-attach() {
-  return (() => {
-        this.detach()
-        this.id = setInterval(this.update.bind(this), 1000)
-      })()
-}
-
-detach() {
-  return clearInterval(this.id)
-}
-})
-
-const $Provider_AnimationFrame = new (class extends Provider {
-update() {
-  return $Array.do($Array.map(((func) => {
-  return func()
-  }), $Array.map(((item) => {
-  return item.frames
-  }), this._subscriptions)))
-}
-
-attach() {
-  return (() => {
-        this.detach()
-        this.id = this.frame()
-      })()
-}
-
-frame() {
-  return (() => {
-        this.id = requestAnimationFrame(() => {
-          this.update()
-          this.frame()
-        })
-      })()
-}
-
-detach() {
-  return cancelAnimationFrame(this.id)
-}
-})
-
 const $Provider_Mouse = new (class extends Provider {
 moves(event) {
   return $Array.do($Array.map(((func) => {
@@ -236,6 +161,81 @@ detach() {
         window.removeEventListener("mousemove", this._moves)
         window.removeEventListener("mouseup", this._ups)
       })()
+}
+})
+
+const $Provider_AnimationFrame = new (class extends Provider {
+update() {
+  return $Array.do($Array.map(((func) => {
+  return func()
+  }), $Array.map(((item) => {
+  return item.frames
+  }), this._subscriptions)))
+}
+
+attach() {
+  return (() => {
+        this.detach()
+        this.id = this.frame()
+      })()
+}
+
+frame() {
+  return (() => {
+        this.id = requestAnimationFrame(() => {
+          this.update()
+          this.frame()
+        })
+      })()
+}
+
+detach() {
+  return cancelAnimationFrame(this.id)
+}
+})
+
+const $Provider_Scroll = new (class extends Provider {
+scrolls(event) {
+  return $Array.do($Array.map(((subscription) => {
+  return subscription(event)
+  }), $Array.map(((subscription) => {
+  return subscription.scrolls
+  }), this._subscriptions)))
+}
+
+attach() {
+  return (() => {
+        const scrolls = this._scrolls || (this._scrolls = this.scrolls.bind(this))
+
+        window.addEventListener("scroll", scrolls)
+      })()
+}
+
+detach() {
+  return (() => {
+        window.removeEventListener("mousemove", this._scrolls)
+      })()
+}
+})
+
+const $Provider_Tick = new (class extends Provider {
+update() {
+  return $Array.do($Array.map(((func) => {
+  return func()
+  }), $Array.map(((item) => {
+  return item.ticks
+  }), this._subscriptions)))
+}
+
+attach() {
+  return (() => {
+        this.detach()
+        this.id = setInterval(this.update.bind(this), 1000)
+      })()
+}
+
+detach() {
+  return clearInterval(this.id)
 }
 })
 
@@ -433,18 +433,6 @@ let actualPage = await $Maybe.withDefault(0, $Number.fromString(page))
   path: `*`
 }])
 
-const $Version = new(class {
-  empty() {
-    return new Record({
-      date: $Time.now(),
-      description: ``,
-      version: ``,
-      assets: [],
-      url: ``
-    })
-  }
-})
-
 const $AssetLoader = new(class {
   loadStyle(url) {
     return new Promise((resolve, reject) => {
@@ -469,80 +457,39 @@ const $AssetLoader = new(class {
   }
 })
 
-const $Dom = new(class {
-  createElement(tag) {
-    return document.createElement(tag)
+const $Version = new(class {
+  empty() {
+    return new Record({
+      date: $Time.now(),
+      description: ``,
+      version: ``,
+      assets: [],
+      url: ``
+    })
+  }
+})
+
+const $Promise = new(class {
+  reject(input) {
+    return Promise.reject(input)
   }
 
-  getElementById(id) {
-    return (() => {
-          let element = document.getElementById(id)
-
-          if (element) {
-            return new Just(element)
-          } else {
-            return new Nothing()
-          }
-        })()
+  resolve(input) {
+    return Promise.resolve(input)
   }
 
-  getElementBySelector(selector) {
-    return (() => {
-          try {
-            let element = document.querySelector(selector)
+  wrap(method, input) {
+    return method(input)
+  }
+})
 
-            if (element) {
-              return new Just(element)
-            } else {
-              return new Nothing()
-            }
-          } catch (error) {
-            return new Nothing()
-          }
-        })()
+const $Bool = new(class {
+  not(item) {
+    return !item
   }
 
-  getDimensions(dom) {
-    return (() => {
-          const rect = dom.getBoundingClientRect()
-
-          return new Record({
-            bottom: rect.bottom,
-            height: rect.height,
-            width: rect.width,
-            right: rect.right,
-            left: rect.left,
-            top: rect.top,
-            x: rect.x,
-            y: rect.y
-          })
-        })()
-  }
-
-  getValue(dom) {
-    return (() => {
-          let value = dom.value
-
-          if (typeof value === "string") {
-            return value
-          } else {
-            return ""
-          }
-        })()
-  }
-
-  setValue(value, dom) {
-    return (dom.value = value) && dom
-  }
-
-  matches(selector, dom) {
-    return (() => {
-          try {
-            return dom.matches(selector)
-          } catch (error) {
-            return false
-          }
-        })()
+  toString(item) {
+    return item.toString()
   }
 })
 
@@ -557,6 +504,555 @@ const $Html_Event = new(class {
 
   preventDefault(event) {
     return event.preventDefault()
+  }
+})
+
+const $Regexp = new(class {
+  create(input) {
+    return new RegExp(input)
+  }
+
+  createWithOptions(input, options) {
+    return (() => {
+          let flags = ""
+
+          if (options.caseInsensitive) { flags += "i" }
+          if (options.multiline) { flags += "m" }
+          if (options.unicode) { flags += "u" }
+          if (options.global) { flags += "g" }
+          if (options.sticky) { flags += "y" }
+
+          return new RegExp(input, flags)
+        })()
+  }
+
+  toString(regexp) {
+    return regexp.toString()
+  }
+
+  escape(input) {
+    return input.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')
+  }
+
+  split(input, regexp) {
+    return input.split(regexp)
+  }
+
+  replace(input, replacer, regexp) {
+    return (() => {
+          let index = 0
+
+          return input.replace(regexp, function() {
+            const args =
+              Array.from(arguments)
+
+            const match =
+              args.shift()
+
+            const submatches =
+              args.slice(0, -2)
+
+            index += 1
+
+            return replacer({
+              submatches, submatches,
+              index: index,
+              match: match
+            })
+          })
+        })()
+  }
+})
+
+const $Url = new(class {
+  parse(url) {
+    return (() => {
+          if (!this._a) {
+            this._a = document.createElement('a')
+          }
+
+          this._a.href = url
+
+          return {
+            hostname: this._a.hostname,
+            protocol: this._a.protocol,
+            origin: this._a.origin,
+            path: this._a.pathname,
+            search: this._a.search,
+            hash: this._a.hash,
+            host: this._a.host,
+            port: this._a.port
+          }
+        })()
+  }
+})
+
+const $Uid = new(class {
+  generate() {
+    return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11)
+          .replace(/[018]/g, c =>
+            (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4)
+              .toString(16))
+  }
+})
+
+const $Json = new(class {
+  parse(input) {
+    return (() => {
+         	try {
+         		return new Just(JSON.parse(input))
+         	} catch (error) {
+         		return new Nothing()
+        	}
+        })()
+  }
+
+  stringify(input) {
+    return JSON.stringify(input)
+  }
+})
+
+const $Html = new(class {
+  empty() {
+    return false
+  }
+})
+
+const $String = new(class {
+  toLowerCase(string) {
+    return string.toLowerCase()
+  }
+
+  toUpperCase(string) {
+    return string.toUpperCase()
+  }
+
+  reverse(string) {
+    return [...string].reverse().join('')
+  }
+
+  isEmpty(string) {
+    return _compare(string, ``)
+  }
+
+  match(pattern, string) {
+    return string.indexOf(pattern) != -1
+  }
+
+  split(separator, string) {
+    return string.split(separator)
+  }
+
+  size(string) {
+    return string.length
+  }
+
+  capitalize(string) {
+    return string.replace(/\b[a-z]/g, char => char.toUpperCase())
+  }
+
+  repeat(count, string) {
+    return string.repeat(count)
+  }
+
+  join(separator, array) {
+    return array.join(separator)
+  }
+
+  concat(array) {
+    return $String.join(``, array)
+  }
+
+  isAnagarm(string1, string2) {
+    return (() => {
+          const normalize = string =>
+            string
+              .toLowerCase()
+              .replace(/[^a-z0-9]/gi, '')
+              .split('')
+              .sort()
+              .join('');
+
+          return normalize(string1) === normalize(string2);
+        })()
+  }
+})
+
+const $Time = new(class {
+  fromIso(raw) {
+    return (() => {
+          try {
+            return new Just(new Date(raw))
+          } catch (error) {
+            return new Nothing()
+          }
+        })()
+  }
+
+  toIso(date) {
+    return date.toISOString()
+  }
+
+  now() {
+    return new Date()
+  }
+
+  today() {
+    return (() => {
+          const date = new Date()
+
+          return new Date(Date.UTC(
+            date.getUTCFullYear(),
+            date.getUTCMonth(),
+            date.getUTCDate()
+          ))
+        })()
+  }
+
+  from(year, month, day) {
+    return new Date(Date.UTC(year, month - 1, day))
+  }
+
+  day(date) {
+    return date.getUTCDate()
+  }
+
+  month(date) {
+    return (date.getUTCMonth() + 1)
+  }
+
+  year(date) {
+    return date.getUTCFullYear()
+  }
+
+  format(pattern, date) {
+    return DateFNS.format(date, pattern)
+  }
+
+  startOf(what, date) {
+    return (() => {
+          switch (what) {
+            case 'month':
+              return DateFNS.startOfMonth(date)
+            case 'week':
+              return DateFNS.startOfWeek(date, { weekStartsOn: 1 })
+            case 'day':
+              return DateFNS.startOfDay(date)
+            default:
+              return date
+          }
+        })()
+  }
+
+  endOf(what, date) {
+    return (() => {
+          switch (what) {
+            case 'month':
+              return DateFNS.endOfMonth(date)
+            case 'week':
+              return DateFNS.endOfWeek(date, { weekStartsOn: 1 })
+            case 'day':
+              return DateFNS.endOfDay(date)
+            default:
+              return date
+          }
+        })()
+  }
+
+  range(from, to) {
+    return DateFNS.eachDay(from, to)
+  }
+
+  nextMonth(date) {
+    return (() => {
+          return DateFNS.addMonths(date, 1)
+        })()
+  }
+
+  previousMonth(date) {
+    return (() => {
+          return DateFNS.addMonths(date, -1)
+        })()
+  }
+
+  relative(other, now) {
+    return (() => {
+          return DateFNS.distanceInWordsStrict(now, other, { addSuffix: true })
+        })()
+  }
+})
+
+const $File = new(class {
+  fromString(contents, name, type) {
+    return new File([contents], name, { type: type })
+  }
+
+  name(file) {
+    return file.name
+  }
+
+  size(file) {
+    return file.size
+  }
+
+  mimeType(file) {
+    return file.type
+  }
+
+  selectMultiple(accept) {
+    return (() => {
+          let input = document.createElement('input')
+
+          input.style.position = 'absolute'
+          input.style.height = '1px'
+          input.style.width = '1px'
+          input.style.left = '-1px'
+          input.style.top = '-1px'
+
+          input.multiple = true
+          input.accept = accept
+          input.type = 'file'
+
+          document.body.appendChild(input)
+
+          return new Promise((resolve, reject) => {
+            input.addEventListener('change', () => {
+              resolve(Array.from(input.files))
+            })
+            input.click()
+            document.body.removeChild(input)
+          })
+        })()
+  }
+
+  select(accept) {
+    return (() => {
+          let input = document.createElement('input')
+
+          input.style.position = 'absolute'
+          input.style.height = '1px'
+          input.style.width = '1px'
+          input.style.left = '-1px'
+          input.style.top = '-1px'
+
+          input.accept = accept
+          input.type = 'file'
+
+          document.body.appendChild(input)
+
+          return new Promise((resolve, reject) => {
+            input.addEventListener('change', () => {
+              resolve(input.files[0])
+            })
+            input.click()
+            document.body.removeChild(input)
+          })
+        })()
+  }
+
+  readAsDataURL(file) {
+    return (() => {
+          let reader = new FileReader();
+          return new Promise((resolve, reject) => {
+            reader.addEventListener('load', (event) => {
+              resolve(reader.result)
+            })
+            reader.readAsDataURL(file)
+          })
+        })()
+  }
+
+  readAsString(file) {
+    return (() => {
+          let reader = new FileReader();
+          return new Promise((resolve, reject) => {
+            reader.addEventListener('load', (event) => {
+              resolve(reader.result)
+            })
+            reader.readAsText(file)
+          })
+        })()
+  }
+})
+
+const $Http = new(class {
+  empty() {
+    return new Record({
+      withCredentials: false,
+      method: `GET`,
+      headers: [],
+      body: null,
+      url: ``
+    })
+  }
+
+  delete(value) {
+    return $Http.url(value, $Http.method(`DELETE`, $Http.empty()))
+  }
+
+  get(value) {
+    return $Http.url(value, $Http.method(`GET`, $Http.empty()))
+  }
+
+  put(value) {
+    return $Http.url(value, $Http.method(`PUT`, $Http.empty()))
+  }
+
+  post(value) {
+    return $Http.url(value, $Http.method(`POST`, $Http.empty()))
+  }
+
+  stringBody(value, request) {
+    return _update(request, { body: value })
+  }
+
+  formDataBody(value, request) {
+    return _update(request, { body: value })
+  }
+
+  method(value, request) {
+    return _update(request, { method: value })
+  }
+
+  withCredentials(value, request) {
+    return _update(request, { withCredentials: value })
+  }
+
+  url(value, request) {
+    return _update(request, { url: value })
+  }
+
+  header(key, value, request) {
+    return _update(request, { headers: $Array.push(new Record({ value: value, key: key }), request.headers) })
+  }
+
+  abortAll() {
+    return this._requests && Object.keys(this._requests).forEach((uid) => {
+          this._requests[uid].abort()
+          delete this._requests[uid]
+        })
+  }
+
+  sendWithID(uid, request) {
+    return new Promise((resolve, reject) => {
+          if (!this._requests) { this._requests = {} }
+
+          let xhr = new XMLHttpRequest()
+
+          this._requests[uid] = xhr
+
+          xhr.withCredentials = request.withCredentials
+
+          try {
+            xhr.open(request.method.toUpperCase(), request.url, true)
+          } catch (error) {
+            delete this._requests[uid]
+
+            reject({
+              type: $Http_Error_BadUrl,
+              status: xhr.status,
+              url: request.url
+            })
+          }
+
+          request.headers.forEach((item) => {
+            xhr.setRequestHeader(item.key, item.value)
+          })
+
+          xhr.addEventListener('error', (event) => {
+            delete this._requests[uid]
+
+            reject({
+              type: $Http_Error_NetworkError,
+              status: xhr.status,
+              url: request.url
+            })
+          })
+
+          xhr.addEventListener('timeout', (event) => {
+            delete this._requests[uid]
+
+            reject({
+              type: $Http_Error_Timeout,
+              status: xhr.status,
+              url: request.url
+            })
+          })
+
+          xhr.addEventListener('load', (event) => {
+            delete this._requests[uid]
+
+            resolve({ body: xhr.responseText, status: xhr.status })
+          })
+
+          xhr.addEventListener('abort', (event) => {
+            delete this._requests[uid]
+
+            reject({
+              type: $Http_Error_Aborted,
+              status: xhr.status,
+              url: request.url
+            })
+          })
+
+          xhr.send(request.body)
+        })
+  }
+
+  send(request) {
+    return $Http.sendWithID($Uid.generate(), request)
+  }
+})
+
+const $Storage_Local = new(class {
+  set(key, value) {
+    return $Storage_Common.set(localStorage, key, value)
+  }
+
+  get(key) {
+    return $Storage_Common.get(localStorage, key)
+  }
+
+  remove(key) {
+    return $Storage_Common.remove(localStorage, key)
+  }
+
+  clear() {
+    return $Storage_Common.clear(localStorage)
+  }
+
+  size() {
+    return $Storage_Common.size(localStorage)
+  }
+
+  keys() {
+    return $Storage_Common.keys(localStorage)
+  }
+})
+
+const $Storage_Session = new(class {
+  set(key, value) {
+    return $Storage_Common.set(sessionStorage, key, value)
+  }
+
+  get(key) {
+    return $Storage_Common.get(sessionStorage, key)
+  }
+
+  remove(key) {
+    return $Storage_Common.remove(sessionStorage, key)
+  }
+
+  clear() {
+    return $Storage_Common.clear(sessionStorage)
+  }
+
+  size() {
+    return $Storage_Common.size(sessionStorage)
+  }
+
+  keys() {
+    return $Storage_Common.keys(sessionStorage)
   }
 })
 
@@ -667,55 +1163,138 @@ const $Storage_Common = new(class {
   }
 })
 
-const $Storage_Session = new(class {
-  set(key, value) {
-    return $Storage_Common.set(sessionStorage, key, value)
+const $Result = new(class {
+  error(input) {
+    return new Err(input)
   }
 
-  get(key) {
-    return $Storage_Common.get(sessionStorage, key)
+  ok(input) {
+    return new Ok(input)
   }
 
-  remove(key) {
-    return $Storage_Common.remove(sessionStorage, key)
+  withDefault(value, input) {
+    return input instanceof Ok ? input.value : value
   }
 
-  clear() {
-    return $Storage_Common.clear(sessionStorage)
+  withError(value, input) {
+    return input instanceof Err ? input.value : value
   }
 
-  size() {
-    return $Storage_Common.size(sessionStorage)
+  map(func, input) {
+    return input instanceof Ok ? new Ok(func(input.value)) : input
   }
 
-  keys() {
-    return $Storage_Common.keys(sessionStorage)
+  mapError(func, input) {
+    return input instanceof Err ? new Err(func(input.value)) : input
+  }
+
+  isOk(input) {
+    return input instanceof Ok
+  }
+
+  isError(input) {
+    return input instanceof Err
+  }
+
+  toMaybe(result) {
+    return (() => {
+          if (result instanceof Ok) {
+            return new Just(result.value)
+          } else {
+            return new Nothing()
+          }
+        })()
   }
 })
 
-const $Storage_Local = new(class {
-  set(key, value) {
-    return $Storage_Common.set(localStorage, key, value)
+const $Dom_Dimensions = new(class {
+  empty() {
+    return new Record({
+      bottom: 0,
+      height: 0,
+      width: 0,
+      right: 0,
+      left: 0,
+      top: 0,
+      x: 0,
+      y: 0
+    })
+  }
+})
+
+const $Window = new(class {
+  navigate(url) {
+    return _navigate(url)
   }
 
-  get(key) {
-    return $Storage_Common.get(localStorage, key)
+  setUrl(url) {
+    return _navigate(url, false)
   }
 
-  remove(key) {
-    return $Storage_Common.remove(localStorage, key)
+  title() {
+    return document.title
   }
 
-  clear() {
-    return $Storage_Common.clear(localStorage)
+  setTitle(title) {
+    return document.title = title
   }
 
-  size() {
-    return $Storage_Common.size(localStorage)
+  url() {
+    return $Url.parse($Window.href())
   }
 
-  keys() {
-    return $Storage_Common.keys(localStorage)
+  href() {
+    return window.location.href
+  }
+
+  width() {
+    return window.innerWidth
+  }
+
+  height() {
+    return window.innerHeight
+  }
+
+  scrollHeight() {
+    return document.body.scrollHeight
+  }
+
+  scrollWidth() {
+    return document.body.scrollWidth
+  }
+
+  scrollLeft() {
+    return document.body.scrollLeft
+  }
+
+  scrollTop() {
+    return document.body.scrollTop
+  }
+
+  setScrollTop(position) {
+    return window.scrollTo(this.scrollTop(), position)
+  }
+
+  setScrollLeft(position) {
+    return window.scrollTo(position, this.scrollLeft())
+  }
+})
+
+const $Timer = new(class {
+  timeout(duration, subject) {
+    return new Promise((resolve) => {
+        	setTimeout(() => {
+            resolve(subject)
+          }, duration)
+        })
+  }
+
+  nextFrame(subject) {
+    return new Promise((resolve) => {
+        	requestAnimationFrame(() => {
+            resolve(subject)
+          })
+        })
   }
 })
 
@@ -749,39 +1328,6 @@ const $Number = new(class {
             return new Just(value)
           }
         })()
-  }
-})
-
-const $FormData = new(class {
-  empty() {
-    return new FormData
-  }
-
-  keys(formData) {
-    return Array.from(formData.keys())
-  }
-
-  addString(key, value, formData) {
-    return (() => {
-         	formData.append(key, value)
-         	return formData
-        })()
-  }
-
-  addFile(key, value, formData) {
-    return (() => {
-         	formData.append(key, value)
-         	return formData
-        })()
-  }
-})
-
-const $Uid = new(class {
-  generate() {
-    return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11)
-          .replace(/[018]/g, c =>
-            (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4)
-              .toString(16))
   }
 })
 
@@ -936,114 +1482,33 @@ const $Array = new(class {
   }
 })
 
-const $Regexp = new(class {
-  create(input) {
-    return new RegExp(input)
+const $Object_Decode = new(class {
+  field(key, decoder, input) {
+    return Decoder.field(key, decoder)(input)
   }
 
-  createWithOptions(input, options) {
-    return (() => {
-          let flags = ""
-
-          if (options.caseInsensitive) { flags += "i" }
-          if (options.multiline) { flags += "m" }
-          if (options.unicode) { flags += "u" }
-          if (options.global) { flags += "g" }
-          if (options.sticky) { flags += "y" }
-
-          return new RegExp(input, flags)
-        })()
+  string(input) {
+    return Decoder.string(input)
   }
 
-  toString(regexp) {
-    return regexp.toString()
+  time(input) {
+    return Decoder.time(input)
   }
 
-  escape(input) {
-    return input.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')
+  number(input) {
+    return Decoder.number(input)
   }
 
-  split(input, regexp) {
-    return input.split(regexp)
+  boolean(input) {
+    return Decoder.boolean(input)
   }
 
-  replace(input, replacer, regexp) {
-    return (() => {
-          let index = 0
-
-          return input.replace(regexp, function() {
-            const args =
-              Array.from(arguments)
-
-            const match =
-              args.shift()
-
-            const submatches =
-              args.slice(0, -2)
-
-            index += 1
-
-            return replacer({
-              submatches, submatches,
-              index: index,
-              match: match
-            })
-          })
-        })()
-  }
-})
-
-const $Bool = new(class {
-  not(item) {
-    return !item
+  array(decoder, input) {
+    return Decoder.array(decoder)(input)
   }
 
-  toString(item) {
-    return item.toString()
-  }
-})
-
-const $Result = new(class {
-  error(input) {
-    return new Err(input)
-  }
-
-  ok(input) {
-    return new Ok(input)
-  }
-
-  withDefault(value, input) {
-    return input instanceof Ok ? input.value : value
-  }
-
-  withError(value, input) {
-    return input instanceof Err ? input.value : value
-  }
-
-  map(func, input) {
-    return input instanceof Ok ? new Ok(func(input.value)) : input
-  }
-
-  mapError(func, input) {
-    return input instanceof Err ? new Err(func(input.value)) : input
-  }
-
-  isOk(input) {
-    return input instanceof Ok
-  }
-
-  isError(input) {
-    return input instanceof Err
-  }
-
-  toMaybe(result) {
-    return (() => {
-          if (result instanceof Ok) {
-            return new Just(result.value)
-          } else {
-            return new Nothing()
-          }
-        })()
+  maybe(decoder, input) {
+    return Decoder.maybe(decoder)(input)
   }
 })
 
@@ -1085,115 +1550,110 @@ const $Object_Encode = new(class {
   }
 })
 
-const $Object_Decode = new(class {
-  field(key, decoder, input) {
-    return Decoder.field(key, decoder)(input)
+const $Math = new(class {
+  negate(number) {
+    return -number
   }
 
-  string(input) {
-    return Decoder.string(input)
+  abs(number) {
+    return Math.abs(number)
   }
 
-  time(input) {
-    return Decoder.time(input)
+  ceil(number) {
+    return Math.ceil(number)
   }
 
-  number(input) {
-    return Decoder.number(input)
+  floor(number) {
+    return Math.floor(number)
   }
 
-  boolean(input) {
-    return Decoder.boolean(input)
+  round(number) {
+    return Math.round(number)
   }
 
-  array(decoder, input) {
-    return Decoder.array(decoder)(input)
+  min(number1, number2) {
+    return Math.min(number1, number2)
   }
 
-  maybe(decoder, input) {
-    return Decoder.maybe(decoder)(input)
-  }
-})
-
-const $Window = new(class {
-  navigate(url) {
-    return _navigate(url)
-  }
-
-  setUrl(url) {
-    return _navigate(url, false)
-  }
-
-  title() {
-    return document.title
-  }
-
-  setTitle(title) {
-    return document.title = title
-  }
-
-  url() {
-    return $Url.parse($Window.href())
-  }
-
-  href() {
-    return window.location.href
-  }
-
-  width() {
-    return window.innerWidth
-  }
-
-  height() {
-    return window.innerHeight
-  }
-
-  scrollHeight() {
-    return document.body.scrollHeight
-  }
-
-  scrollWidth() {
-    return document.body.scrollWidth
-  }
-
-  scrollLeft() {
-    return document.body.scrollLeft
-  }
-
-  scrollTop() {
-    return document.body.scrollTop
-  }
-
-  setScrollTop(position) {
-    return window.scrollTo(this.scrollTop(), position)
-  }
-
-  setScrollLeft(position) {
-    return window.scrollTo(position, this.scrollLeft())
+  max(number1, number2) {
+    return Math.max(number1, number2)
   }
 })
 
-const $Debug = new(class {
-  log(value) {
+const $Dom = new(class {
+  createElement(tag) {
+    return document.createElement(tag)
+  }
+
+  getElementById(id) {
     return (() => {
-          console.log(value)
-          return value
+          let element = document.getElementById(id)
+
+          if (element) {
+            return new Just(element)
+          } else {
+            return new Nothing()
+          }
         })()
   }
-})
 
-const $Dom_Dimensions = new(class {
-  empty() {
-    return new Record({
-      bottom: 0,
-      height: 0,
-      width: 0,
-      right: 0,
-      left: 0,
-      top: 0,
-      x: 0,
-      y: 0
-    })
+  getElementBySelector(selector) {
+    return (() => {
+          try {
+            let element = document.querySelector(selector)
+
+            if (element) {
+              return new Just(element)
+            } else {
+              return new Nothing()
+            }
+          } catch (error) {
+            return new Nothing()
+          }
+        })()
+  }
+
+  getDimensions(dom) {
+    return (() => {
+          const rect = dom.getBoundingClientRect()
+
+          return new Record({
+            bottom: rect.bottom,
+            height: rect.height,
+            width: rect.width,
+            right: rect.right,
+            left: rect.left,
+            top: rect.top,
+            x: rect.x,
+            y: rect.y
+          })
+        })()
+  }
+
+  getValue(dom) {
+    return (() => {
+          let value = dom.value
+
+          if (typeof value === "string") {
+            return value
+          } else {
+            return ""
+          }
+        })()
+  }
+
+  setValue(value, dom) {
+    return (dom.value = value) && dom
+  }
+
+  matches(selector, dom) {
+    return (() => {
+          try {
+            return dom.matches(selector)
+          } catch (error) {
+            return false
+          }
+        })()
   }
 })
 
@@ -1224,24 +1684,6 @@ const $Test_Context = new(class {
             throw `Assertion failed ${a} === ${subject}`
           }
         })
-  }
-})
-
-const $Test_Window = new(class {
-  setScrollLeft(to, context) {
-    return $Test_Context.then(((subject) => {
-    return (() => {  $Window.setScrollLeft(100)
-
-    return $Promise.resolve(subject) })()
-    }), context)
-  }
-
-  setScrollTop(to, context) {
-    return $Test_Context.then(((subject) => {
-    return (() => {  $Window.setScrollTop(100)
-
-    return $Promise.resolve(subject) })()
-    }), context)
   }
 })
 
@@ -1341,127 +1783,53 @@ const $Test_Html = new(class {
   }
 })
 
-const $Timer = new(class {
-  timeout(duration, subject) {
-    return new Promise((resolve) => {
-        	setTimeout(() => {
-            resolve(subject)
-          }, duration)
-        })
+const $Test_Window = new(class {
+  setScrollLeft(to, context) {
+    return $Test_Context.then(((subject) => {
+    return (() => {  $Window.setScrollLeft(100)
+
+    return $Promise.resolve(subject) })()
+    }), context)
   }
 
-  nextFrame(subject) {
-    return new Promise((resolve) => {
-        	requestAnimationFrame(() => {
-            resolve(subject)
-          })
-        })
-  }
-})
+  setScrollTop(to, context) {
+    return $Test_Context.then(((subject) => {
+    return (() => {  $Window.setScrollTop(100)
 
-const $Promise = new(class {
-  reject(input) {
-    return Promise.reject(input)
-  }
-
-  resolve(input) {
-    return Promise.resolve(input)
-  }
-
-  wrap(method, input) {
-    return method(input)
+    return $Promise.resolve(subject) })()
+    }), context)
   }
 })
 
-const $File = new(class {
-  fromString(contents, name, type) {
-    return new File([contents], name, { type: type })
+const $FormData = new(class {
+  empty() {
+    return new FormData
   }
 
-  name(file) {
-    return file.name
+  keys(formData) {
+    return Array.from(formData.keys())
   }
 
-  size(file) {
-    return file.size
-  }
-
-  mimeType(file) {
-    return file.type
-  }
-
-  selectMultiple(accept) {
+  addString(key, value, formData) {
     return (() => {
-          let input = document.createElement('input')
-
-          input.style.position = 'absolute'
-          input.style.height = '1px'
-          input.style.width = '1px'
-          input.style.left = '-1px'
-          input.style.top = '-1px'
-
-          input.multiple = true
-          input.accept = accept
-          input.type = 'file'
-
-          document.body.appendChild(input)
-
-          return new Promise((resolve, reject) => {
-            input.addEventListener('change', () => {
-              resolve(Array.from(input.files))
-            })
-            input.click()
-            document.body.removeChild(input)
-          })
+         	formData.append(key, value)
+         	return formData
         })()
   }
 
-  select(accept) {
+  addFile(key, value, formData) {
     return (() => {
-          let input = document.createElement('input')
-
-          input.style.position = 'absolute'
-          input.style.height = '1px'
-          input.style.width = '1px'
-          input.style.left = '-1px'
-          input.style.top = '-1px'
-
-          input.accept = accept
-          input.type = 'file'
-
-          document.body.appendChild(input)
-
-          return new Promise((resolve, reject) => {
-            input.addEventListener('change', () => {
-              resolve(input.files[0])
-            })
-            input.click()
-            document.body.removeChild(input)
-          })
+         	formData.append(key, value)
+         	return formData
         })()
   }
+})
 
-  readAsDataURL(file) {
+const $Debug = new(class {
+  log(value) {
     return (() => {
-          let reader = new FileReader();
-          return new Promise((resolve, reject) => {
-            reader.addEventListener('load', (event) => {
-              resolve(reader.result)
-            })
-            reader.readAsDataURL(file)
-          })
-        })()
-  }
-
-  readAsString(file) {
-    return (() => {
-          let reader = new FileReader();
-          return new Promise((resolve, reject) => {
-            reader.addEventListener('load', (event) => {
-              resolve(reader.result)
-            })
-            reader.readAsText(file)
-          })
+          console.log(value)
+          return value
         })()
   }
 })
@@ -1513,462 +1881,6 @@ const $Maybe = new(class {
         })()
   }
 })
-
-const $Math = new(class {
-  negate(number) {
-    return -number
-  }
-
-  abs(number) {
-    return Math.abs(number)
-  }
-
-  ceil(number) {
-    return Math.ceil(number)
-  }
-
-  floor(number) {
-    return Math.floor(number)
-  }
-
-  round(number) {
-    return Math.round(number)
-  }
-
-  min(number1, number2) {
-    return Math.min(number1, number2)
-  }
-
-  max(number1, number2) {
-    return Math.max(number1, number2)
-  }
-})
-
-const $Url = new(class {
-  parse(url) {
-    return (() => {
-          if (!this._a) {
-            this._a = document.createElement('a')
-          }
-
-          this._a.href = url
-
-          return {
-            hostname: this._a.hostname,
-            protocol: this._a.protocol,
-            origin: this._a.origin,
-            path: this._a.pathname,
-            search: this._a.search,
-            hash: this._a.hash,
-            host: this._a.host,
-            port: this._a.port
-          }
-        })()
-  }
-})
-
-const $Http = new(class {
-  empty() {
-    return new Record({
-      withCredentials: false,
-      method: `GET`,
-      headers: [],
-      body: null,
-      url: ``
-    })
-  }
-
-  delete(value) {
-    return $Http.url(value, $Http.method(`DELETE`, $Http.empty()))
-  }
-
-  get(value) {
-    return $Http.url(value, $Http.method(`GET`, $Http.empty()))
-  }
-
-  put(value) {
-    return $Http.url(value, $Http.method(`PUT`, $Http.empty()))
-  }
-
-  post(value) {
-    return $Http.url(value, $Http.method(`POST`, $Http.empty()))
-  }
-
-  stringBody(value, request) {
-    return _update(request, { body: value })
-  }
-
-  formDataBody(value, request) {
-    return _update(request, { body: value })
-  }
-
-  method(value, request) {
-    return _update(request, { method: value })
-  }
-
-  withCredentials(value, request) {
-    return _update(request, { withCredentials: value })
-  }
-
-  url(value, request) {
-    return _update(request, { url: value })
-  }
-
-  header(key, value, request) {
-    return _update(request, { headers: $Array.push(new Record({ value: value, key: key }), request.headers) })
-  }
-
-  abortAll() {
-    return this._requests && Object.keys(this._requests).forEach((uid) => {
-          this._requests[uid].abort()
-          delete this._requests[uid]
-        })
-  }
-
-  sendWithID(uid, request) {
-    return new Promise((resolve, reject) => {
-          if (!this._requests) { this._requests = {} }
-
-          let xhr = new XMLHttpRequest()
-
-          this._requests[uid] = xhr
-
-          xhr.withCredentials = request.withCredentials
-
-          try {
-            xhr.open(request.method.toUpperCase(), request.url, true)
-          } catch (error) {
-            delete this._requests[uid]
-
-            reject({
-              type: $Http_Error_BadUrl,
-              status: xhr.status,
-              url: request.url
-            })
-          }
-
-          request.headers.forEach((item) => {
-            xhr.setRequestHeader(item.key, item.value)
-          })
-
-          xhr.addEventListener('error', (event) => {
-            delete this._requests[uid]
-
-            reject({
-              type: $Http_Error_NetworkError,
-              status: xhr.status,
-              url: request.url
-            })
-          })
-
-          xhr.addEventListener('timeout', (event) => {
-            delete this._requests[uid]
-
-            reject({
-              type: $Http_Error_Timeout,
-              status: xhr.status,
-              url: request.url
-            })
-          })
-
-          xhr.addEventListener('load', (event) => {
-            delete this._requests[uid]
-
-            resolve({ body: xhr.responseText, status: xhr.status })
-          })
-
-          xhr.addEventListener('abort', (event) => {
-            delete this._requests[uid]
-
-            reject({
-              type: $Http_Error_Aborted,
-              status: xhr.status,
-              url: request.url
-            })
-          })
-
-          xhr.send(request.body)
-        })
-  }
-
-  send(request) {
-    return $Http.sendWithID($Uid.generate(), request)
-  }
-})
-
-const $Html = new(class {
-  empty() {
-    return false
-  }
-})
-
-const $String = new(class {
-  toLowerCase(string) {
-    return string.toLowerCase()
-  }
-
-  toUpperCase(string) {
-    return string.toUpperCase()
-  }
-
-  reverse(string) {
-    return [...string].reverse().join('')
-  }
-
-  isEmpty(string) {
-    return _compare(string, ``)
-  }
-
-  match(pattern, string) {
-    return string.indexOf(pattern) != -1
-  }
-
-  split(separator, string) {
-    return string.split(separator)
-  }
-
-  size(string) {
-    return string.length
-  }
-
-  capitalize(string) {
-    return string.replace(/\b[a-z]/g, char => char.toUpperCase())
-  }
-
-  repeat(count, string) {
-    return string.repeat(count)
-  }
-
-  join(separator, array) {
-    return array.join(separator)
-  }
-
-  concat(array) {
-    return $String.join(``, array)
-  }
-
-  isAnagarm(string1, string2) {
-    return (() => {
-          const normalize = string =>
-            string
-              .toLowerCase()
-              .replace(/[^a-z0-9]/gi, '')
-              .split('')
-              .sort()
-              .join('');
-
-          return normalize(string1) === normalize(string2);
-        })()
-  }
-})
-
-const $Json = new(class {
-  parse(input) {
-    return (() => {
-         	try {
-         		return new Just(JSON.parse(input))
-         	} catch (error) {
-         		return new Nothing()
-        	}
-        })()
-  }
-
-  stringify(input) {
-    return JSON.stringify(input)
-  }
-})
-
-const $Time = new(class {
-  fromIso(raw) {
-    return (() => {
-          try {
-            return new Just(new Date(raw))
-          } catch (error) {
-            return new Nothing()
-          }
-        })()
-  }
-
-  toIso(date) {
-    return date.toISOString()
-  }
-
-  now() {
-    return new Date()
-  }
-
-  today() {
-    return (() => {
-          const date = new Date()
-
-          return new Date(Date.UTC(
-            date.getUTCFullYear(),
-            date.getUTCMonth(),
-            date.getUTCDate()
-          ))
-        })()
-  }
-
-  from(year, month, day) {
-    return new Date(Date.UTC(year, month - 1, day))
-  }
-
-  day(date) {
-    return date.getUTCDate()
-  }
-
-  month(date) {
-    return (date.getUTCMonth() + 1)
-  }
-
-  year(date) {
-    return date.getUTCFullYear()
-  }
-
-  format(pattern, date) {
-    return DateFNS.format(date, pattern)
-  }
-
-  startOf(what, date) {
-    return (() => {
-          switch (what) {
-            case 'month':
-              return DateFNS.startOfMonth(date)
-            case 'week':
-              return DateFNS.startOfWeek(date, { weekStartsOn: 1 })
-            case 'day':
-              return DateFNS.startOfDay(date)
-            default:
-              return date
-          }
-        })()
-  }
-
-  endOf(what, date) {
-    return (() => {
-          switch (what) {
-            case 'month':
-              return DateFNS.endOfMonth(date)
-            case 'week':
-              return DateFNS.endOfWeek(date, { weekStartsOn: 1 })
-            case 'day':
-              return DateFNS.endOfDay(date)
-            default:
-              return date
-          }
-        })()
-  }
-
-  range(from, to) {
-    return DateFNS.eachDay(from, to)
-  }
-
-  nextMonth(date) {
-    return (() => {
-          return DateFNS.addMonths(date, 1)
-        })()
-  }
-
-  previousMonth(date) {
-    return (() => {
-          return DateFNS.addMonths(date, -1)
-        })()
-  }
-
-  relative(other, now) {
-    return (() => {
-          return DateFNS.distanceInWordsStrict(now, other, { addSuffix: true })
-        })()
-  }
-})
-
-const $Showcase_Store = new (class extends Store {
-    constructor() {
-    super()
-    this.props = {
-        active: `store`,over: ``
-    }
-  }
-
-  get active () {
-    if (this.props.active != undefined) {
-      return this.props.active
-    } else {
-      return `store`
-    }
-  }
-
-  get over () {
-    if (this.props.over != undefined) {
-      return this.props.over
-    } else {
-      return ``
-    }
-  }
-
-  get state () {
-    return {
-    active: this.active,
-    over: this.over
-    }
-  }
-
-  setActive(active) {
-    return new Promise((_resolve) => {
-      this.setState(_update(this.state, { active: active }), _resolve)
-    })
-  }
-
-  setOver(over) {
-    return new Promise((_resolve) => {
-      this.setState(_update(this.state, { over: over }), _resolve)
-    })
-  }
-})
-$Showcase_Store.__displayName = `Showcase.Store`
-
-const $Application = new (class extends Store {
-    constructor() {
-    super()
-    this.props = {
-        page: ``
-    }
-  }
-
-  get page () {
-    if (this.props.page != undefined) {
-      return this.props.page
-    } else {
-      return ``
-    }
-  }
-
-  get state () {
-    return {
-    page: this.page
-    }
-  }
-
-  setPage(a) {
-    return (async () => {
-      try {
-         await $Http.abortAll()
-
-     await new Promise((_resolve) => {
-      this.setState(_update(this.state, { page: a }), _resolve)
-    })
-      }
-      catch(_error) {
-        if (_error instanceof DoError) {
-        } else {
-          console.warn(`Unhandled error in do statement`)
-          console.log(_error)
-        }
-      } 
-    })()
-  }
-})
-$Application.__displayName = `Application`
 
 const $Users_List = new (class extends Store {
     constructor() {
@@ -2394,89 +2306,6 @@ const $Users_List = new (class extends Store {
 })
 $Users_List.__displayName = `Users.List`
 
-const $Examples_Store = new (class extends Store {
-    constructor() {
-    super()
-    this.props = {
-        userManagement: new Record({
-      title: `User Management`,
-      href: `/users`,
-      description: `This example contains an implementation of a table of users with client side pagination and forms for creating new users and editing existsing ones through an HTTP API.`
-    }),drag: new Record({
-      title: `Drag and Drop`,
-      href: `/drag`,
-      description: `This example shows how to drag and drop an HTML element on the page.`
-    }),fileHandling: new Record({
-      title: `File Handling`,
-      href: `/examples/file-handling`,
-      description: `This example shows how to implement a component which loads and shows a file from the users computer and then uploads it to a server via HTTP.`
-    }),counter: new Record({
-      title: `Counter`,
-      href: `/counter`,
-      description: `This example shows a counter which stored in a store with two buttons one for incrementing th counter and one for decrementing it.`
-    })
-    }
-  }
-
-  get userManagement () {
-    if (this.props.userManagement != undefined) {
-      return this.props.userManagement
-    } else {
-      return new Record({
-      title: `User Management`,
-      href: `/users`,
-      description: `This example contains an implementation of a table of users with client side pagination and forms for creating new users and editing existsing ones through an HTTP API.`
-    })
-    }
-  }
-
-  get drag () {
-    if (this.props.drag != undefined) {
-      return this.props.drag
-    } else {
-      return new Record({
-      title: `Drag and Drop`,
-      href: `/drag`,
-      description: `This example shows how to drag and drop an HTML element on the page.`
-    })
-    }
-  }
-
-  get fileHandling () {
-    if (this.props.fileHandling != undefined) {
-      return this.props.fileHandling
-    } else {
-      return new Record({
-      title: `File Handling`,
-      href: `/examples/file-handling`,
-      description: `This example shows how to implement a component which loads and shows a file from the users computer and then uploads it to a server via HTTP.`
-    })
-    }
-  }
-
-  get counter () {
-    if (this.props.counter != undefined) {
-      return this.props.counter
-    } else {
-      return new Record({
-      title: `Counter`,
-      href: `/counter`,
-      description: `This example shows a counter which stored in a store with two buttons one for incrementing th counter and one for decrementing it.`
-    })
-    }
-  }
-
-  get state () {
-    return {
-    userManagement: this.userManagement,
-    drag: this.drag,
-    fileHandling: this.fileHandling,
-    counter: this.counter
-    }
-  }
-})
-$Examples_Store.__displayName = `Examples.Store`
-
 const $Stores_Try = new (class extends Store {
     constructor() {
     super()
@@ -2698,7 +2527,7 @@ const $Versions = new (class extends Store {
     }
   }
 
-  latest() {
+  get latest() {
     return $Maybe.withDefault($Version.empty(), $Array.first(this.versions))
   }
 
@@ -2810,6 +2639,89 @@ const $Counter_Store = new (class extends Store {
 })
 $Counter_Store.__displayName = `Counter.Store`
 
+const $Examples_Store = new (class extends Store {
+    constructor() {
+    super()
+    this.props = {
+        userManagement: new Record({
+      title: `User Management`,
+      href: `/users`,
+      description: `This example contains an implementation of a table of users with client side pagination and forms for creating new users and editing existsing ones through an HTTP API.`
+    }),drag: new Record({
+      title: `Drag and Drop`,
+      href: `/drag`,
+      description: `This example shows how to drag and drop an HTML element on the page.`
+    }),fileHandling: new Record({
+      title: `File Handling`,
+      href: `/examples/file-handling`,
+      description: `This example shows how to implement a component which loads and shows a file from the users computer and then uploads it to a server via HTTP.`
+    }),counter: new Record({
+      title: `Counter`,
+      href: `/counter`,
+      description: `This example shows a counter which stored in a store with two buttons one for incrementing th counter and one for decrementing it.`
+    })
+    }
+  }
+
+  get userManagement () {
+    if (this.props.userManagement != undefined) {
+      return this.props.userManagement
+    } else {
+      return new Record({
+      title: `User Management`,
+      href: `/users`,
+      description: `This example contains an implementation of a table of users with client side pagination and forms for creating new users and editing existsing ones through an HTTP API.`
+    })
+    }
+  }
+
+  get drag () {
+    if (this.props.drag != undefined) {
+      return this.props.drag
+    } else {
+      return new Record({
+      title: `Drag and Drop`,
+      href: `/drag`,
+      description: `This example shows how to drag and drop an HTML element on the page.`
+    })
+    }
+  }
+
+  get fileHandling () {
+    if (this.props.fileHandling != undefined) {
+      return this.props.fileHandling
+    } else {
+      return new Record({
+      title: `File Handling`,
+      href: `/examples/file-handling`,
+      description: `This example shows how to implement a component which loads and shows a file from the users computer and then uploads it to a server via HTTP.`
+    })
+    }
+  }
+
+  get counter () {
+    if (this.props.counter != undefined) {
+      return this.props.counter
+    } else {
+      return new Record({
+      title: `Counter`,
+      href: `/counter`,
+      description: `This example shows a counter which stored in a store with two buttons one for incrementing th counter and one for decrementing it.`
+    })
+    }
+  }
+
+  get state () {
+    return {
+    userManagement: this.userManagement,
+    drag: this.drag,
+    fileHandling: this.fileHandling,
+    counter: this.counter
+    }
+  }
+})
+$Examples_Store.__displayName = `Examples.Store`
+
 const $DragStore = new (class extends Store {
     constructor() {
     super()
@@ -2845,6 +2757,94 @@ const $DragStore = new (class extends Store {
   }
 })
 $DragStore.__displayName = `DragStore`
+
+const $Showcase_Store = new (class extends Store {
+    constructor() {
+    super()
+    this.props = {
+        active: `store`,over: ``
+    }
+  }
+
+  get active () {
+    if (this.props.active != undefined) {
+      return this.props.active
+    } else {
+      return `store`
+    }
+  }
+
+  get over () {
+    if (this.props.over != undefined) {
+      return this.props.over
+    } else {
+      return ``
+    }
+  }
+
+  get state () {
+    return {
+    active: this.active,
+    over: this.over
+    }
+  }
+
+  setActive(active) {
+    return new Promise((_resolve) => {
+      this.setState(_update(this.state, { active: active }), _resolve)
+    })
+  }
+
+  setOver(over) {
+    return new Promise((_resolve) => {
+      this.setState(_update(this.state, { over: over }), _resolve)
+    })
+  }
+})
+$Showcase_Store.__displayName = `Showcase.Store`
+
+const $Application = new (class extends Store {
+    constructor() {
+    super()
+    this.props = {
+        page: ``
+    }
+  }
+
+  get page () {
+    if (this.props.page != undefined) {
+      return this.props.page
+    } else {
+      return ``
+    }
+  }
+
+  get state () {
+    return {
+    page: this.page
+    }
+  }
+
+  setPage(a) {
+    return (async () => {
+      try {
+         await $Http.abortAll()
+
+     await new Promise((_resolve) => {
+      this.setState(_update(this.state, { page: a }), _resolve)
+    })
+      }
+      catch(_error) {
+        if (_error instanceof DoError) {
+        } else {
+          console.warn(`Unhandled error in do statement`)
+          console.log(_error)
+        }
+      } 
+    })()
+  }
+})
+$Application.__displayName = `Application`
 
 const $Ui = new (class extends Store {
     constructor() {
@@ -3008,6 +3008,31 @@ const $Ui = new (class extends Store {
 })
 $Ui.__displayName = `Ui`
 
+class $Title extends Component {
+  get children () {
+    if (this.props.children != undefined) {
+      return this.props.children
+    } else {
+      return []
+    }
+  }
+
+  render() {
+    return _createElement("div", {
+      className: `title-base-media-0 title-base`,
+      style: {
+
+      }
+    }, [this.children])
+  }
+}
+
+$Title.displayName = "Title"
+
+$Title.defaultProps = {
+  children: []
+}
+
 class $Main extends Component {
   get pages() {
     return [new Record({
@@ -3096,6 +3121,576 @@ class $Main extends Component {
 }
 
 $Main.displayName = "Main"
+
+class $Users_Table extends Component {
+  get loading () { return $Users_List.loading }
+
+  get users () { return $Users_List.users }
+
+  get page () { return $Users_List.page }
+
+  get perPage () { return $Users_List.perPage }
+
+  get error () { return $Users_List.error }
+
+  get theme () { return $Ui.theme }
+
+  componentWillUnmount () {
+    $Users_List._unsubscribe(this);$Ui._unsubscribe(this)
+  }
+
+  componentDidMount () {
+    $Users_List._subscribe(this);$Ui._subscribe(this)
+  }
+
+  setPage(a) {
+    return $Window.navigate(`/users?page=` + $Number.toString(a))
+  }
+
+  renderItem(item) {
+    return _createElement($UserRow, { "key": $Number.toString(item.id), "user": item })
+  }
+
+  render() {
+    let slicedUsers = $Array.slice(this.page * this.perPage, (this.page + 1) * this.perPage, this.users)
+
+    let rows = ($Array.isEmpty(slicedUsers) ? [_createElement("tr", {}, [_createElement("td", {
+      "colspan": `5`
+    }, [_createElement("div", {
+      className: `users-table-empty`,
+      style: {
+
+      }
+    }, [`There are no users to display!`])])])] : $Array.map(this.renderItem.bind(this), slicedUsers))
+
+    return _createElement($Ui_Loader, { "shown": this.loading }, _array(_createElement("div", {}, [_createElement("div", {
+      className: `users-table-header`,
+      style: {
+
+      }
+    }, [_createElement("div", {
+      className: `users-table-title`,
+      style: {
+
+      }
+    }, [`Users`])]), _createElement("table", {
+      className: `users-table-table`,
+      style: {
+        [`--users-table-table-border`]: `1px solid ` + this.theme.border.color,
+        [`--users-table-table-color`]: this.theme.colors.input.text,
+        [`--users-table-table-font-family`]: this.theme.fontFamily
+      }
+    }, [_createElement("thead", {}, [_createElement("tr", {}, [_createElement($Ui_Table_Th, { "width": `40px` }, _array(`Id`)), _createElement($Ui_Table_Th, {  }, _array(`Name`)), _createElement($Ui_Table_Th, {  }, _array(`Status`)), _createElement($Ui_Table_Th, {  }, _array(`Last Updated`)), _createElement($Ui_Table_Th, { "align": `center`, "width": `70px` }, _array(`Active`))])]), _createElement("tbody", {}, [rows])]), _createElement($Ui_Pagination, { "onChange": this.setPage.bind(this), "page": this.page, "total": $Array.size(this.users) })])))
+  }
+}
+
+$Users_Table.displayName = "Users.Table"
+
+class $CodeMirror extends Component {
+  get onChange () {
+    if (this.props.onChange != undefined) {
+      return this.props.onChange
+    } else {
+      return ((value) => {
+    return null
+    })
+    }
+  }
+
+  get value () {
+    if (this.props.value != undefined) {
+      return this.props.value
+    } else {
+      return ``
+    }
+  }
+
+  componentDidUpdate() {
+    return (() => {
+          if (this.editor) {
+            if (this.props.value != null) {
+              if (this.editor.getValue() !== this.props.value) {
+                this.editor.setValue(this.props.value);
+              }
+            }
+          }
+        })()
+  }
+
+  initRef(element) {
+    return (() => {
+          if (!window.CodeMirror) { return }
+          if (this.editor) { return }
+          this.editor = CodeMirror.fromTextArea(element, {
+            lineNumbers: true,
+            theme: "neo"
+          })
+          this.editor.on('change', (value) => {
+            this.onChange(this.editor.getValue())
+          })
+        })()
+  }
+
+  render() {
+    return _createElement("div", {
+      className: `code-mirror-base`,
+      style: {
+
+      }
+    }, [_createElement("textarea", {
+      "ref": (ref => { ref ? this.initRef.bind(this).call(this, ref) : null })
+    })])
+  }
+}
+
+$CodeMirror.displayName = "CodeMirror"
+
+$CodeMirror.defaultProps = {
+  onChange: ((value) => {
+  return null
+  }),value: ``
+}
+
+class $SubTitle extends Component {
+  get children () {
+    if (this.props.children != undefined) {
+      return this.props.children
+    } else {
+      return []
+    }
+  }
+
+  render() {
+    return _createElement("div", {
+      className: `sub-title-base-media-0 sub-title-base`,
+      style: {
+
+      }
+    }, [this.children])
+  }
+}
+
+$SubTitle.displayName = "SubTitle"
+
+$SubTitle.defaultProps = {
+  children: []
+}
+
+class $Example extends Component {
+  get children () {
+    if (this.props.children != undefined) {
+      return this.props.children
+    } else {
+      return []
+    }
+  }
+
+  get subTitle () {
+    if (this.props.subTitle != undefined) {
+      return this.props.subTitle
+    } else {
+      return ``
+    }
+  }
+
+  get title () {
+    if (this.props.title != undefined) {
+      return this.props.title
+    } else {
+      return ``
+    }
+  }
+
+  render() {
+    return _createElement($Page, {  }, _array(_createElement($Title, {  }, _array(this.title)), _createElement($SubTitle, {  }, _array(this.subTitle)), _createElement("div", {
+      className: `example-frame`,
+      style: {
+
+      }
+    }, [this.children])))
+  }
+}
+
+$Example.displayName = "Example"
+
+$Example.defaultProps = {
+  children: [],subTitle: ``,title: ``
+}
+
+class $Feature extends Component {
+  get star() {
+    return _createElement("svg", {
+      "xmlns": `http://www.w3.org/2000/svg`,
+      "viewBox": `0 0 24 24`,
+      "height": `24`,
+      "width": `24`,
+      className: `feature-star`,
+      style: {
+
+      }
+    }, [_createElement("path", {
+      "d": `M12 .288l2.833 8.718h9.167l-7.417 5.389 2.833 8.718-7.416-5.388-7.417 5.388 2.833-8.718-7.416-5.389h9.167z`
+    })])
+  }
+
+  get title () {
+    if (this.props.title != undefined) {
+      return this.props.title
+    } else {
+      return ``
+    }
+  }
+
+  get text () {
+    if (this.props.text != undefined) {
+      return this.props.text
+    } else {
+      return ``
+    }
+  }
+
+  render() {
+    return _createElement("div", {
+      className: `feature-base`,
+      style: {
+
+      }
+    }, [_createElement("div", {
+      className: `feature-title`,
+      style: {
+
+      }
+    }, [this.star, this.title]), _createElement("div", {
+      className: `feature-text`,
+      style: {
+
+      }
+    }, [this.text])])
+  }
+}
+
+$Feature.displayName = "Feature"
+
+$Feature.defaultProps = {
+  title: ``,text: ``
+}
+
+class $Features extends Component {
+  render() {
+    return _createElement("div", {
+      className: `features-base`,
+      style: {
+
+      }
+    }, [_createElement("div", {
+      className: `features-container`,
+      style: {
+
+      }
+    }, [_createElement("div", {
+      className: `features-title`,
+      style: {
+
+      }
+    }, [`Why use Mint?`]), _createElement("div", {
+      className: `features-subtitle`,
+      style: {
+
+      }
+    }, [`Because it has a lot of awesome features!`]), _createElement("div", {
+      className: `features-grid`,
+      style: {
+
+      }
+    }, [_createElement($Feature, { "title": `Typed`, "text": `Mint is a typed language. From components to HTML and CSS everything is type checked, which means virtually no runtime exceptions.` }), _createElement($Feature, { "title": `Fast`, "text": `Mint is fast. With incremental compilation it's usually under a half a second to reload the page, while automatically formatting the code.` }), _createElement($Feature, { "title": `Everything is included`, "text": `Mint has a development server, production builder, test runner and formatter in one binary, it has everything you need to create SPAs.` }), _createElement($Feature, { "title": `Built in styling`, "text": `Write scoped CSS directly in components, and stop worrying about conflicting global styles.` }), _createElement($Feature, { "title": `Built in state management`, "text": `With stores you can handle the state of the application easily, when the data changes the view is re-rendered.` }), _createElement($Feature, { "title": `Built in routing`, "text": `Define the routes of your application at the language level and let the runtime handle the navigation for you.` }), _createElement($Feature, { "title": `Immutable`, "text": `Data structures are immutable by default, only stores and the components state is mutable in a safe way.` }), _createElement($Feature, { "title": `Managed computations`, "text": `Handling synchronous and asynchronous computation is easy with the try and do statements.` }), _createElement($Feature, { "title": `Expression oriented`, "text": `Mint is an expression oriented language this means that everything is an expression.` })])])])
+  }
+}
+
+$Features.displayName = "Features"
+
+class $Logo extends Component {
+  get bottomColor() {
+    return (this.invert ? `#FFF` : `#247e3d`)
+  }
+
+  get topColor() {
+    return (this.invert ? `#FFF` : `#56cf86`)
+  }
+
+  get id() {
+    return (this.invert ? `a` : `b`)
+  }
+
+  get mobileSize () {
+    if (this.props.mobileSize != undefined) {
+      return this.props.mobileSize
+    } else {
+      return 90
+    }
+  }
+
+  get invert () {
+    if (this.props.invert != undefined) {
+      return this.props.invert
+    } else {
+      return false
+    }
+  }
+
+  get size () {
+    if (this.props.size != undefined) {
+      return this.props.size
+    } else {
+      return 90
+    }
+  }
+
+  render() {
+    return _createElement("svg", {
+      "viewBox": `0 0 256 256`,
+      "height": `256`,
+      "width": `256`,
+      className: `logo-base-media-0 logo-base`,
+      style: {
+        [`--logo-base-height`]: this.size + `px`,
+        [`--logo-base-width`]: this.size + `px`,
+        [`--logo-base-media-0-height`]: this.size + `px`,
+        [`--logo-base-media-0-width`]: this.size + `px`
+      }
+    }, [_createElement("defs", {}, [_createElement("linearGradient", {
+      "gradientUnits": `userSpaceOnUse`,
+      "y2": `435.85`,
+      "x2": `260.59`,
+      "y1": `665.136`,
+      "x1": `260.59`,
+      "id": this.id,
+      "gradientTransform": `translate(-132.333 374.602)`
+    }, [_createElement("stop", {
+      "offset": `0`,
+      "stop-color": this.bottomColor
+    }), _createElement("stop", {
+      "offset": `1`,
+      "stop-color": this.topColor
+    })])]), _createElement("path", {
+      "d": `M127.999 810.452c-2.961 11.304-28.25 18.524-30 32.857l-2.855-8.57c-14.89 18.963-13.573 28.57-13.573 28.57l-1.25-6.875c-10.869 18.17-8.567 27.072-7.312 29.786l.527.93s-.235-.3-.527-.93l-2.865-5.053c-11.286 31.219-1.43 40.803-1.43 40.803l-6.07-7.053c-2.683 23.92 4.285 33.75 4.285 33.75l-4.375-4.108c-.557 16.247 10.09 25.893 10.09 25.893l-7.018-4.812c13.505 58.995 40.317 60.584 43.775 60.539l-10.687.345c7.127 7.63 16.225 10.59 22.379 11.748 3.356-17.796 6.44-60.887 6.906-173.808.466 112.912 3.552 156.005 6.908 173.805 6.155-1.16 15.253-4.12 22.38-11.748l-10.686-.344c3.463.044 30.27-1.552 43.773-60.54l-7.018 4.813s10.647-9.646 10.09-25.893l-4.375 4.108s6.968-9.83 4.285-33.75l-6.07 7.053s9.856-9.584-1.43-40.803l-2.863 5.047c-.293.634-.53.933-.53.933l.53-.933c1.256-2.72 3.548-11.62-7.314-29.78l-1.25 6.875s1.318-9.609-13.573-28.572L158 843.307c-1.75-14.332-27.037-21.552-30-32.855z`,
+      "fill": `url(#` + this.id + `)`,
+      "fill-rule": `evenodd`,
+      "transform": `translate(0 -796.362)`
+    })])
+  }
+}
+
+$Logo.displayName = "Logo"
+
+$Logo.defaultProps = {
+  mobileSize: 90,invert: false,size: 90
+}
+
+class $UserRow extends Component {
+  get textDecoration() {
+    return (() => {
+      let __condition = this.user.status
+
+       if (_compare(__condition, `locked`)) {
+        return `line-through`
+      } else {
+        return ``
+      }
+    })()
+  }
+
+  get user () {
+    if (this.props.user != undefined) {
+      return this.props.user
+    } else {
+      return new Record({
+      createdAt: $Time.now(),
+      updatedAt: $Time.now(),
+      firstName: ``,
+      lastName: ``,
+      status: ``,
+      id: 0
+    })
+    }
+  }
+
+  updateUserStatus (...params) { return $Users_List.updateUserStatus(...params) }
+
+  componentWillUnmount () {
+    $Users_List._unsubscribe(this)
+  }
+
+  componentDidMount () {
+    $Users_List._subscribe(this)
+  }
+
+  onChange(isLocked) {
+    return this.updateUserStatus.bind(this)(this.user, isLocked)
+  }
+
+  render() {
+    return _createElement("tr", {
+      className: `user-row-tr`,
+      style: {
+        [`--user-row-tr-a-text-decoration`]: this.textDecoration
+      }
+    }, [_createElement($Ui_Table_Td, {  }, _array(_createElement($Ui_Link, { "href": `/users/` + $Number.toString(this.user.id) }, _array($Number.toString(this.user.id))))), _createElement($Ui_Table_Td, {  }, _array(_createElement($Ui_Link, { "href": `/users/` + $Number.toString(this.user.id) }, _array(this.user.firstName + ` ` + this.user.lastName)))), _createElement($Ui_Table_Td, {  }, _array($String.capitalize(this.user.status))), _createElement($Ui_Table_Td, {  }, _array(_createElement($Ui_Time, { "date": this.user.updatedAt }))), _createElement($Ui_Table_Td, { "align": `center` }, _array(_createElement($Ui_Checkbox, { "checked": _compare(this.user.status, `locked`), "onChange": this.onChange.bind(this) })))])
+  }
+}
+
+$UserRow.displayName = "UserRow"
+
+$UserRow.defaultProps = {
+  user: new Record({
+    createdAt: $Time.now(),
+    updatedAt: $Time.now(),
+    firstName: ``,
+    lastName: ``,
+    status: ``,
+    id: 0
+  })
+}
+
+class $Footer extends Component {
+  render() {
+    return _createElement("div", {
+      className: `footer-base`,
+      style: {
+
+      }
+    }, [_createElement("div", {
+      className: `footer-wrapper`,
+      style: {
+
+      }
+    }, [_createElement("div", {
+      className: `footer-column`,
+      style: {
+
+      }
+    }, [_createElement("div", {
+      className: `footer-title`,
+      style: {
+
+      }
+    }, [`Source`]), _createElement("a", {
+      "href": `https://github.com/mint-lang/mint`,
+      "target": `_blank`,
+      className: `footer-link`,
+      style: {
+
+      }
+    }, [`Github Repository`]), _createElement("a", {
+      "href": `https://github.com/mint-lang/mint/releases`,
+      "target": `_blank`,
+      className: `footer-link`,
+      style: {
+
+      }
+    }, [`Releases / Changelog`])]), _createElement("div", {
+      className: `footer-column`,
+      style: {
+
+      }
+    }, [_createElement("div", {
+      className: `footer-title`,
+      style: {
+
+      }
+    }, [`Community`]), _createElement("a", {
+      "href": `https://gitter.im/mint-lang/Lobby`,
+      "target": `_blank`,
+      className: `footer-link`,
+      style: {
+
+      }
+    }, [`Gitter`]), _createElement("a", {
+      "href": `https://spectrum.chat/mint-lang`,
+      "target": `_blank`,
+      className: `footer-link`,
+      style: {
+
+      }
+    }, [`Spectrum`])]), _createElement("div", {
+      className: `footer-column`,
+      style: {
+
+      }
+    }, [_createElement("div", {
+      className: `footer-title`,
+      style: {
+
+      }
+    }, [`Social`]), _createElement("a", {
+      "href": `https://twitter.com/mint_lang`,
+      "target": `_blank`,
+      className: `footer-link`,
+      style: {
+
+      }
+    }, [`Twitter`])])])])
+  }
+}
+
+$Footer.displayName = "Footer"
+
+class $Counter extends Component {
+  get background() {
+    return (this.counter >= 10 ? `lightgreen` : (this.counter < 0 ? `orangered` : `#F2F2F2`))
+  }
+
+  get disabled () {
+    if (this.props.disabled != undefined) {
+      return this.props.disabled
+    } else {
+      return false
+    }
+  }
+
+  increment (...params) { return $Counter_Store.increment(...params) }
+
+  decrement (...params) { return $Counter_Store.decrement(...params) }
+
+  get counter () { return $Counter_Store.counter }
+
+  componentWillUnmount () {
+    $Counter_Store._unsubscribe(this)
+  }
+
+  componentDidMount () {
+    $Counter_Store._subscribe(this)
+  }
+
+  render() {
+    return _createElement("div", {
+      className: `counter-base`,
+      style: {
+        [`--counter-base-background`]: this.background
+      }
+    }, [_createElement("button", {
+      "onClick": (event => (((event) => {
+      return this.decrement.bind(this)()
+      }))(_normalizeEvent(event))),
+      "disabled": this.disabled
+    }, [`Decrement`]), _createElement("span", {
+      className: `counter-counter`,
+      style: {
+
+      }
+    }, [$Number.toString(this.counter)]), _createElement("button", {
+      "onClick": (event => (((event) => {
+      return this.increment.bind(this)()
+      }))(_normalizeEvent(event))),
+      "disabled": this.disabled
+    }, [`Increment`])])
+  }
+}
+
+$Counter.displayName = "Counter"
+
+$Counter.defaultProps = {
+  disabled: false
+}
 
 class $Examples_FileHandling extends Component {
   constructor(props) {
@@ -3234,7 +3829,198 @@ $Layout.defaultProps = {
   children: []
 }
 
-class $SubTitle extends Component {
+class $Button extends Component {
+  get children () {
+    if (this.props.children != undefined) {
+      return this.props.children
+    } else {
+      return []
+    }
+  }
+
+  get target () {
+    if (this.props.target != undefined) {
+      return this.props.target
+    } else {
+      return ``
+    }
+  }
+
+  get href () {
+    if (this.props.href != undefined) {
+      return this.props.href
+    } else {
+      return ``
+    }
+  }
+
+  render() {
+    return _createElement("a", {
+      "target": this.target,
+      "href": this.href,
+      className: `button-base-media-0 button-base`,
+      style: {
+
+      }
+    }, [this.children])
+  }
+}
+
+$Button.displayName = "Button"
+
+$Button.defaultProps = {
+  children: [],target: ``,href: ``
+}
+
+class $Examples_Example extends Component {
+  get description () {
+    if (this.props.description != undefined) {
+      return this.props.description
+    } else {
+      return ``
+    }
+  }
+
+  get title () {
+    if (this.props.title != undefined) {
+      return this.props.title
+    } else {
+      return ``
+    }
+  }
+
+  get href () {
+    if (this.props.href != undefined) {
+      return this.props.href
+    } else {
+      return ``
+    }
+  }
+
+  render() {
+    return _createElement("div", {
+      "onClick": (event => (((event) => {
+      return $Window.navigate(this.href)
+      }))(_normalizeEvent(event))),
+      className: `examples-example-base`,
+      style: {
+
+      }
+    }, [_createElement("div", {
+      className: `examples-example-title`,
+      style: {
+
+      }
+    }, [this.title]), _createElement("div", {
+      className: `examples-example-description`,
+      style: {
+
+      }
+    }, [this.description])])
+  }
+}
+
+$Examples_Example.displayName = "Examples.Example"
+
+$Examples_Example.defaultProps = {
+  description: ``,title: ``,href: ``
+}
+
+class $Examples extends Component {
+  get userManagement () { return $Examples_Store.userManagement }
+
+  get drag () { return $Examples_Store.drag }
+
+  get fileHandling () { return $Examples_Store.fileHandling }
+
+  get counter () { return $Examples_Store.counter }
+
+  componentWillUnmount () {
+    $Examples_Store._unsubscribe(this)
+  }
+
+  componentDidMount () {
+    $Examples_Store._subscribe(this)
+  }
+
+  render() {
+    return _createElement($Page, {  }, _array(_createElement($Title, {  }, _array(`Examples`)), _createElement($SubTitle, {  }, _array(`Here you can find some examples that showcase the language features.`)), _createElement("hr", {
+      className: `examples-hr`,
+      style: {
+
+      }
+    }), _createElement("div", {
+      className: `examples-grid`,
+      style: {
+
+      }
+    }, [_createElement($Examples_Example, { "description": this.userManagement.description, "title": this.userManagement.title, "href": this.userManagement.href }), _createElement($Examples_Example, { "description": this.drag.description, "title": this.drag.title, "href": this.drag.href }), _createElement($Examples_Example, { "description": this.counter.description, "title": this.counter.title, "href": this.counter.href }), _createElement($Examples_Example, { "description": this.fileHandling.description, "title": this.fileHandling.title, "href": this.fileHandling.href })])))
+  }
+}
+
+$Examples.displayName = "Examples"
+
+class $Header extends Component {
+  render() {
+    return _createElement("div", {
+      className: `header-base`,
+      style: {
+
+      }
+    }, [_createElement("div", {
+      className: `header-wrapper`,
+      style: {
+
+      }
+    }, [_createElement("a", {
+      "href": `/`,
+      className: `header-brand`,
+      style: {
+
+      }
+    }, [_createElement($Logo, { "mobileSize": 20, "invert": true, "size": 20 }), _createElement("div", {}, [`MINT`])]), _createElement($Ui_Toolbar_Spacer, {  }), _createElement("div", {
+      className: `header-desktop-media-0 header-desktop`,
+      style: {
+
+      }
+    }, [_createElement("a", {
+      "href": `/try`,
+      className: `header-link`,
+      style: {
+
+      }
+    }, [`Try`]), _createElement($Ui_Toolbar_Separator, {  }), _createElement("a", {
+      "href": `/install`,
+      className: `header-link`,
+      style: {
+
+      }
+    }, [`Install`]), _createElement($Ui_Toolbar_Separator, {  }), _createElement("a", {
+      "href": `https://guide.mint-lang.com`,
+      "target": `_blank`,
+      className: `header-link`,
+      style: {
+
+      }
+    }, [`Learn`]), _createElement($Ui_Toolbar_Separator, {  }), _createElement("a", {
+      "href": `/examples`,
+      className: `header-link`,
+      style: {
+
+      }
+    }, [`Examples`]), _createElement($Ui_Toolbar_Separator, {  }), _createElement("a", {
+      "href": `/roadmap`,
+      className: `header-link`,
+      style: {
+
+      }
+    }, [`Roadmap`])])])])
+  }
+}
+
+$Header.displayName = "Header"
+
+class $Users_Layout extends Component {
   get children () {
     if (this.props.children != undefined) {
       return this.props.children
@@ -3244,19 +4030,252 @@ class $SubTitle extends Component {
   }
 
   render() {
-    return _createElement("div", {
-      className: `sub-title-base-media-0 sub-title-base`,
+    return _createElement("div", {}, [_createElement($Ui_Breadcrumbs, { "separator": `|` }, _array(_createElement($Ui_Breadcrumb, { "label": `Home`, "href": `/users` }), _createElement($Ui_Breadcrumb, { "label": `New User`, "href": `/users/new` }))), _createElement("div", {
+      className: `users-layout-wrapper`,
       style: {
 
       }
-    }, [this.children])
+    }, [_createElement("div", {
+      className: `users-layout-content`,
+      style: {
+
+      }
+    }, [this.children])])])
   }
 }
 
-$SubTitle.displayName = "SubTitle"
+$Users_Layout.displayName = "Users.Layout"
 
-$SubTitle.defaultProps = {
+$Users_Layout.defaultProps = {
   children: []
+}
+
+class $Drag extends Component {
+  constructor(props) {
+    super(props)
+    this.state = new Record({
+      mousePosition: new Record({
+        left: 0,
+        top: 0
+      }),
+      startPosition: new Record({
+        left: 0,
+        top: 0
+      }),
+      dragging: false
+    })
+  }
+
+  setPosition (...params) { return $DragStore.setPosition(...params) }
+
+  get position () { return $DragStore.position }
+
+  componentWillUnmount () {
+    $DragStore._unsubscribe(this);$Provider_Mouse._unsubscribe(this)
+  }
+
+  componentDidUpdate () {
+    if (this.state.dragging) {
+      $Provider_Mouse._subscribe(this, new Record({
+      moves: ((data) => {
+      return this.move.bind(this)(data)
+      }),
+      clicks: ((data) => {
+      return null
+      }),
+      ups: ((data) => {
+      return this.end.bind(this)()
+      })
+    }))
+    } else {
+      $Provider_Mouse._unsubscribe(this)
+    }
+  }
+
+  componentDidMount () {
+    $DragStore._subscribe(this);if (this.state.dragging) {
+      $Provider_Mouse._subscribe(this, new Record({
+      moves: ((data) => {
+      return this.move.bind(this)(data)
+      }),
+      clicks: ((data) => {
+      return null
+      }),
+      ups: ((data) => {
+      return this.end.bind(this)()
+      })
+    }))
+    } else {
+      $Provider_Mouse._unsubscribe(this)
+    }
+  }
+
+  move(data) {
+    let diff = new Record({
+      left: this.state.mousePosition.left - data.pageX,
+      top: this.state.mousePosition.top - data.pageY
+    })
+
+    return (this.state.dragging ? this.setPosition.bind(this)(new Record({
+      left: this.state.startPosition.left - diff.left,
+      top: this.state.startPosition.top - diff.top
+    })) : new Promise((_resolve) => {
+      this.setState(this.state, _resolve)
+    }))
+  }
+
+  end() {
+    return new Promise((_resolve) => {
+      this.setState(_update(this.state, { dragging: false }), _resolve)
+    })
+  }
+
+  start(event) {
+    let mousePosition = new Record({
+      left: event.pageX,
+      top: event.pageY
+    })
+
+    let startPosition = new Record({
+      left: this.position.left,
+      top: this.position.top
+    })
+
+    return (async () => {
+      try {
+         await $Html_Event.preventDefault(event)
+
+     await new Promise((_resolve) => {
+      this.setState(_update(this.state, { mousePosition: mousePosition, startPosition: startPosition, dragging: true }), _resolve)
+    })
+      }
+      catch(_error) {
+        if (_error instanceof DoError) {
+        } else {
+          console.warn(`Unhandled error in do statement`)
+          console.log(_error)
+        }
+      } 
+    })()
+  }
+
+  render() {
+    return _createElement("div", {
+      "onMouseDown": (event => (((event) => {
+      return this.start.bind(this)(event)
+      }))(_normalizeEvent(event))),
+      className: `drag-base`,
+      style: {
+        [`--drag-base-transform`]: `translate3d(` + this.position.left + `px,` + this.position.top + `px, 0)`
+      }
+    }, [`DragMe`])
+  }
+}
+
+$Drag.displayName = "Drag"
+
+class $Showcase_Highlight extends Component {
+  get border() {
+    return (_compare(this.over, this.name) ? `1px dashed rgba(0,0,0,0.6)` : `1px dashed rgba(0,0,0,0.1)`)
+  }
+
+  get color() {
+    return (_compare(this.active, this.name) ? `white` : ``)
+  }
+
+  get background() {
+    return (_compare(this.active, this.name) ? `#2f9e59` : (_compare(this.over, this.name) ? `rgba(0,0,0,0.15)` : `rgba(0,0,0,0.07)`))
+  }
+
+  get text () {
+    if (this.props.text != undefined) {
+      return this.props.text
+    } else {
+      return ``
+    }
+  }
+
+  get name () {
+    if (this.props.name != undefined) {
+      return this.props.name
+    } else {
+      return ``
+    }
+  }
+
+  get active () { return $Showcase_Store.active }
+
+  get over () { return $Showcase_Store.over }
+
+  setActive (...params) { return $Showcase_Store.setActive(...params) }
+
+  setOver (...params) { return $Showcase_Store.setOver(...params) }
+
+  componentWillUnmount () {
+    $Showcase_Store._unsubscribe(this)
+  }
+
+  componentDidMount () {
+    $Showcase_Store._subscribe(this)
+  }
+
+  handleClick(event) {
+    return (async () => {
+      try {
+         await $Html_Event.stopPropagation(event)
+
+     await this.setActive.bind(this)(this.name)
+      }
+      catch(_error) {
+        if (_error instanceof DoError) {
+        } else {
+          console.warn(`Unhandled error in do statement`)
+          console.log(_error)
+        }
+      } 
+    })()
+  }
+
+  handleMouseEnter(event) {
+    return (async () => {
+      try {
+         await $Html_Event.stopPropagation(event)
+
+     await this.setOver.bind(this)(this.name)
+      }
+      catch(_error) {
+        if (_error instanceof DoError) {
+        } else {
+          console.warn(`Unhandled error in do statement`)
+          console.log(_error)
+        }
+      } 
+    })()
+  }
+
+  handleMouseLeave(event) {
+    return this.setOver.bind(this)(``)
+  }
+
+  render() {
+    return _createElement("div", {
+      "onMouseLeave": (event => (this.handleMouseLeave.bind(this))(_normalizeEvent(event))),
+      "onMouseOver": (event => (this.handleMouseEnter.bind(this))(_normalizeEvent(event))),
+      "onClick": (event => (this.handleClick.bind(this))(_normalizeEvent(event))),
+      className: `showcase-highlight-base`,
+      style: {
+        [`--showcase-highlight-base-background`]: this.background,
+        [`--showcase-highlight-base-border`]: this.border,
+        [`--showcase-highlight-base-color`]: this.color
+      }
+    }, [this.text])
+  }
+}
+
+$Showcase_Highlight.displayName = "Showcase.Highlight"
+
+$Showcase_Highlight.defaultProps = {
+  text: ``,name: ``
 }
 
 class $Showcase_Block extends Component {
@@ -3455,109 +4474,34 @@ $Showcase_HighlightBlock.defaultProps = {
   children: [],openingChar: ` {`,closingChar: `}`,padding: `5px`,line: ``,name: ``
 }
 
-class $Showcase_Highlight extends Component {
-  get border() {
-    return (_compare(this.over, this.name) ? `1px dashed rgba(0,0,0,0.6)` : `1px dashed rgba(0,0,0,0.1)`)
-  }
-
-  get color() {
-    return (_compare(this.active, this.name) ? `white` : ``)
-  }
-
-  get background() {
-    return (_compare(this.active, this.name) ? `#2f9e59` : (_compare(this.over, this.name) ? `rgba(0,0,0,0.15)` : `rgba(0,0,0,0.07)`))
-  }
-
-  get text () {
-    if (this.props.text != undefined) {
-      return this.props.text
-    } else {
-      return ``
-    }
-  }
-
-  get name () {
-    if (this.props.name != undefined) {
-      return this.props.name
-    } else {
-      return ``
-    }
-  }
-
-  get active () { return $Showcase_Store.active }
-
-  get over () { return $Showcase_Store.over }
-
-  setActive (...params) { return $Showcase_Store.setActive(...params) }
-
-  setOver (...params) { return $Showcase_Store.setOver(...params) }
-
-  componentWillUnmount () {
-    $Showcase_Store._unsubscribe(this)
-  }
-
-  componentDidMount () {
-    $Showcase_Store._subscribe(this)
-  }
-
-  handleClick(event) {
-    return (async () => {
-      try {
-         await $Html_Event.stopPropagation(event)
-
-     await this.setActive.bind(this)(this.name)
-      }
-      catch(_error) {
-        if (_error instanceof DoError) {
-        } else {
-          console.warn(`Unhandled error in do statement`)
-          console.log(_error)
-        }
-      } 
-    })()
-  }
-
-  handleMouseEnter(event) {
-    return (async () => {
-      try {
-         await $Html_Event.stopPropagation(event)
-
-     await this.setOver.bind(this)(this.name)
-      }
-      catch(_error) {
-        if (_error instanceof DoError) {
-        } else {
-          console.warn(`Unhandled error in do statement`)
-          console.log(_error)
-        }
-      } 
-    })()
-  }
-
-  handleMouseLeave(event) {
-    return this.setOver.bind(this)(``)
-  }
-
+class $Github extends Component {
   render() {
     return _createElement("div", {
-      "onMouseLeave": (event => (this.handleMouseLeave.bind(this))(_normalizeEvent(event))),
-      "onMouseOver": (event => (this.handleMouseEnter.bind(this))(_normalizeEvent(event))),
-      "onClick": (event => (this.handleClick.bind(this))(_normalizeEvent(event))),
-      className: `showcase-highlight-base`,
+      className: `github-base-media-0 github-base`,
       style: {
-        [`--showcase-highlight-base-background`]: this.background,
-        [`--showcase-highlight-base-border`]: this.border,
-        [`--showcase-highlight-base-color`]: this.color
+
       }
-    }, [this.text])
+    }, [_createElement("img", {
+      "src": `https://octodex.github.com/images/daftpunktocat-thomas.gif`,
+      className: `github-image`,
+      style: {
+
+      }
+    }), _createElement("div", {
+      className: `github-title`,
+      style: {
+
+      }
+    }, [`Fork the project on GitHub`]), _createElement("div", {
+      className: `github-text`,
+      style: {
+
+      }
+    }, [_createElement("b", {}, [`Mint`]), ` is open source! `, _createElement("br", {}), `It’s hosted, developed, and maintained on GitHub by folks like you.`]), _createElement($Button, { "href": `https://github.com/mint-lang/mint`, "target": `_blank` }, _array(`Contribute on Github`))])
   }
 }
 
-$Showcase_Highlight.displayName = "Showcase.Highlight"
-
-$Showcase_Highlight.defaultProps = {
-  text: ``,name: ``
-}
+$Github.displayName = "Github"
 
 class $Showcase extends Component {
   get data() {
@@ -3766,34 +4710,467 @@ class $Showcase extends Component {
 
 $Showcase.displayName = "Showcase"
 
-class $Github extends Component {
+class $Pages_Try extends Component {
+  get frame() {
+    return (this.compiling ? _createElement("div", {
+      className: `pages-try-loader`,
+      style: {
+
+      }
+    }, [`Compiling...`]) : _createElement("iframe", {
+      "src": this.src,
+      className: `pages-try-iframe`,
+      style: {
+
+      }
+    }))
+  }
+
+  get src () { return $Stores_Try.src }
+
+  setSource (...params) { return $Stores_Try.setSource(...params) }
+
+  get source () { return $Stores_Try.source }
+
+  compile (...params) { return $Stores_Try.compile(...params) }
+
+  get compiling () { return $Stores_Try.compiling }
+
+  get initialized () { return $Stores_Try.initialized }
+
+  componentWillUnmount () {
+    $Stores_Try._unsubscribe(this)
+  }
+
+  componentDidMount () {
+    $Stores_Try._subscribe(this)
+  }
+
+  handleChange(value) {
+    return this.setSource.bind(this)(value)
+  }
+
+  handleCompile(event) {
+    return this.compile.bind(this)()
+  }
+
   render() {
-    return _createElement("div", {
-      className: `github-base-media-0 github-base`,
+    return (this.initialized ? _createElement("div", {
+      className: `pages-try-base`,
       style: {
 
       }
-    }, [_createElement("img", {
-      "src": `https://octodex.github.com/images/daftpunktocat-thomas.gif`,
-      className: `github-image`,
+    }, [_createElement("div", {
+      className: `pages-try-source`,
       style: {
 
       }
-    }), _createElement("div", {
-      className: `github-title`,
+    }, [_createElement("div", {
+      className: `pages-try-toolbar`,
       style: {
 
       }
-    }, [`Fork the project on GitHub`]), _createElement("div", {
-      className: `github-text`,
+    }, [_createElement("div", {
+      className: `pages-try-file`,
       style: {
 
       }
-    }, [_createElement("b", {}, [`Mint`]), ` is open source! `, _createElement("br", {}), `It’s hosted, developed, and maintained on GitHub by folks like you.`]), _createElement($Button, { "href": `https://github.com/mint-lang/mint`, "target": `_blank` }, _array(`Contribute on Github`))])
+    }, [`Main.mint`]), _createElement("button", {
+      "onClick": (event => (this.handleCompile.bind(this))(_normalizeEvent(event))),
+      className: `pages-try-button`,
+      style: {
+
+      }
+    }, [`Compile`])]), _createElement($CodeMirror, { "onChange": this.handleChange.bind(this), "value": this.source })]), this.frame]) : _createElement("div", {
+      className: `pages-try-loader`,
+      style: {
+
+      }
+    }, [`Initializing`]))
   }
 }
 
-$Github.displayName = "Github"
+$Pages_Try.displayName = "Pages.Try"
+
+class $Install extends Component {
+  get content() {
+    return (this.loading ? _createElement("ul", {
+      className: `install-files`,
+      style: {
+
+      }
+    }, [_createElement("li", {}, [`Loading linux version...`]), _createElement("li", {}, [`Loading osx version...`])]) : _createElement("ul", {
+      className: `install-files`,
+      style: {
+
+      }
+    }, [this.files]))
+  }
+
+  get files() {
+    return (this.loading ? [] : $Array.map(this.renderFile.bind(this), this.latest.assets))
+  }
+
+  get loading () { return $Versions.loading }
+
+  get latest () { return $Versions.latest }
+
+  componentWillUnmount () {
+    $Versions._unsubscribe(this)
+  }
+
+  componentDidMount () {
+    $Versions._subscribe(this)
+  }
+
+  renderFile(asset) {
+    return _createElement("li", {}, [_createElement("a", {
+      "href": asset.url,
+      className: `install-link`,
+      style: {
+
+      }
+    }, [asset.name])])
+  }
+
+  render() {
+    return _createElement($Page, {  }, _array(_createElement($Title, {  }, _array(`Install Binaries`)), _createElement($SubTitle, {  }, _array(`Follow the directions below to install Mint:`)), _createElement("ol", {
+      className: `install-list-media-0 install-list`,
+      style: {
+
+      }
+    }, [_createElement("li", {}, [`Download the binary for your operating system: `, this.content]), _createElement("li", {}, [`Move the binary to `, _createElement("code", {
+      className: `install-code`,
+      style: {
+
+      }
+    }, [`/usr/local/bin/mint`]), _createElement("pre", {
+      className: `install-code`,
+      style: {
+
+      }
+    }, [`sudo mv /path/to/binary /usr/local/bin/mint`])]), _createElement("li", {}, [`You invoke the CLI in your terminal by just typing `, _createElement("code", {
+      className: `install-code`,
+      style: {
+
+      }
+    }, [`mint`])])]), _createElement("div", {
+      className: `install-hint-icon-media-0 install-hint`,
+      style: {
+
+      }
+    }, [_createElement("svg", {
+      "xmlns": `http://www.w3.org/2000/svg`,
+      "preserveAspectRatio": `xMidYMid meet`,
+      "viewBox": `0 0 24 24`,
+      className: `install-hint-icon-media-0 install-hint-icon`,
+      style: {
+
+      }
+    }, [_createElement("g", {}, [_createElement("path", {
+      "d": `M12.2 8.98c.06-.01.12-.03.18-.06.06-.02.12-.05.18-.09l.15-.12c.18-.19.29-.45.29-.71 0-.06-.01-.13-.02-.19a.603.603 0 0 0-.06-.19.757.757 0 0 0-.09-.18c-.03-.05-.08-.1-.12-.15-.28-.27-.72-.37-1.09-.21-.13.05-.23.12-.33.21-.04.05-.09.1-.12.15-.04.06-.07.12-.09.18-.03.06-.05.12-.06.19-.01.06-.02.13-.02.19 0 .26.11.52.29.71.1.09.2.16.33.21.12.05.25.08.38.08.06 0 .13-.01.2-.02M13 16v-4a1 1 0 1 0-2 0v4a1 1 0 1 0 2 0M12 3c-4.962 0-9 4.038-9 9 0 4.963 4.038 9 9 9 4.963 0 9-4.037 9-9 0-4.962-4.037-9-9-9m0 20C5.935 23 1 18.065 1 12S5.935 1 12 1c6.066 0 11 4.935 11 11s-4.934 11-11 11`,
+      "fill-rule": `evenodd`
+    })])]), `The Mac OSX the binary needs some dependencies, until there is a package you need to`, _createElement("a", {
+      "href": `https://crystal-lang.org/docs/installation/on_mac_osx_using_homebrew.html`,
+      className: `install-link`,
+      style: {
+
+      }
+    }, [`install Crystal`]), `to satisfy them.`]), _createElement("hr", {
+      className: `install-hr`,
+      style: {
+
+      }
+    }), _createElement($Title, {  }, _array(`Install with Nix`)), _createElement($SubTitle, {  }, _array(`You can install Mint using the `, _createElement("a", {
+      "href": `https://nixos.org/nix/`,
+      className: `install-link`,
+      style: {
+
+      }
+    }, [`Nix Package Manager`]), ` with these steps: `)), _createElement("ol", {
+      className: `install-list-media-0 install-list`,
+      style: {
+
+      }
+    }, [_createElement("li", {}, [`Install Nix if not installed using `, _createElement("a", {
+      "href": `https://nixos.org/nix/download.html`,
+      className: `install-link`,
+      style: {
+
+      }
+    }, [`these instructions.`])]), _createElement("li", {}, [`Run this command: `, _createElement("pre", {
+      className: `install-code`,
+      style: {
+
+      }
+    }, [`nix-env -f channel:nixpkgs-unstable -iA mint`])]), _createElement("li", {}, [`You invoke the CLI in your terminal by just typing `, _createElement("code", {
+      className: `install-code`,
+      style: {
+
+      }
+    }, [`mint`])])]), _createElement("hr", {
+      className: `install-hr`,
+      style: {
+
+      }
+    }), _createElement($Title, {  }, _array(`Install from Source`)), _createElement($SubTitle, {  }, _array(`Follow the directions below to install Mint from source:`)), _createElement("ol", {
+      className: `install-list-media-0 install-list`,
+      style: {
+
+      }
+    }, [_createElement("li", {}, [`Install the `, _createElement("a", {
+      "href": `https://crystal-lang.org/docs/installation/`,
+      "target": `_blank`,
+      className: `install-link`,
+      style: {
+
+      }
+    }, [`Crystal programming language`])]), _createElement("li", {}, [`Download and extract the source files from Github:`, _createElement("br", {}), _createElement("a", {
+      "href": `https://github.com/mint-lang/mint`,
+      "target": `_blank`,
+      className: `install-link`,
+      style: {
+
+      }
+    }, [`https://github.com/mint-lang/mint`])]), _createElement("li", {}, [`In your terminal enter the folder you extracted the source code:`, _createElement("pre", {
+      className: `install-code`,
+      style: {
+
+      }
+    }, [`cd /path/to/source`])]), _createElement("li", {}, [`Install dependencies:`, _createElement("pre", {
+      className: `install-code`,
+      style: {
+
+      }
+    }, [`crystal deps`])]), _createElement("li", {}, [`Build the binary (might need to use sudo):`, _createElement("pre", {
+      className: `install-code`,
+      style: {
+
+      }
+    }, [`crystal build src/mint.cr -o /usr/local/bin/mint -p --release --no-debug`])]), _createElement("li", {}, [`You invoke the CLI in your terminal by just typing `, _createElement("code", {
+      className: `install-code`,
+      style: {
+
+      }
+    }, [`mint`])])]), _createElement("hr", {
+      className: `install-hr`,
+      style: {
+
+      }
+    }), _createElement($Title, {  }, _array(`Daily Binaries`)), _createElement($SubTitle, {  }, _array(_createElement("p", {}, [`A fresh binary is created everything something changes in the master branch.`]), _createElement("p", {}, [`You can download those binaries here:`]), _createElement("ul", {
+      className: `install-files`,
+      style: {
+
+      }
+    }, [_createElement("li", {}, [_createElement("a", {
+      "href": `https://bintray.com/mint-lang/mint/download_file?file_path=mint-latest-linux`,
+      className: `install-link`,
+      style: {
+
+      }
+    }, [`mint-latest-linux`])]), _createElement("li", {}, [_createElement("a", {
+      "href": `https://bintray.com/mint-lang/mint/download_file?file_path=mint-latest-osx`,
+      className: `install-link`,
+      style: {
+
+      }
+    }, [`mint-latest-osx`])])])))))
+  }
+}
+
+$Install.displayName = "Install"
+
+class $Home extends Component {
+  render() {
+    return _createElement("div", {
+      className: `home-base`,
+      style: {
+
+      }
+    }, [_createElement("div", {
+      className: `home-hero-media-0 home-hero`,
+      style: {
+
+      }
+    }, [_createElement("div", {
+      className: `home-logo`,
+      style: {
+
+      }
+    }, [_createElement($Logo, { "size": 180, "mobileSize": 60 }), _createElement("h1", {
+      className: `home-h1`,
+      style: {
+
+      }
+    }, [`MINT`])]), _createElement("h2", {
+      className: `home-slogan-media-0 home-slogan`,
+      style: {
+
+      }
+    }, [`A refreshing language for the front-end web`]), _createElement("div", {
+      className: `home-compiles`,
+      style: {
+
+      }
+    }, [`Mint is a programming language that compiles to JavaScript.`]), _createElement("div", {
+      className: `home-buttons-media-0 home-buttons`,
+      style: {
+
+      }
+    }, [_createElement($Button, { "href": `/try` }, _array(`Try`)), _createElement("div", {
+      className: `home-separator-media-1 home-separator-media-0 home-separator`,
+      style: {
+
+      }
+    }), _createElement($Button, { "href": `/install` }, _array(`Install`)), _createElement("div", {
+      className: `home-separator-media-1 home-separator-media-0 home-separator`,
+      style: {
+
+      }
+    }), _createElement($Button, { "href": `https://guide.mint-lang.com`, "target": `_blank` }, _array(`Learn`))])]), _createElement($Showcase, {  }), _createElement($Features, {  }), _createElement($Github, {  })])
+  }
+}
+
+$Home.displayName = "Home"
+
+class $Pages_Roadmap_Feature extends Component {
+  get children () {
+    if (this.props.children != undefined) {
+      return this.props.children
+    } else {
+      return []
+    }
+  }
+
+  get icon () {
+    if (this.props.icon != undefined) {
+      return this.props.icon
+    } else {
+      return $Html.empty()
+    }
+  }
+
+  get description () {
+    if (this.props.description != undefined) {
+      return this.props.description
+    } else {
+      return ``
+    }
+  }
+
+  get name () {
+    if (this.props.name != undefined) {
+      return this.props.name
+    } else {
+      return ``
+    }
+  }
+
+  render() {
+    return _createElement("div", {
+      className: `pages-roadmap-feature-base`,
+      style: {
+
+      }
+    }, [_createElement("div", {
+      className: `pages-roadmap-feature-icon`,
+      style: {
+
+      }
+    }, [this.icon]), _createElement("div", {}, [_createElement("div", {
+      className: `pages-roadmap-feature-title`,
+      style: {
+
+      }
+    }, [this.name]), _createElement("div", {
+      className: `pages-roadmap-feature-description`,
+      style: {
+
+      }
+    }, [this.description]), ($Array.isEmpty(this.children) ? $Html.empty() : _createElement("div", {
+      className: `pages-roadmap-feature-features`,
+      style: {
+
+      }
+    }, [this.children]))])])
+  }
+}
+
+$Pages_Roadmap_Feature.displayName = "Pages.Roadmap.Feature"
+
+$Pages_Roadmap_Feature.defaultProps = {
+  children: [],icon: $Html.empty(),description: ``,name: ``
+}
+
+class $Roadmap_Version extends Component {
+  get children () {
+    if (this.props.children != undefined) {
+      return this.props.children
+    } else {
+      return []
+    }
+  }
+
+  get version () {
+    if (this.props.version != undefined) {
+      return this.props.version
+    } else {
+      return ``
+    }
+  }
+
+  render() {
+    return _createElement("div", {}, [_createElement("div", {
+      className: `roadmap-version-title`,
+      style: {
+
+      }
+    }, [this.version]), _createElement("div", {
+      className: `roadmap-version-features`,
+      style: {
+
+      }
+    }, [this.children])])
+  }
+}
+
+$Roadmap_Version.displayName = "Roadmap.Version"
+
+$Roadmap_Version.defaultProps = {
+  children: [],version: ``
+}
+
+class $Roadmap extends Component {
+  get checkmark() {
+    return _createElement("svg", {
+      "xmlns": `http://www.w3.org/2000/svg`,
+      "width": `24`,
+      "height": `24`,
+      "viewBox": `0 0 24 24`
+    }, [_createElement("path", {
+      "d": `M20.285 2l-11.285 11.567-5.286-5.011-3.714 3.716 9 8.728 15-15.285z`
+    })])
+  }
+
+  get diamond() {
+    return _createElement("svg", {
+      "xmlns": `http://www.w3.org/2000/svg`,
+      "viewBox": `0 0 24 24`,
+      "fillRule": `evenodd`,
+      "clipRule": `evenodd`,
+      "height": `24`,
+      "width": `24`
+    }, [_createElement("path", {
+      "d": `M12 0l-12 12.001 12 11.999 12.001-11.999-12.001-12.001zm-9.171 12.001l9.171-9.172 9.172 9.172-9.172 9.172-9.171-9.172z`
+    })])
+  }
+
+  render() {
+    return _createElement($Page, {  }, _array(_createElement($Title, {  }, _array(`Roadmap`)), _createElement($SubTitle, {  }, _array(`This page contains planned and shipped high level features up to the stable release (1.0.0).`)), _createElement($Roadmap_Version, { "version": `Planned Features` }, _array(_createElement($Pages_Roadmap_Feature, { "name": `CSS Type Checking`, "icon": this.diamond, "description": `Check the values of known CSS properties and warn the developer if it's not matches the available values.` }), _createElement($Pages_Roadmap_Feature, { "name": `HTML Attribute Checking`, "icon": this.diamond, "description": `Check the values of HTML attributes based on the tag they belong to (for example check alt attributes for <img> tags).` }), _createElement($Pages_Roadmap_Feature, { "name": `Progressive Web Application Support`, "icon": this.diamond, "description": `Automatically generate files for basic PWA features (service-worker, manifest, icons).` }), _createElement($Pages_Roadmap_Feature, { "description": `A package for monitoring the state of the application.`, "name": `Devtools`, "icon": this.diamond }), _createElement($Pages_Roadmap_Feature, { "name": `Documentation Generator`, "icon": this.diamond, "description": `Generate beautiful documentation for your project, including dependencies.` }), _createElement($Pages_Roadmap_Feature, { "name": `Selective Compilation`, "icon": this.diamond, "description": `Only compile the entities that are being used.` }), _createElement($Pages_Roadmap_Feature, { "name": `Hot Reloading`, "icon": this.diamond, "description": `In development mode replace entities that changed without losing state. ` }), _createElement($Pages_Roadmap_Feature, { "name": `Language Server Protocol`, "icon": this.diamond, "description": `Implement a language server to expose the AST for code editors.` }), _createElement($Pages_Roadmap_Feature, { "name": `Website for Packages`, "icon": this.diamond, "description": `A website to browse, find and rate community packages.` }), _createElement($Pages_Roadmap_Feature, { "name": `Image Optimization`, "icon": this.diamond, "description": `During the build process optimize images automatically.` }), _createElement($Pages_Roadmap_Feature, { "name": `Application Structure Diagram`, "icon": this.diamond, "description": `Construct an interactive diagram of application structure containing routes, stores, providers and components. ` }))), _createElement($Roadmap_Version, { "version": `0.1` }, _array(_createElement($Pages_Roadmap_Feature, { "description": `The language itself.`, "name": `Language Basics`, "icon": this.checkmark }, _array(_createElement($Pages_Roadmap_Feature, { "name": `Parser`, "description": `Converts source code to an AST.` }), _createElement($Pages_Roadmap_Feature, { "name": `Formatter`, "description": `Reproduces source code from an AST.` }), _createElement($Pages_Roadmap_Feature, { "name": `Type Checker`, "description": `Walks the AST and type checks the application.` }), _createElement($Pages_Roadmap_Feature, { "name": `Compiler`, "description": `Compiles an application to JavaScript.` }))), _createElement($Pages_Roadmap_Feature, { "description": `The features of the language.`, "name": `Language Features`, "icon": this.checkmark }, _array(_createElement($Pages_Roadmap_Feature, { "name": `Components`, "description": `Define components with type checked properties and state.` }), _createElement($Pages_Roadmap_Feature, { "name": `Styling`, "description": `Styling HTML tags in a dynamic way without conflicts.` }), _createElement($Pages_Roadmap_Feature, { "name": `Routing`, "description": `Define routes in a declarative way.` }), _createElement($Pages_Roadmap_Feature, { "name": `Computations`, "description": `Handle synchronous (JSON decoding) and asynchronous (HTTP Request) computations that might fail.` }), _createElement($Pages_Roadmap_Feature, { "name": `State`, "description": `Manage global state with Stores.` }), _createElement($Pages_Roadmap_Feature, { "name": `Subscriptions`, "description": `Subscribe to global events (mouse, window) using providers.` }), _createElement($Pages_Roadmap_Feature, { "name": `JavaScript Interopability`, "description": `Simply call out the JavaScript when you need to.` }))), _createElement($Pages_Roadmap_Feature, { "name": `Production Builder`, "icon": this.checkmark, "description": `The process of building the production version of the application.` }, _array(_createElement($Pages_Roadmap_Feature, { "name": `Icon Generator`, "description": `Generate icons for most common use cases (favicon, application icons).` }), _createElement($Pages_Roadmap_Feature, { "name": `Bundling and Minification`, "description": `Compile and minify the application into a single JavaScript file.` }))), _createElement($Pages_Roadmap_Feature, { "name": `Development Server`, "icon": this.checkmark, "description": `A server that automatically formats code and reloads the application when any of the source files change.` }), _createElement($Pages_Roadmap_Feature, { "name": `Package Manager`, "icon": this.checkmark, "description": `Install external sources (packages) directly from Git repositories.` }), _createElement($Pages_Roadmap_Feature, { "name": `Testing`, "icon": this.checkmark, "description": `Language feature for easily testing modules, packages, components or the whole application.` }), _createElement($Pages_Roadmap_Feature, { "name": `Command Line Interface`, "icon": this.checkmark, "description": `A binary that allows to access the features of the language.` })))))
+  }
+}
+
+$Roadmap.displayName = "Roadmap"
 
 class $UserForm extends Component {
   constructor(props) {
@@ -3965,723 +5342,6 @@ $UserForm.defaultProps = {
   isNew: false
 }
 
-class $Install extends Component {
-  get version() {
-    return this.latest.bind(this)()
-  }
-
-  get content() {
-    return (this.loading ? _createElement("ul", {
-      className: `install-files`,
-      style: {
-
-      }
-    }, [_createElement("li", {}, [`Loading linux version...`]), _createElement("li", {}, [`Loading osx version...`])]) : _createElement("ul", {
-      className: `install-files`,
-      style: {
-
-      }
-    }, [this.files]))
-  }
-
-  get files() {
-    return (this.loading ? [] : $Array.map(this.renderFile.bind(this), this.version.assets))
-  }
-
-  get loading () { return $Versions.loading }
-
-  latest (...params) { return $Versions.latest(...params) }
-
-  componentWillUnmount () {
-    $Versions._unsubscribe(this)
-  }
-
-  componentDidMount () {
-    $Versions._subscribe(this)
-  }
-
-  renderFile(asset) {
-    return _createElement("li", {}, [_createElement("a", {
-      "href": asset.url,
-      className: `install-link`,
-      style: {
-
-      }
-    }, [asset.name])])
-  }
-
-  render() {
-    return _createElement($Page, {  }, _array(_createElement($Title, {  }, _array(`Install Binaries`)), _createElement($SubTitle, {  }, _array(`Follow the directions below to install Mint:`)), _createElement("ol", {
-      className: `install-list-media-0 install-list`,
-      style: {
-
-      }
-    }, [_createElement("li", {}, [`Download the binary for your operating system: `, this.content]), _createElement("li", {}, [`Move the binary to `, _createElement("code", {
-      className: `install-code`,
-      style: {
-
-      }
-    }, [`/usr/local/bin/mint`]), _createElement("pre", {
-      className: `install-code`,
-      style: {
-
-      }
-    }, [`sudo mv /path/to/binary /usr/local/bin/mint`])]), _createElement("li", {}, [`You invoke the CLI in your terminal by just typing `, _createElement("code", {
-      className: `install-code`,
-      style: {
-
-      }
-    }, [`mint`])])]), _createElement("div", {
-      className: `install-hint-icon-media-0 install-hint`,
-      style: {
-
-      }
-    }, [_createElement("svg", {
-      "xmlns": `http://www.w3.org/2000/svg`,
-      "preserveAspectRatio": `xMidYMid meet`,
-      "viewBox": `0 0 24 24`,
-      className: `install-hint-icon-media-0 install-hint-icon`,
-      style: {
-
-      }
-    }, [_createElement("g", {}, [_createElement("path", {
-      "d": `M12.2 8.98c.06-.01.12-.03.18-.06.06-.02.12-.05.18-.09l.15-.12c.18-.19.29-.45.29-.71 0-.06-.01-.13-.02-.19a.603.603 0 0 0-.06-.19.757.757 0 0 0-.09-.18c-.03-.05-.08-.1-.12-.15-.28-.27-.72-.37-1.09-.21-.13.05-.23.12-.33.21-.04.05-.09.1-.12.15-.04.06-.07.12-.09.18-.03.06-.05.12-.06.19-.01.06-.02.13-.02.19 0 .26.11.52.29.71.1.09.2.16.33.21.12.05.25.08.38.08.06 0 .13-.01.2-.02M13 16v-4a1 1 0 1 0-2 0v4a1 1 0 1 0 2 0M12 3c-4.962 0-9 4.038-9 9 0 4.963 4.038 9 9 9 4.963 0 9-4.037 9-9 0-4.962-4.037-9-9-9m0 20C5.935 23 1 18.065 1 12S5.935 1 12 1c6.066 0 11 4.935 11 11s-4.934 11-11 11`,
-      "fill-rule": `evenodd`
-    })])]), `The Mac OSX the binary needs some dependencies, until there is a package you need to`, _createElement("a", {
-      "href": `https://crystal-lang.org/docs/installation/on_mac_osx_using_homebrew.html`,
-      className: `install-link`,
-      style: {
-
-      }
-    }, [`install Cystal`]), `to satisfy them.`]), _createElement("hr", {
-      className: `install-hr`,
-      style: {
-
-      }
-    }), _createElement($Title, {  }, _array(`Install with Nix`)), _createElement($SubTitle, {  }, _array(`You can install Mint using the `, _createElement("a", {
-      "href": `https://nixos.org/nix/`,
-      className: `install-link`,
-      style: {
-
-      }
-    }, [`Nix Package Manager`]), ` with these steps: `)), _createElement("ol", {
-      className: `install-list-media-0 install-list`,
-      style: {
-
-      }
-    }, [_createElement("li", {}, [`Install Nix if not installed using `, _createElement("a", {
-      "href": `https://nixos.org/nix/download.html`,
-      className: `install-link`,
-      style: {
-
-      }
-    }, [`these instructions.`])]), _createElement("li", {}, [`Run this command: `, _createElement("pre", {
-      className: `install-code`,
-      style: {
-
-      }
-    }, [`nix-env -f channel:nixpkgs-unstable -iA mint`])]), _createElement("li", {}, [`You invoke the CLI in your terminal by just typing `, _createElement("code", {
-      className: `install-code`,
-      style: {
-
-      }
-    }, [`mint`])])]), _createElement("hr", {
-      className: `install-hr`,
-      style: {
-
-      }
-    }), _createElement($Title, {  }, _array(`Install from Source`)), _createElement($SubTitle, {  }, _array(`Follow the directions below to install Mint from source:`)), _createElement("ol", {
-      className: `install-list-media-0 install-list`,
-      style: {
-
-      }
-    }, [_createElement("li", {}, [`Install the `, _createElement("a", {
-      "href": `https://crystal-lang.org/docs/installation/`,
-      "target": `_blank`,
-      className: `install-link`,
-      style: {
-
-      }
-    }, [`Crystal programming language`])]), _createElement("li", {}, [`Download and extract the source files from Github:`, _createElement("br", {}), _createElement("a", {
-      "href": `https://github.com/mint-lang/mint`,
-      "target": `_blank`,
-      className: `install-link`,
-      style: {
-
-      }
-    }, [`https://github.com/mint-lang/mint`])]), _createElement("li", {}, [`In your terminal enter the folder you extracted the source code:`, _createElement("pre", {
-      className: `install-code`,
-      style: {
-
-      }
-    }, [`cd /path/to/source`])]), _createElement("li", {}, [`Install dependencies:`, _createElement("pre", {
-      className: `install-code`,
-      style: {
-
-      }
-    }, [`crystal deps`])]), _createElement("li", {}, [`Build the binary (might need to use sudo):`, _createElement("pre", {
-      className: `install-code`,
-      style: {
-
-      }
-    }, [`crystal build src/mint.cr -o /usr/local/bin/mint -p --release --no-debug`])]), _createElement("li", {}, [`You invoke the CLI in your terminal by just typing `, _createElement("code", {
-      className: `install-code`,
-      style: {
-
-      }
-    }, [`mint`])])]), _createElement("hr", {
-      className: `install-hr`,
-      style: {
-
-      }
-    }), _createElement($Title, {  }, _array(`Daily Binaries`)), _createElement($SubTitle, {  }, _array(_createElement("p", {}, [`A fresh binary is created everything something changes in the master branch.`]), _createElement("p", {}, [`You can download those binaries here:`]), _createElement("ul", {
-      className: `install-files`,
-      style: {
-
-      }
-    }, [_createElement("li", {}, [_createElement("a", {
-      "href": `https://bintray.com/mint-lang/mint/download_file?file_path=mint-latest-linux`,
-      className: `install-link`,
-      style: {
-
-      }
-    }, [`mint-latest-linux`])]), _createElement("li", {}, [_createElement("a", {
-      "href": `https://bintray.com/mint-lang/mint/download_file?file_path=mint-latest-osx`,
-      className: `install-link`,
-      style: {
-
-      }
-    }, [`mint-latest-osx`])])])))))
-  }
-}
-
-$Install.displayName = "Install"
-
-class $Pages_Try extends Component {
-  get frame() {
-    return (this.compiling ? _createElement("div", {
-      className: `pages-try-loader`,
-      style: {
-
-      }
-    }, [`Compiling...`]) : _createElement("iframe", {
-      "src": this.src,
-      className: `pages-try-iframe`,
-      style: {
-
-      }
-    }))
-  }
-
-  get src () { return $Stores_Try.src }
-
-  setSource (...params) { return $Stores_Try.setSource(...params) }
-
-  get source () { return $Stores_Try.source }
-
-  compile (...params) { return $Stores_Try.compile(...params) }
-
-  get compiling () { return $Stores_Try.compiling }
-
-  get initialized () { return $Stores_Try.initialized }
-
-  componentWillUnmount () {
-    $Stores_Try._unsubscribe(this)
-  }
-
-  componentDidMount () {
-    $Stores_Try._subscribe(this)
-  }
-
-  handleChange(value) {
-    return this.setSource.bind(this)(value)
-  }
-
-  handleCompile(event) {
-    return this.compile.bind(this)()
-  }
-
-  render() {
-    return (this.initialized ? _createElement("div", {
-      className: `pages-try-base`,
-      style: {
-
-      }
-    }, [_createElement("div", {
-      className: `pages-try-source`,
-      style: {
-
-      }
-    }, [_createElement("div", {
-      className: `pages-try-toolbar`,
-      style: {
-
-      }
-    }, [_createElement("div", {
-      className: `pages-try-file`,
-      style: {
-
-      }
-    }, [`Main.mint`]), _createElement("button", {
-      "onClick": (event => (this.handleCompile.bind(this))(_normalizeEvent(event))),
-      className: `pages-try-button`,
-      style: {
-
-      }
-    }, [`Compile`])]), _createElement($CodeMirror, { "onChange": this.handleChange.bind(this), "value": this.source })]), this.frame]) : _createElement("div", {
-      className: `pages-try-loader`,
-      style: {
-
-      }
-    }, [`Initializing`]))
-  }
-}
-
-$Pages_Try.displayName = "Pages.Try"
-
-class $Roadmap_Version extends Component {
-  get children () {
-    if (this.props.children != undefined) {
-      return this.props.children
-    } else {
-      return []
-    }
-  }
-
-  get version () {
-    if (this.props.version != undefined) {
-      return this.props.version
-    } else {
-      return ``
-    }
-  }
-
-  render() {
-    return _createElement("div", {}, [_createElement("div", {
-      className: `roadmap-version-title`,
-      style: {
-
-      }
-    }, [this.version]), _createElement("div", {
-      className: `roadmap-version-features`,
-      style: {
-
-      }
-    }, [this.children])])
-  }
-}
-
-$Roadmap_Version.displayName = "Roadmap.Version"
-
-$Roadmap_Version.defaultProps = {
-  children: [],version: ``
-}
-
-class $Roadmap extends Component {
-  get checkmark() {
-    return _createElement("svg", {
-      "xmlns": `http://www.w3.org/2000/svg`,
-      "width": `24`,
-      "height": `24`,
-      "viewBox": `0 0 24 24`
-    }, [_createElement("path", {
-      "d": `M20.285 2l-11.285 11.567-5.286-5.011-3.714 3.716 9 8.728 15-15.285z`
-    })])
-  }
-
-  get diamond() {
-    return _createElement("svg", {
-      "xmlns": `http://www.w3.org/2000/svg`,
-      "viewBox": `0 0 24 24`,
-      "fillRule": `evenodd`,
-      "clipRule": `evenodd`,
-      "height": `24`,
-      "width": `24`
-    }, [_createElement("path", {
-      "d": `M12 0l-12 12.001 12 11.999 12.001-11.999-12.001-12.001zm-9.171 12.001l9.171-9.172 9.172 9.172-9.172 9.172-9.171-9.172z`
-    })])
-  }
-
-  render() {
-    return _createElement($Page, {  }, _array(_createElement($Title, {  }, _array(`Roadmap`)), _createElement($SubTitle, {  }, _array(`This page contains planned and shipped high level features up to the stable release (1.0.0).`)), _createElement($Roadmap_Version, { "version": `Planned Features` }, _array(_createElement($Pages_Roadmap_Feature, { "name": `CSS Type Checking`, "icon": this.diamond, "description": `Check the values of known CSS properties and warn the developer if it's not matches the available values.` }), _createElement($Pages_Roadmap_Feature, { "name": `HTML Attribute Checking`, "icon": this.diamond, "description": `Check the values of HTML attributes based on the tag they belong to (for example check alt attributes for <img> tags).` }), _createElement($Pages_Roadmap_Feature, { "name": `Progressive Web Application Support`, "icon": this.diamond, "description": `Automatically generate files for basic PWA features (service-worker, manifest, icons).` }), _createElement($Pages_Roadmap_Feature, { "description": `A package for monitoring the state of the application.`, "name": `Devtools`, "icon": this.diamond }), _createElement($Pages_Roadmap_Feature, { "name": `Documentation Generator`, "icon": this.diamond, "description": `Generate beautiful documentation for your project, including dependencies.` }), _createElement($Pages_Roadmap_Feature, { "name": `Selective Compilation`, "icon": this.diamond, "description": `Only compile the entities that are being used.` }), _createElement($Pages_Roadmap_Feature, { "name": `Hot Reloading`, "icon": this.diamond, "description": `In development mode replace entities that changed without losing state. ` }), _createElement($Pages_Roadmap_Feature, { "name": `Language Server Protocol`, "icon": this.diamond, "description": `Implement a language server to expose the AST for code editors.` }), _createElement($Pages_Roadmap_Feature, { "name": `Website for Packages`, "icon": this.diamond, "description": `A website to browse, find and rate community packages.` }), _createElement($Pages_Roadmap_Feature, { "name": `Image Optimization`, "icon": this.diamond, "description": `During the build process optimize images automatically.` }), _createElement($Pages_Roadmap_Feature, { "name": `Application Structure Diagram`, "icon": this.diamond, "description": `Construct an interactive diagram of application structure containing routes, stores, providers and components. ` }))), _createElement($Roadmap_Version, { "version": `0.1` }, _array(_createElement($Pages_Roadmap_Feature, { "description": `The language itself.`, "name": `Language Basics`, "icon": this.checkmark }, _array(_createElement($Pages_Roadmap_Feature, { "name": `Parser`, "description": `Converts source code to an AST.` }), _createElement($Pages_Roadmap_Feature, { "name": `Formatter`, "description": `Reproduces source code from an AST.` }), _createElement($Pages_Roadmap_Feature, { "name": `Type Checker`, "description": `Walks the AST and type checks the application.` }), _createElement($Pages_Roadmap_Feature, { "name": `Compiler`, "description": `Compiles an application to JavaScript.` }))), _createElement($Pages_Roadmap_Feature, { "description": `The features of the language.`, "name": `Language Features`, "icon": this.checkmark }, _array(_createElement($Pages_Roadmap_Feature, { "name": `Components`, "description": `Define components with type checked properties and state.` }), _createElement($Pages_Roadmap_Feature, { "name": `Styling`, "description": `Styling HTML tags in a dynamic way without conflicts.` }), _createElement($Pages_Roadmap_Feature, { "name": `Routing`, "description": `Define routes in a declarative way.` }), _createElement($Pages_Roadmap_Feature, { "name": `Computations`, "description": `Handle synchronous (JSON decoding) and asynchronous (HTTP Request) computations that might fail.` }), _createElement($Pages_Roadmap_Feature, { "name": `State`, "description": `Manage global state with Stores.` }), _createElement($Pages_Roadmap_Feature, { "name": `Subscriptions`, "description": `Subscribe to global events (mouse, window) using providers.` }), _createElement($Pages_Roadmap_Feature, { "name": `JavaScript Interopability`, "description": `Simply call out the JavaScript when you need to.` }))), _createElement($Pages_Roadmap_Feature, { "name": `Production Builder`, "icon": this.checkmark, "description": `The process of building the production version of the application.` }, _array(_createElement($Pages_Roadmap_Feature, { "name": `Icon Generator`, "description": `Generate icons for most common use cases (favicon, application icons).` }), _createElement($Pages_Roadmap_Feature, { "name": `Bundling and Minification`, "description": `Compile and minify the application into a single JavaScript file.` }))), _createElement($Pages_Roadmap_Feature, { "name": `Development Server`, "icon": this.checkmark, "description": `A server that automatically formats code and reloads the application when any of the source files change.` }), _createElement($Pages_Roadmap_Feature, { "name": `Package Manager`, "icon": this.checkmark, "description": `Install external sources (packages) directly from Git repositories.` }), _createElement($Pages_Roadmap_Feature, { "name": `Testing`, "icon": this.checkmark, "description": `Language feature for easily testing modules, packages, components or the whole application.` }), _createElement($Pages_Roadmap_Feature, { "name": `Command Line Interface`, "icon": this.checkmark, "description": `A binary that allows to access the features of the language.` })))))
-  }
-}
-
-$Roadmap.displayName = "Roadmap"
-
-class $Pages_Roadmap_Feature extends Component {
-  get children () {
-    if (this.props.children != undefined) {
-      return this.props.children
-    } else {
-      return []
-    }
-  }
-
-  get icon () {
-    if (this.props.icon != undefined) {
-      return this.props.icon
-    } else {
-      return $Html.empty()
-    }
-  }
-
-  get description () {
-    if (this.props.description != undefined) {
-      return this.props.description
-    } else {
-      return ``
-    }
-  }
-
-  get name () {
-    if (this.props.name != undefined) {
-      return this.props.name
-    } else {
-      return ``
-    }
-  }
-
-  render() {
-    return _createElement("div", {
-      className: `pages-roadmap-feature-base`,
-      style: {
-
-      }
-    }, [_createElement("div", {
-      className: `pages-roadmap-feature-icon`,
-      style: {
-
-      }
-    }, [this.icon]), _createElement("div", {}, [_createElement("div", {
-      className: `pages-roadmap-feature-title`,
-      style: {
-
-      }
-    }, [this.name]), _createElement("div", {
-      className: `pages-roadmap-feature-description`,
-      style: {
-
-      }
-    }, [this.description]), ($Array.isEmpty(this.children) ? $Html.empty() : _createElement("div", {
-      className: `pages-roadmap-feature-features`,
-      style: {
-
-      }
-    }, [this.children]))])])
-  }
-}
-
-$Pages_Roadmap_Feature.displayName = "Pages.Roadmap.Feature"
-
-$Pages_Roadmap_Feature.defaultProps = {
-  children: [],icon: $Html.empty(),description: ``,name: ``
-}
-
-class $Home extends Component {
-  render() {
-    return _createElement("div", {
-      className: `home-base`,
-      style: {
-
-      }
-    }, [_createElement("div", {
-      className: `home-hero-media-0 home-hero`,
-      style: {
-
-      }
-    }, [_createElement("div", {
-      className: `home-logo`,
-      style: {
-
-      }
-    }, [_createElement($Logo, { "size": 180, "mobileSize": 60 }), _createElement("h1", {
-      className: `home-h1`,
-      style: {
-
-      }
-    }, [`MINT`])]), _createElement("h2", {
-      className: `home-slogan-media-0 home-slogan`,
-      style: {
-
-      }
-    }, [`A refreshing language for the front-end web.`]), _createElement("div", {
-      className: `home-buttons-media-0 home-buttons`,
-      style: {
-
-      }
-    }, [_createElement($Button, { "href": `/try` }, _array(`Try`)), _createElement("div", {
-      className: `home-separator-media-1 home-separator-media-0 home-separator`,
-      style: {
-
-      }
-    }), _createElement($Button, { "href": `/install` }, _array(`Install`)), _createElement("div", {
-      className: `home-separator-media-1 home-separator-media-0 home-separator`,
-      style: {
-
-      }
-    }), _createElement($Button, { "href": `https://guide.mint-lang.com`, "target": `_blank` }, _array(`Learn`))])]), _createElement($Showcase, {  }), _createElement($Github, {  })])
-  }
-}
-
-$Home.displayName = "Home"
-
-class $Logo extends Component {
-  get bottomColor() {
-    return (this.invert ? `#FFF` : `#247e3d`)
-  }
-
-  get topColor() {
-    return (this.invert ? `#FFF` : `#56cf86`)
-  }
-
-  get id() {
-    return (this.invert ? `a` : `b`)
-  }
-
-  get mobileSize () {
-    if (this.props.mobileSize != undefined) {
-      return this.props.mobileSize
-    } else {
-      return 90
-    }
-  }
-
-  get invert () {
-    if (this.props.invert != undefined) {
-      return this.props.invert
-    } else {
-      return false
-    }
-  }
-
-  get size () {
-    if (this.props.size != undefined) {
-      return this.props.size
-    } else {
-      return 90
-    }
-  }
-
-  render() {
-    return _createElement("svg", {
-      "viewBox": `0 0 256 256`,
-      "height": `256`,
-      "width": `256`,
-      className: `logo-base-media-0 logo-base`,
-      style: {
-        [`--logo-base-height`]: this.size + `px`,
-        [`--logo-base-width`]: this.size + `px`,
-        [`--logo-base-media-0-height`]: this.size + `px`,
-        [`--logo-base-media-0-width`]: this.size + `px`
-      }
-    }, [_createElement("defs", {}, [_createElement("linearGradient", {
-      "gradientUnits": `userSpaceOnUse`,
-      "y2": `435.85`,
-      "x2": `260.59`,
-      "y1": `665.136`,
-      "x1": `260.59`,
-      "id": this.id,
-      "gradientTransform": `translate(-132.333 374.602)`
-    }, [_createElement("stop", {
-      "offset": `0`,
-      "stop-color": this.bottomColor
-    }), _createElement("stop", {
-      "offset": `1`,
-      "stop-color": this.topColor
-    })])]), _createElement("path", {
-      "d": `M127.999 810.452c-2.961 11.304-28.25 18.524-30 32.857l-2.855-8.57c-14.89 18.963-13.573 28.57-13.573 28.57l-1.25-6.875c-10.869 18.17-8.567 27.072-7.312 29.786l.527.93s-.235-.3-.527-.93l-2.865-5.053c-11.286 31.219-1.43 40.803-1.43 40.803l-6.07-7.053c-2.683 23.92 4.285 33.75 4.285 33.75l-4.375-4.108c-.557 16.247 10.09 25.893 10.09 25.893l-7.018-4.812c13.505 58.995 40.317 60.584 43.775 60.539l-10.687.345c7.127 7.63 16.225 10.59 22.379 11.748 3.356-17.796 6.44-60.887 6.906-173.808.466 112.912 3.552 156.005 6.908 173.805 6.155-1.16 15.253-4.12 22.38-11.748l-10.686-.344c3.463.044 30.27-1.552 43.773-60.54l-7.018 4.813s10.647-9.646 10.09-25.893l-4.375 4.108s6.968-9.83 4.285-33.75l-6.07 7.053s9.856-9.584-1.43-40.803l-2.863 5.047c-.293.634-.53.933-.53.933l.53-.933c1.256-2.72 3.548-11.62-7.314-29.78l-1.25 6.875s1.318-9.609-13.573-28.572L158 843.307c-1.75-14.332-27.037-21.552-30-32.855z`,
-      "fill": `url(#` + this.id + `)`,
-      "fill-rule": `evenodd`,
-      "transform": `translate(0 -796.362)`
-    })])
-  }
-}
-
-$Logo.displayName = "Logo"
-
-$Logo.defaultProps = {
-  mobileSize: 90,invert: false,size: 90
-}
-
-class $Examples_Example extends Component {
-  get description () {
-    if (this.props.description != undefined) {
-      return this.props.description
-    } else {
-      return ``
-    }
-  }
-
-  get title () {
-    if (this.props.title != undefined) {
-      return this.props.title
-    } else {
-      return ``
-    }
-  }
-
-  get href () {
-    if (this.props.href != undefined) {
-      return this.props.href
-    } else {
-      return ``
-    }
-  }
-
-  render() {
-    return _createElement("div", {
-      "onClick": (event => (((event) => {
-      return $Window.navigate(this.href)
-      }))(_normalizeEvent(event))),
-      className: `examples-example-base`,
-      style: {
-
-      }
-    }, [_createElement("div", {
-      className: `examples-example-title`,
-      style: {
-
-      }
-    }, [this.title]), _createElement("div", {
-      className: `examples-example-description`,
-      style: {
-
-      }
-    }, [this.description])])
-  }
-}
-
-$Examples_Example.displayName = "Examples.Example"
-
-$Examples_Example.defaultProps = {
-  description: ``,title: ``,href: ``
-}
-
-class $Examples extends Component {
-  get userManagement () { return $Examples_Store.userManagement }
-
-  get drag () { return $Examples_Store.drag }
-
-  get fileHandling () { return $Examples_Store.fileHandling }
-
-  get counter () { return $Examples_Store.counter }
-
-  componentWillUnmount () {
-    $Examples_Store._unsubscribe(this)
-  }
-
-  componentDidMount () {
-    $Examples_Store._subscribe(this)
-  }
-
-  render() {
-    return _createElement($Page, {  }, _array(_createElement($Title, {  }, _array(`Examples`)), _createElement($SubTitle, {  }, _array(`Here you can find some examples that showcase the language features.`)), _createElement("hr", {
-      className: `examples-hr`,
-      style: {
-
-      }
-    }), _createElement("div", {
-      className: `examples-grid`,
-      style: {
-
-      }
-    }, [_createElement($Examples_Example, { "description": this.userManagement.description, "title": this.userManagement.title, "href": this.userManagement.href }), _createElement($Examples_Example, { "description": this.drag.description, "title": this.drag.title, "href": this.drag.href }), _createElement($Examples_Example, { "description": this.counter.description, "title": this.counter.title, "href": this.counter.href }), _createElement($Examples_Example, { "description": this.fileHandling.description, "title": this.fileHandling.title, "href": this.fileHandling.href })])))
-  }
-}
-
-$Examples.displayName = "Examples"
-
-class $Title extends Component {
-  get children () {
-    if (this.props.children != undefined) {
-      return this.props.children
-    } else {
-      return []
-    }
-  }
-
-  render() {
-    return _createElement("div", {
-      className: `title-base-media-0 title-base`,
-      style: {
-
-      }
-    }, [this.children])
-  }
-}
-
-$Title.displayName = "Title"
-
-$Title.defaultProps = {
-  children: []
-}
-
-class $UserRow extends Component {
-  get textDecoration() {
-    return (() => {
-      let __condition = this.user.status
-
-       if (_compare(__condition, `locked`)) {
-        return `line-through`
-      } else {
-        return ``
-      }
-    })()
-  }
-
-  get user () {
-    if (this.props.user != undefined) {
-      return this.props.user
-    } else {
-      return new Record({
-      createdAt: $Time.now(),
-      updatedAt: $Time.now(),
-      firstName: ``,
-      lastName: ``,
-      status: ``,
-      id: 0
-    })
-    }
-  }
-
-  updateUserStatus (...params) { return $Users_List.updateUserStatus(...params) }
-
-  componentWillUnmount () {
-    $Users_List._unsubscribe(this)
-  }
-
-  componentDidMount () {
-    $Users_List._subscribe(this)
-  }
-
-  onChange(isLocked) {
-    return this.updateUserStatus.bind(this)(this.user, isLocked)
-  }
-
-  render() {
-    return _createElement("tr", {
-      className: `user-row-tr`,
-      style: {
-        [`--user-row-tr-a-text-decoration`]: this.textDecoration
-      }
-    }, [_createElement($Ui_Table_Td, {  }, _array(_createElement($Ui_Link, { "href": `/users/` + $Number.toString(this.user.id) }, _array($Number.toString(this.user.id))))), _createElement($Ui_Table_Td, {  }, _array(_createElement($Ui_Link, { "href": `/users/` + $Number.toString(this.user.id) }, _array(this.user.firstName + ` ` + this.user.lastName)))), _createElement($Ui_Table_Td, {  }, _array($String.capitalize(this.user.status))), _createElement($Ui_Table_Td, {  }, _array(_createElement($Ui_Time, { "date": this.user.updatedAt }))), _createElement($Ui_Table_Td, { "align": `center` }, _array(_createElement($Ui_Checkbox, { "checked": _compare(this.user.status, `locked`), "onChange": this.onChange.bind(this) })))])
-  }
-}
-
-$UserRow.displayName = "UserRow"
-
-$UserRow.defaultProps = {
-  user: new Record({
-    createdAt: $Time.now(),
-    updatedAt: $Time.now(),
-    firstName: ``,
-    lastName: ``,
-    status: ``,
-    id: 0
-  })
-}
-
 class $Page extends Component {
   get children () {
     if (this.props.children != undefined) {
@@ -4705,645 +5365,6 @@ $Page.displayName = "Page"
 
 $Page.defaultProps = {
   children: []
-}
-
-class $Users_Layout extends Component {
-  get children () {
-    if (this.props.children != undefined) {
-      return this.props.children
-    } else {
-      return []
-    }
-  }
-
-  render() {
-    return _createElement("div", {}, [_createElement($Ui_Breadcrumbs, { "separator": `|` }, _array(_createElement($Ui_Breadcrumb, { "label": `Home`, "href": `/users` }), _createElement($Ui_Breadcrumb, { "label": `New User`, "href": `/users/new` }))), _createElement("div", {
-      className: `users-layout-wrapper`,
-      style: {
-
-      }
-    }, [_createElement("div", {
-      className: `users-layout-content`,
-      style: {
-
-      }
-    }, [this.children])])])
-  }
-}
-
-$Users_Layout.displayName = "Users.Layout"
-
-$Users_Layout.defaultProps = {
-  children: []
-}
-
-class $Users_Table extends Component {
-  get loading () { return $Users_List.loading }
-
-  get users () { return $Users_List.users }
-
-  get page () { return $Users_List.page }
-
-  get perPage () { return $Users_List.perPage }
-
-  get error () { return $Users_List.error }
-
-  get theme () { return $Ui.theme }
-
-  componentWillUnmount () {
-    $Users_List._unsubscribe(this);$Ui._unsubscribe(this)
-  }
-
-  componentDidMount () {
-    $Users_List._subscribe(this);$Ui._subscribe(this)
-  }
-
-  setPage(a) {
-    return $Window.navigate(`/users?page=` + $Number.toString(a))
-  }
-
-  renderItem(item) {
-    return _createElement($UserRow, { "key": $Number.toString(item.id), "user": item })
-  }
-
-  render() {
-    let slicedUsers = $Array.slice(this.page * this.perPage, (this.page + 1) * this.perPage, this.users)
-
-    let rows = ($Array.isEmpty(slicedUsers) ? [_createElement("tr", {}, [_createElement("td", {
-      "colspan": `5`
-    }, [_createElement("div", {
-      className: `users-table-empty`,
-      style: {
-
-      }
-    }, [`There are no users to display!`])])])] : $Array.map(this.renderItem.bind(this), slicedUsers))
-
-    return _createElement($Ui_Loader, { "shown": this.loading }, _array(_createElement("div", {}, [_createElement("div", {
-      className: `users-table-header`,
-      style: {
-
-      }
-    }, [_createElement("div", {
-      className: `users-table-title`,
-      style: {
-
-      }
-    }, [`Users`])]), _createElement("table", {
-      className: `users-table-table`,
-      style: {
-        [`--users-table-table-border`]: `1px solid ` + this.theme.border.color,
-        [`--users-table-table-color`]: this.theme.colors.input.text,
-        [`--users-table-table-font-family`]: this.theme.fontFamily
-      }
-    }, [_createElement("thead", {}, [_createElement("tr", {}, [_createElement($Ui_Table_Th, { "width": `40px` }, _array(`Id`)), _createElement($Ui_Table_Th, {  }, _array(`Name`)), _createElement($Ui_Table_Th, {  }, _array(`Status`)), _createElement($Ui_Table_Th, {  }, _array(`Last Updated`)), _createElement($Ui_Table_Th, { "align": `center`, "width": `70px` }, _array(`Active`))])]), _createElement("tbody", {}, [rows])]), _createElement($Ui_Pagination, { "onChange": this.setPage.bind(this), "page": this.page, "total": $Array.size(this.users) })])))
-  }
-}
-
-$Users_Table.displayName = "Users.Table"
-
-class $Header extends Component {
-  render() {
-    return _createElement("div", {
-      className: `header-base`,
-      style: {
-
-      }
-    }, [_createElement("div", {
-      className: `header-wrapper`,
-      style: {
-
-      }
-    }, [_createElement("a", {
-      "href": `/`,
-      className: `header-brand`,
-      style: {
-
-      }
-    }, [_createElement($Logo, { "mobileSize": 20, "invert": true, "size": 20 }), _createElement("div", {}, [`MINT`])]), _createElement($Ui_Toolbar_Spacer, {  }), _createElement("div", {
-      className: `header-desktop-media-0 header-desktop`,
-      style: {
-
-      }
-    }, [_createElement("a", {
-      "href": `/try`,
-      className: `header-link`,
-      style: {
-
-      }
-    }, [`Try`]), _createElement($Ui_Toolbar_Separator, {  }), _createElement("a", {
-      "href": `/install`,
-      className: `header-link`,
-      style: {
-
-      }
-    }, [`Install`]), _createElement($Ui_Toolbar_Separator, {  }), _createElement("a", {
-      "href": `https://guide.mint-lang.com`,
-      "target": `_blank`,
-      className: `header-link`,
-      style: {
-
-      }
-    }, [`Learn`]), _createElement($Ui_Toolbar_Separator, {  }), _createElement("a", {
-      "href": `/examples`,
-      className: `header-link`,
-      style: {
-
-      }
-    }, [`Examples`]), _createElement($Ui_Toolbar_Separator, {  }), _createElement("a", {
-      "href": `/roadmap`,
-      className: `header-link`,
-      style: {
-
-      }
-    }, [`Roadmap`])])])])
-  }
-}
-
-$Header.displayName = "Header"
-
-class $Footer extends Component {
-  render() {
-    return _createElement("div", {
-      className: `footer-base`,
-      style: {
-
-      }
-    }, [_createElement("div", {
-      className: `footer-wrapper`,
-      style: {
-
-      }
-    }, [_createElement("div", {
-      className: `footer-column`,
-      style: {
-
-      }
-    }, [_createElement("div", {
-      className: `footer-title`,
-      style: {
-
-      }
-    }, [`Source`]), _createElement("a", {
-      "href": `https://github.com/mint-lang/mint`,
-      "target": `_blank`,
-      className: `footer-link`,
-      style: {
-
-      }
-    }, [`Github Repository`]), _createElement("a", {
-      "href": `https://github.com/mint-lang/mint/releases`,
-      "target": `_blank`,
-      className: `footer-link`,
-      style: {
-
-      }
-    }, [`Releases / Changelog`])]), _createElement("div", {
-      className: `footer-column`,
-      style: {
-
-      }
-    }, [_createElement("div", {
-      className: `footer-title`,
-      style: {
-
-      }
-    }, [`Community`]), _createElement("a", {
-      "href": `https://gitter.im/mint-lang/Lobby`,
-      "target": `_blank`,
-      className: `footer-link`,
-      style: {
-
-      }
-    }, [`Gitter`]), _createElement("a", {
-      "href": `https://spectrum.chat/mint-lang`,
-      "target": `_blank`,
-      className: `footer-link`,
-      style: {
-
-      }
-    }, [`Spectrum`])]), _createElement("div", {
-      className: `footer-column`,
-      style: {
-
-      }
-    }, [_createElement("div", {
-      className: `footer-title`,
-      style: {
-
-      }
-    }, [`Social`]), _createElement("a", {
-      "href": `https://twitter.com/mint_lang`,
-      "target": `_blank`,
-      className: `footer-link`,
-      style: {
-
-      }
-    }, [`Twitter`])])])])
-  }
-}
-
-$Footer.displayName = "Footer"
-
-class $Button extends Component {
-  get children () {
-    if (this.props.children != undefined) {
-      return this.props.children
-    } else {
-      return []
-    }
-  }
-
-  get target () {
-    if (this.props.target != undefined) {
-      return this.props.target
-    } else {
-      return ``
-    }
-  }
-
-  get href () {
-    if (this.props.href != undefined) {
-      return this.props.href
-    } else {
-      return ``
-    }
-  }
-
-  render() {
-    return _createElement("a", {
-      "target": this.target,
-      "href": this.href,
-      className: `button-base-media-0 button-base`,
-      style: {
-
-      }
-    }, [this.children])
-  }
-}
-
-$Button.displayName = "Button"
-
-$Button.defaultProps = {
-  children: [],target: ``,href: ``
-}
-
-class $Example extends Component {
-  get children () {
-    if (this.props.children != undefined) {
-      return this.props.children
-    } else {
-      return []
-    }
-  }
-
-  get subTitle () {
-    if (this.props.subTitle != undefined) {
-      return this.props.subTitle
-    } else {
-      return ``
-    }
-  }
-
-  get title () {
-    if (this.props.title != undefined) {
-      return this.props.title
-    } else {
-      return ``
-    }
-  }
-
-  render() {
-    return _createElement($Page, {  }, _array(_createElement($Title, {  }, _array(this.title)), _createElement($SubTitle, {  }, _array(this.subTitle)), _createElement("div", {
-      className: `example-frame`,
-      style: {
-
-      }
-    }, [this.children])))
-  }
-}
-
-$Example.displayName = "Example"
-
-$Example.defaultProps = {
-  children: [],subTitle: ``,title: ``
-}
-
-class $CodeMirror extends Component {
-  get onChange () {
-    if (this.props.onChange != undefined) {
-      return this.props.onChange
-    } else {
-      return ((value) => {
-    return null
-    })
-    }
-  }
-
-  get value () {
-    if (this.props.value != undefined) {
-      return this.props.value
-    } else {
-      return ``
-    }
-  }
-
-  componentDidUpdate() {
-    return (() => {
-          if (this.editor) {
-            if (this.props.value != null) {
-              if (this.editor.getValue() !== this.props.value) {
-                this.editor.setValue(this.props.value);
-              }
-            }
-          }
-        })()
-  }
-
-  initRef(element) {
-    return (() => {
-          if (!window.CodeMirror) { return }
-          if (this.editor) { return }
-          this.editor = CodeMirror.fromTextArea(element, {
-            lineNumbers: true,
-            theme: "neo"
-          })
-          this.editor.on('change', (value) => {
-            this.onChange(this.editor.getValue())
-          })
-        })()
-  }
-
-  render() {
-    return _createElement("div", {
-      className: `code-mirror-base`,
-      style: {
-
-      }
-    }, [_createElement("textarea", {
-      "ref": (ref => { ref ? this.initRef.bind(this).call(this, ref) : null })
-    })])
-  }
-}
-
-$CodeMirror.displayName = "CodeMirror"
-
-$CodeMirror.defaultProps = {
-  onChange: ((value) => {
-  return null
-  }),value: ``
-}
-
-class $Counter extends Component {
-  get background() {
-    return (this.counter >= 10 ? `lightgreen` : (this.counter < 0 ? `orangered` : `#F2F2F2`))
-  }
-
-  get disabled () {
-    if (this.props.disabled != undefined) {
-      return this.props.disabled
-    } else {
-      return false
-    }
-  }
-
-  increment (...params) { return $Counter_Store.increment(...params) }
-
-  decrement (...params) { return $Counter_Store.decrement(...params) }
-
-  get counter () { return $Counter_Store.counter }
-
-  componentWillUnmount () {
-    $Counter_Store._unsubscribe(this)
-  }
-
-  componentDidMount () {
-    $Counter_Store._subscribe(this)
-  }
-
-  render() {
-    return _createElement("div", {
-      className: `counter-base`,
-      style: {
-        [`--counter-base-background`]: this.background
-      }
-    }, [_createElement("button", {
-      "onClick": (event => (((event) => {
-      return this.decrement.bind(this)()
-      }))(_normalizeEvent(event))),
-      "disabled": this.disabled
-    }, [`Decrement`]), _createElement("span", {
-      className: `counter-counter`,
-      style: {
-
-      }
-    }, [$Number.toString(this.counter)]), _createElement("button", {
-      "onClick": (event => (((event) => {
-      return this.increment.bind(this)()
-      }))(_normalizeEvent(event))),
-      "disabled": this.disabled
-    }, [`Increment`])])
-  }
-}
-
-$Counter.displayName = "Counter"
-
-$Counter.defaultProps = {
-  disabled: false
-}
-
-class $Drag extends Component {
-  constructor(props) {
-    super(props)
-    this.state = new Record({
-      mousePosition: new Record({
-        left: 0,
-        top: 0
-      }),
-      startPosition: new Record({
-        left: 0,
-        top: 0
-      }),
-      dragging: false
-    })
-  }
-
-  setPosition (...params) { return $DragStore.setPosition(...params) }
-
-  get position () { return $DragStore.position }
-
-  componentWillUnmount () {
-    $DragStore._unsubscribe(this);$Provider_Mouse._unsubscribe(this)
-  }
-
-  componentDidUpdate () {
-    if (this.state.dragging) {
-      $Provider_Mouse._subscribe(this, new Record({
-      moves: ((data) => {
-      return this.move.bind(this)(data)
-      }),
-      clicks: ((data) => {
-      return null
-      }),
-      ups: ((data) => {
-      return this.end.bind(this)()
-      })
-    }))
-    } else {
-      $Provider_Mouse._unsubscribe(this)
-    }
-  }
-
-  componentDidMount () {
-    $DragStore._subscribe(this);if (this.state.dragging) {
-      $Provider_Mouse._subscribe(this, new Record({
-      moves: ((data) => {
-      return this.move.bind(this)(data)
-      }),
-      clicks: ((data) => {
-      return null
-      }),
-      ups: ((data) => {
-      return this.end.bind(this)()
-      })
-    }))
-    } else {
-      $Provider_Mouse._unsubscribe(this)
-    }
-  }
-
-  move(data) {
-    let diff = new Record({
-      left: this.state.mousePosition.left - data.pageX,
-      top: this.state.mousePosition.top - data.pageY
-    })
-
-    return (this.state.dragging ? this.setPosition.bind(this)(new Record({
-      left: this.state.startPosition.left - diff.left,
-      top: this.state.startPosition.top - diff.top
-    })) : new Promise((_resolve) => {
-      this.setState(this.state, _resolve)
-    }))
-  }
-
-  end() {
-    return new Promise((_resolve) => {
-      this.setState(_update(this.state, { dragging: false }), _resolve)
-    })
-  }
-
-  start(event) {
-    let mousePosition = new Record({
-      left: event.pageX,
-      top: event.pageY
-    })
-
-    let startPosition = new Record({
-      left: this.position.left,
-      top: this.position.top
-    })
-
-    return (async () => {
-      try {
-         await $Html_Event.preventDefault(event)
-
-     await new Promise((_resolve) => {
-      this.setState(_update(this.state, { mousePosition: mousePosition, startPosition: startPosition, dragging: true }), _resolve)
-    })
-      }
-      catch(_error) {
-        if (_error instanceof DoError) {
-        } else {
-          console.warn(`Unhandled error in do statement`)
-          console.log(_error)
-        }
-      } 
-    })()
-  }
-
-  render() {
-    return _createElement("div", {
-      "onMouseDown": (event => (((event) => {
-      return this.start.bind(this)(event)
-      }))(_normalizeEvent(event))),
-      className: `drag-base`,
-      style: {
-        [`--drag-base-transform`]: `translate3d(` + this.position.left + `px,` + this.position.top + `px, 0)`
-      }
-    }, [`DragMe`])
-  }
-}
-
-$Drag.displayName = "Drag"
-
-class $Ui_Table_Td extends Component {
-  get borderBottom() {
-    return (this.header ? `2px solid ` + this.theme.border.color : ``)
-  }
-
-  get fontWeight() {
-    return (this.header ? `bold` : `normal`)
-  }
-
-  get children () {
-    if (this.props.children != undefined) {
-      return this.props.children
-    } else {
-      return []
-    }
-  }
-
-  get align () {
-    if (this.props.align != undefined) {
-      return this.props.align
-    } else {
-      return `left`
-    }
-  }
-
-  get width () {
-    if (this.props.width != undefined) {
-      return this.props.width
-    } else {
-      return `auto`
-    }
-  }
-
-  get header () {
-    if (this.props.header != undefined) {
-      return this.props.header
-    } else {
-      return false
-    }
-  }
-
-  get theme () { return $Ui.theme }
-
-  componentWillUnmount () {
-    $Ui._unsubscribe(this)
-  }
-
-  componentDidMount () {
-    $Ui._subscribe(this)
-  }
-
-  render() {
-    return _createElement("td", {
-      className: `ui-table-td-td`,
-      style: {
-        [`--ui-table-td-td-border`]: `1px solid ` + this.theme.border.color,
-        [`--ui-table-td-td-border-bottom`]: this.borderBottom,
-        [`--ui-table-td-td-font-weight`]: this.fontWeight,
-        [`--ui-table-td-td-text-align`]: this.align,
-        [`--ui-table-td-td-width`]: this.width
-      }
-    }, [this.children])
-  }
-}
-
-$Ui_Table_Td.displayName = "Ui.Table.Td"
-
-$Ui_Table_Td.defaultProps = {
-  children: [],align: `left`,width: `auto`,header: false
 }
 
 class $Ui_Table_Th extends Component {
@@ -5380,694 +5401,6 @@ $Ui_Table_Th.displayName = "Ui.Table.Th"
 
 $Ui_Table_Th.defaultProps = {
   align: `left`,width: `auto`,children: []
-}
-
-class $Ui_Loader extends Component {
-  get pointerEvents() {
-    return (this.shown ? `` : `none`)
-  }
-
-  get opacity() {
-    return (this.shown ? 1 : 0)
-  }
-
-  get children () {
-    if (this.props.children != undefined) {
-      return this.props.children
-    } else {
-      return []
-    }
-  }
-
-  get shown () {
-    if (this.props.shown != undefined) {
-      return this.props.shown
-    } else {
-      return false
-    }
-  }
-
-  render() {
-    return _createElement("div", {
-      className: `ui-loader-base`,
-      style: {
-
-      }
-    }, [this.children, _createElement("div", {
-      className: `ui-loader-loader`,
-      style: {
-        [`--ui-loader-loader-pointer-events`]: this.pointerEvents,
-        [`--ui-loader-loader-opacity`]: this.opacity
-      }
-    }, [`Loading...`])])
-  }
-}
-
-$Ui_Loader.displayName = "Ui.Loader"
-
-$Ui_Loader.defaultProps = {
-  children: [],shown: false
-}
-
-class $Ui_Link extends Component {
-  get colors() {
-    return (() => {
-      let __condition = this.type
-
-       if (_compare(__condition, `secondary`)) {
-        return this.theme.colors.secondary
-      } else if (_compare(__condition, `warning`)) {
-        return this.theme.colors.warning
-      } else if (_compare(__condition, `success`)) {
-        return this.theme.colors.success
-      } else if (_compare(__condition, `primary`)) {
-        return this.theme.colors.primary
-      } else if (_compare(__condition, `danger`)) {
-        return this.theme.colors.danger
-      } else if (_compare(__condition, `inherit`)) {
-        return new Record({
-        background: `inherit`,
-        focus: `inherit`,
-        text: `inherit`
-      })
-      } else {
-        return new Record({
-        background: ``,
-        focus: ``,
-        text: ``
-      })
-      }
-    })()
-  }
-
-  get children () {
-    if (this.props.children != undefined) {
-      return this.props.children
-    } else {
-      return []
-    }
-  }
-
-  get type () {
-    if (this.props.type != undefined) {
-      return this.props.type
-    } else {
-      return `primary`
-    }
-  }
-
-  get target () {
-    if (this.props.target != undefined) {
-      return this.props.target
-    } else {
-      return ``
-    }
-  }
-
-  get label () {
-    if (this.props.label != undefined) {
-      return this.props.label
-    } else {
-      return ``
-    }
-  }
-
-  get href () {
-    if (this.props.href != undefined) {
-      return this.props.href
-    } else {
-      return ``
-    }
-  }
-
-  get theme () { return $Ui.theme }
-
-  componentWillUnmount () {
-    $Ui._unsubscribe(this)
-  }
-
-  componentDidMount () {
-    $Ui._subscribe(this)
-  }
-
-  render() {
-    return _createElement("a", {
-      "target": this.target,
-      "href": this.href,
-      className: `ui-link-base`,
-      style: {
-        [`--ui-link-base-color`]: this.colors.background,
-        [`--ui-link-base-hover-color`]: this.colors.focus,
-        [`--ui-link-base-focus-color`]: this.colors.focus
-      }
-    }, [this.label, this.children])
-  }
-}
-
-$Ui_Link.displayName = "Ui.Link"
-
-$Ui_Link.defaultProps = {
-  children: [],type: `primary`,target: ``,label: ``,href: ``
-}
-
-class $Ui_Checkbox extends Component {
-  get opacity() {
-    return (this.checked ? `1` : `0`)
-  }
-
-  get transform() {
-    return (this.checked ? `scale(1)` : `scale(0.4) rotate(45deg)`)
-  }
-
-  get onChange () {
-    if (this.props.onChange != undefined) {
-      return this.props.onChange
-    } else {
-      return ((value) => {
-    return null
-    })
-    }
-  }
-
-  get disabled () {
-    if (this.props.disabled != undefined) {
-      return this.props.disabled
-    } else {
-      return false
-    }
-  }
-
-  get readonly () {
-    if (this.props.readonly != undefined) {
-      return this.props.readonly
-    } else {
-      return false
-    }
-  }
-
-  get checked () {
-    if (this.props.checked != undefined) {
-      return this.props.checked
-    } else {
-      return false
-    }
-  }
-
-  get theme () { return $Ui.theme }
-
-  componentWillUnmount () {
-    $Ui._unsubscribe(this)
-  }
-
-  componentDidMount () {
-    $Ui._subscribe(this)
-  }
-
-  toggle() {
-    return this.onChange($Bool.not(this.checked))
-  }
-
-  render() {
-    return _createElement("button", {
-      "disabled": this.disabled,
-      "onClick": (event => (((event) => {
-      return this.toggle.bind(this)()
-      }))(_normalizeEvent(event))),
-      className: `ui-checkbox-base`,
-      style: {
-        [`--ui-checkbox-base-background-color`]: this.theme.colors.input.background,
-        [`--ui-checkbox-base-border`]: `1px solid ` + this.theme.border.color,
-        [`--ui-checkbox-base-border-radius`]: this.theme.border.radius,
-        [`--ui-checkbox-base-color`]: this.theme.colors.input.text,
-        [`--ui-checkbox-base-focus-box-shadow`]: `0 0 2px ` + this.theme.outline.fadedColor + ` inset,
-                          0 0 2px ` + this.theme.outline.fadedColor,
-        [`--ui-checkbox-base-focus-border-color`]: this.theme.outline.color,
-        [`--ui-checkbox-base-focus-color`]: this.theme.outline.color,
-        [`--ui-checkbox-base-disabled-background`]: this.theme.colors.disabled.background,
-        [`--ui-checkbox-base-disabled-color`]: this.theme.colors.disabled.text
-      }
-    }, [_createElement("svg", {
-      "viewBox": `0 0 36 36`,
-      className: `ui-checkbox-icon`,
-      style: {
-        [`--ui-checkbox-icon-transform`]: this.transform,
-        [`--ui-checkbox-icon-opacity`]: this.opacity
-      }
-    }, [_createElement("path", {
-      "d": `M35.792 5.332L31.04 1.584c-.147-.12-.33-.208-.537-.208-.207 0-.398.087-.545.217l-17.286 22.21S5.877 17.27 5.687 17.08c-.19-.19-.442-.51-.822-.51-.38 0-.554.268-.753.467-.148.156-2.57 2.7-3.766 3.964-.07.077-.112.12-.173.18-.104.148-.173.313-.173.494 0 .19.07.347.173.494l.242.225s12.058 11.582 12.257 11.78c.2.2.442.45.797.45.345 0 .63-.37.795-.536l21.562-27.7c.104-.146.173-.31.173-.5 0-.217-.087-.4-.208-.555z`
-    })])])
-  }
-}
-
-$Ui_Checkbox.displayName = "Ui.Checkbox"
-
-$Ui_Checkbox.defaultProps = {
-  onChange: ((value) => {
-  return null
-  }),disabled: false,readonly: false,checked: false
-}
-
-class $Ui_Form_Separator extends Component {
-  render() {
-    return _createElement("div", {
-      className: `ui-form-separator-base`,
-      style: {
-
-      }
-    })
-  }
-}
-
-$Ui_Form_Separator.displayName = "Ui.Form.Separator"
-
-class $Ui_Calendar extends Component {
-  get nextMonthIcon() {
-    return _createElement($Ui_Icon_Path, { "onClick": ((event) => {
-    return this.nextMonth.bind(this)()
-    }), "viewbox": `0 0 9 16`, "height": `16px`, "width": `9px`, "path": `M6 8L.1 1.78c-.14-.16-.14-.4.02-.57L1.17.13c.15-.16.4-.16.54 0l7.2 7.6c.07.07.1.18.1.28 0 .1-.03.2-.1.3l-7.2 7.6c-.14.14-.38.14-.53-.02l-1.05-1.1c-.16-.15-.16-.4 0-.56L5.98 8z` })
-  }
-
-  get previousMonthIcon() {
-    return _createElement($Ui_Icon_Path, { "onClick": ((event) => {
-    return this.previousMonth.bind(this)()
-    }), "viewbox": `0 0 9 16`, "height": `16px`, "width": `9px`, "path": `M3 8l5.9-6.22c.14-.16.14-.4-.02-.57L7.83.13c-.15-.16-.4-.16-.54 0L.1 7.7c-.07.07-.1.17-.1.28 0 .1.03.2.1.3l7.2 7.6c.14.14.38.14.53-.02l1.05-1.1c.16-.15.16-.4 0-.56L3.02 8z` })
-  }
-
-  get onMonthChange () {
-    if (this.props.onMonthChange != undefined) {
-      return this.props.onMonthChange
-    } else {
-      return ((date) => {
-    return null
-    })
-    }
-  }
-
-  get onChange () {
-    if (this.props.onChange != undefined) {
-      return this.props.onChange
-    } else {
-      return ((day) => {
-    return null
-    })
-    }
-  }
-
-  get changeMonthOnSelect () {
-    if (this.props.changeMonthOnSelect != undefined) {
-      return this.props.changeMonthOnSelect
-    } else {
-      return false
-    }
-  }
-
-  get month () {
-    if (this.props.month != undefined) {
-      return this.props.month
-    } else {
-      return $Time.today()
-    }
-  }
-
-  get date () {
-    if (this.props.date != undefined) {
-      return this.props.date
-    } else {
-      return $Time.today()
-    }
-  }
-
-  get disabled () {
-    if (this.props.disabled != undefined) {
-      return this.props.disabled
-    } else {
-      return false
-    }
-  }
-
-  get theme () { return $Ui.theme }
-
-  componentWillUnmount () {
-    $Ui._unsubscribe(this)
-  }
-
-  componentDidMount () {
-    $Ui._subscribe(this)
-  }
-
-  days() {
-    let startDate = $Time.startOf(`week`, $Time.startOf(`month`, this.month))
-
-    let endDate = $Time.endOf(`week`, $Time.endOf(`month`, this.month))
-
-    return $Time.range(startDate, endDate)
-  }
-
-  onCellClick(day) {
-    return (!_compare($Time.month(day), $Time.month(this.month)) && this.changeMonthOnSelect ? (async () => {
-      try {
-         await this.onMonthChange(day)
-
-     await this.onChange(day)
-      }
-      catch(_error) {
-        if (_error instanceof DoError) {
-        } else {
-          console.warn(`Unhandled error in do statement`)
-          console.log(_error)
-        }
-      } 
-    })() : this.onChange(day))
-  }
-
-  cells() {
-    let range = $Time.range($Time.startOf(`month`, this.month), $Time.endOf(`month`, this.month))
-
-    return $Array.map(((day) => {
-    return _createElement($Ui_Calendar_Cell, { "active": $Array.any(((item) => {
-    return _compare(day, item)
-    }), range), "selected": _compare(this.date, day), "onClick": this.onCellClick.bind(this), "day": day })
-    }), this.days.bind(this)())
-  }
-
-  dayName(day) {
-    return _createElement("div", {
-      className: `ui-calendar-day-name`,
-      style: {
-
-      }
-    }, [$Time.format(`ddd`, day)])
-  }
-
-  dayNames() {
-    return $Array.map(this.dayName.bind(this), $Time.range($Time.startOf(`week`, this.date), $Time.endOf(`week`, this.date)))
-  }
-
-  previousMonth() {
-    return this.onMonthChange($Time.previousMonth(this.month))
-  }
-
-  nextMonth() {
-    return this.onMonthChange($Time.nextMonth(this.month))
-  }
-
-  render() {
-    return _createElement("div", {
-      className: `ui-calendar-base`,
-      style: {
-        [`--ui-calendar-base-background`]: this.theme.colors.input.background,
-        [`--ui-calendar-base-border`]: `1px solid ` + this.theme.border.color,
-        [`--ui-calendar-base-border-radius`]: this.theme.border.radius,
-        [`--ui-calendar-base-color`]: this.theme.colors.input.text,
-        [`--ui-calendar-base-font-family`]: this.theme.fontFamily
-      }
-    }, [_createElement("div", {
-      className: `ui-calendar-header`,
-      style: {
-
-      }
-    }, [this.previousMonthIcon, _createElement("div", {
-      className: `ui-calendar-text`,
-      style: {
-
-      }
-    }, [$Time.format(`MMMM - YYYY`, this.month)]), this.nextMonthIcon]), _createElement("div", {
-      className: `ui-calendar-day-names`,
-      style: {
-        [`--ui-calendar-day-names-border-bottom`]: `1px dashed ` + this.theme.border.color,
-        [`--ui-calendar-day-names-border-top`]: `1px dashed ` + this.theme.border.color
-      }
-    }, [this.dayNames.bind(this)()]), _createElement("div", {
-      className: `ui-calendar-table`,
-      style: {
-
-      }
-    }, [this.cells.bind(this)()])])
-  }
-}
-
-$Ui_Calendar.displayName = "Ui.Calendar"
-
-$Ui_Calendar.defaultProps = {
-  onMonthChange: ((date) => {
-  return null
-  }),onChange: ((day) => {
-  return null
-  }),changeMonthOnSelect: false,month: $Time.today(),date: $Time.today(),disabled: false
-}
-
-class $Ui_Dropdown extends Component {
-  constructor(props) {
-    super(props)
-    this.state = new Record({
-      uid: $Uid.generate(),
-      left: 0,
-      top: 0
-    })
-  }
-
-  get panel() {
-    return _createElement("div", {
-      "id": this.state.uid,
-      className: `ui-dropdown-panel`,
-      style: {
-        [`--ui-dropdown-panel-left`]: this.state.left + `px`,
-        [`--ui-dropdown-panel-top`]: this.state.top + `px`
-      }
-    }, [this.children])
-  }
-
-  get panelPortal() {
-    return (this.open ? _createElement($Html_Portals_Body, {  }, _array(this.panel)) : $Html.empty())
-  }
-
-  get element () {
-    if (this.props.element != undefined) {
-      return this.props.element
-    } else {
-      return $Html.empty()
-    }
-  }
-
-  get children () {
-    if (this.props.children != undefined) {
-      return this.props.children
-    } else {
-      return []
-    }
-  }
-
-  get open () {
-    if (this.props.open != undefined) {
-      return this.props.open
-    } else {
-      return true
-    }
-  }
-
-  componentWillUnmount () {
-    $Provider_Mouse._unsubscribe(this);$Provider_AnimationFrame._unsubscribe(this)
-  }
-
-  componentDidUpdate () {
-    if (this.open) {
-      $Provider_Mouse._subscribe(this, new Record({
-      clicks: ((event) => {
-      return null
-      }),
-      moves: ((data) => {
-      return null
-      }),
-      ups: ((data) => {
-      return null
-      })
-    }))
-    } else {
-      $Provider_Mouse._unsubscribe(this)
-    };if (this.open) {
-      $Provider_AnimationFrame._subscribe(this, new Record({
-      frames: this.updateDimensions.bind(this)
-    }))
-    } else {
-      $Provider_AnimationFrame._unsubscribe(this)
-    }
-  }
-
-  componentDidMount () {
-    if (this.open) {
-      $Provider_Mouse._subscribe(this, new Record({
-      clicks: ((event) => {
-      return null
-      }),
-      moves: ((data) => {
-      return null
-      }),
-      ups: ((data) => {
-      return null
-      })
-    }))
-    } else {
-      $Provider_Mouse._unsubscribe(this)
-    };if (this.open) {
-      $Provider_AnimationFrame._subscribe(this, new Record({
-      frames: this.updateDimensions.bind(this)
-    }))
-    } else {
-      $Provider_AnimationFrame._unsubscribe(this)
-    }
-  }
-
-  updateDimensions() {
-    let dom = $Maybe.withDefault($Dom.createElement(`div`), $Dom.getElementById(this.state.uid))
-
-    let width = $Window.width()
-
-    let height = $Window.height()
-
-    let panelDimensions = $Dom.getDimensions(dom)
-
-    let dimensions = $Dom.getDimensions(ReactDOM.findDOMNode(this))
-
-    let top = dimensions.top + dimensions.height
-
-    let left = dimensions.left
-
-    return new Promise((_resolve) => {
-      this.setState(_update(this.state, { top: top, left: left }), _resolve)
-    })
-  }
-
-  render() {
-    return [this.element, this.panelPortal]
-  }
-}
-
-$Ui_Dropdown.displayName = "Ui.Dropdown"
-
-$Ui_Dropdown.defaultProps = {
-  element: $Html.empty(),children: [],open: true
-}
-
-class $Ui_Breadcrumb extends Component {
-  get children () {
-    if (this.props.children != undefined) {
-      return this.props.children
-    } else {
-      return []
-    }
-  }
-
-  get target () {
-    if (this.props.target != undefined) {
-      return this.props.target
-    } else {
-      return ``
-    }
-  }
-
-  get label () {
-    if (this.props.label != undefined) {
-      return this.props.label
-    } else {
-      return ``
-    }
-  }
-
-  get type () {
-    if (this.props.type != undefined) {
-      return this.props.type
-    } else {
-      return ``
-    }
-  }
-
-  get href () {
-    if (this.props.href != undefined) {
-      return this.props.href
-    } else {
-      return ``
-    }
-  }
-
-  get theme () { return $Ui.theme }
-
-  componentWillUnmount () {
-    $Ui._unsubscribe(this)
-  }
-
-  componentDidMount () {
-    $Ui._subscribe(this)
-  }
-
-  render() {
-    return _createElement("div", {
-      className: `ui-breadcrumb-base`,
-      style: {
-        [`--ui-breadcrumb-base-hover-color`]: this.theme.hover.color,
-        [`--ui-breadcrumb-base-a-focus-color`]: this.theme.hover.color
-      }
-    }, [_createElement($Ui_Link, { "children": this.children, "target": this.target, "type": `inherit`, "label": this.label, "href": this.href })])
-  }
-}
-
-$Ui_Breadcrumb.displayName = "Ui.Breadcrumb"
-
-$Ui_Breadcrumb.defaultProps = {
-  children: [],target: ``,label: ``,type: ``,href: ``
-}
-
-class $Ui_Breadcrumbs extends Component {
-  get span() {
-    return _createElement("span", {
-      className: `ui-breadcrumbs-separator`,
-      style: {
-
-      }
-    }, [this.separator])
-  }
-
-  get children () {
-    if (this.props.children != undefined) {
-      return this.props.children
-    } else {
-      return []
-    }
-  }
-
-  get separator () {
-    if (this.props.separator != undefined) {
-      return this.props.separator
-    } else {
-      return `|`
-    }
-  }
-
-  get theme () { return $Ui.theme }
-
-  componentWillUnmount () {
-    $Ui._unsubscribe(this)
-  }
-
-  componentDidMount () {
-    $Ui._subscribe(this)
-  }
-
-  render() {
-    return _createElement("div", {
-      className: `ui-breadcrumbs-base`,
-      style: {
-        [`--ui-breadcrumbs-base-background`]: this.theme.colors.inputSecondary.background,
-        [`--ui-breadcrumbs-base-color`]: this.theme.colors.inputSecondary.text,
-        [`--ui-breadcrumbs-base-font-family`]: this.theme.fontFamily
-      }
-    }, [$Array.intersperse(this.span, this.children)])
-  }
-}
-
-$Ui_Breadcrumbs.displayName = "Ui.Breadcrumbs"
-
-$Ui_Breadcrumbs.defaultProps = {
-  children: [],separator: `|`
 }
 
 class $Ui_Toolbar extends Component {
@@ -6130,11 +5463,7 @@ $Ui_Toolbar.defaultProps = {
   children: [],background: ``,color: ``
 }
 
-class $Ui_Toggle extends Component {
-  get left() {
-    return (this.checked ? `2px` : `50%`)
-  }
-
+class $Ui_Slider extends Component {
   get onChange () {
     if (this.props.onChange != undefined) {
       return this.props.onChange
@@ -6142,22 +5471,6 @@ class $Ui_Toggle extends Component {
       return ((value) => {
     return null
     })
-    }
-  }
-
-  get offLabel () {
-    if (this.props.offLabel != undefined) {
-      return this.props.offLabel
-    } else {
-      return `OFF`
-    }
-  }
-
-  get onLabel () {
-    if (this.props.onLabel != undefined) {
-      return this.props.onLabel
-    } else {
-      return `ON`
     }
   }
 
@@ -6169,19 +5482,149 @@ class $Ui_Toggle extends Component {
     }
   }
 
-  get readonly () {
-    if (this.props.readonly != undefined) {
-      return this.props.readonly
+  get max () {
+    if (this.props.max != undefined) {
+      return this.props.max
     } else {
-      return false
+      return 100
     }
   }
 
-  get checked () {
-    if (this.props.checked != undefined) {
-      return this.props.checked
+  get value () {
+    if (this.props.value != undefined) {
+      return this.props.value
     } else {
-      return false
+      return 0
+    }
+  }
+
+  get step () {
+    if (this.props.step != undefined) {
+      return this.props.step
+    } else {
+      return 1
+    }
+  }
+
+  get min () {
+    if (this.props.min != undefined) {
+      return this.props.min
+    } else {
+      return 0
+    }
+  }
+
+  get theme () { return $Ui.theme }
+
+  componentWillUnmount () {
+    $Ui._unsubscribe(this)
+  }
+
+  componentDidMount () {
+    $Ui._subscribe(this)
+  }
+
+  changed(event) {
+    return this.onChange($Maybe.withDefault(0, $Number.fromString($Dom.getValue(event.target))))
+  }
+
+  render() {
+    return _createElement("input", {
+      "value": $Number.toString(this.value),
+      "step": $Number.toString(this.step),
+      "max": $Number.toString(this.max),
+      "min": $Number.toString(this.min),
+      "disabled": this.disabled,
+      "onChange": (event => (this.changed.bind(this))(_normalizeEvent(event))),
+      "type": `range`,
+      className: `ui-slider-base`,
+      style: {
+        [`--ui-slider-base-webkit-slider-thumb-background-color`]: this.theme.colors.primary.background,
+        [`--ui-slider-base-webkit-slider-thumb-border-radius`]: this.theme.border.radius,
+        [`--ui-slider-base-moz-range-thumb-background-color`]: this.theme.colors.primary.background,
+        [`--ui-slider-base-moz-range-thumb-border-radius`]: this.theme.border.radius,
+        [`--ui-slider-base-ms-thumb-background-color`]: this.theme.colors.primary.background,
+        [`--ui-slider-base-ms-thumb-border-radius`]: this.theme.border.radius,
+        [`--ui-slider-base-focus-webkit-slider-thumb-background-color`]: this.theme.hover.color,
+        [`--ui-slider-base-focus-moz-range-thumb-background-color`]: this.theme.hover.color,
+        [`--ui-slider-base-focus-ms-thumb-background-color`]: this.theme.hover.color,
+        [`--ui-slider-base-webkit-slider-runnable-track-background-color`]: this.theme.colors.input.background,
+        [`--ui-slider-base-webkit-slider-runnable-track-border`]: `1px solid ` + this.theme.border.color,
+        [`--ui-slider-base-webkit-slider-runnable-track-border-radius`]: this.theme.border.radius,
+        [`--ui-slider-base-moz-range-track-background-color`]: this.theme.colors.input.background,
+        [`--ui-slider-base-moz-range-track-border`]: `1px solid ` + this.theme.border.color,
+        [`--ui-slider-base-moz-range-track-border-radius`]: this.theme.border.radius,
+        [`--ui-slider-base-ms-track-background-color`]: this.theme.colors.input.background,
+        [`--ui-slider-base-ms-track-border`]: `1px solid ` + this.theme.border.color,
+        [`--ui-slider-base-ms-track-border-radius`]: this.theme.border.radius,
+        [`--ui-slider-base-focus-webkit-slider-runnable-track-box-shadow`]: `0 0 2px ` + this.theme.outline.fadedColor + ` inset,
+                          0 0 2px ` + this.theme.outline.fadedColor,
+        [`--ui-slider-base-focus-webkit-slider-runnable-track-border-color`]: this.theme.outline.color,
+        [`--ui-slider-base-focus-moz-range-track-box-shadow`]: `0 0 2px ` + this.theme.outline.fadedColor + ` inset,
+                          0 0 2px ` + this.theme.outline.fadedColor,
+        [`--ui-slider-base-focus-moz-range-track-border-color`]: this.theme.outline.color,
+        [`--ui-slider-base-focus-ms-track-box-shadow`]: `0 0 2px ` + this.theme.outline.fadedColor + ` inset,
+                          0 0 2px ` + this.theme.outline.fadedColor,
+        [`--ui-slider-base-focus-ms-track-border-color`]: this.theme.outline.color
+      }
+    })
+  }
+}
+
+$Ui_Slider.displayName = "Ui.Slider"
+
+$Ui_Slider.defaultProps = {
+  onChange: ((value) => {
+  return null
+  }),disabled: false,max: 100,value: 0,step: 1,min: 0
+}
+
+class $Ui_Icon_Path extends Component {
+  get pointerEvents() {
+    return (this.clickable ? `` : `none`)
+  }
+
+  get cursor() {
+    return (this.clickable ? `pointer` : ``)
+  }
+
+  get handler() {
+    return (this.clickable ? this.onClick : ((event) => {
+    return null
+    }))
+  }
+
+  get onClick () {
+    if (this.props.onClick != undefined) {
+      return this.props.onClick
+    } else {
+      return ((event) => {
+    return null
+    })
+    }
+  }
+
+  get clickable () {
+    if (this.props.clickable != undefined) {
+      return this.props.clickable
+    } else {
+      return true
+    }
+  }
+
+  get viewbox () {
+    if (this.props.viewbox != undefined) {
+      return this.props.viewbox
+    } else {
+      return ``
+    }
+  }
+
+  get height () {
+    if (this.props.height != undefined) {
+      return this.props.height
+    } else {
+      return ``
     }
   }
 
@@ -6189,7 +5632,15 @@ class $Ui_Toggle extends Component {
     if (this.props.width != undefined) {
       return this.props.width
     } else {
-      return 100
+      return ``
+    }
+  }
+
+  get path () {
+    if (this.props.path != undefined) {
+      return this.props.path
+    } else {
+      return ``
     }
   }
 
@@ -6203,137 +5654,195 @@ class $Ui_Toggle extends Component {
     $Ui._subscribe(this)
   }
 
-  toggle() {
-    return this.onChange($Bool.not(this.checked))
-  }
-
   render() {
-    return _createElement("button", {
-      "onClick": (event => (((event) => {
-      return this.toggle.bind(this)()
-      }))(_normalizeEvent(event))),
-      className: `ui-toggle-base`,
+    return _createElement("svg", {
+      "onClick": (event => (this.handler)(_normalizeEvent(event))),
+      "viewBox": this.viewbox,
+      "height": this.height,
+      "width": this.width,
+      className: `ui-icon-path-svg`,
       style: {
-        [`--ui-toggle-base-background-color`]: this.theme.colors.input.background,
-        [`--ui-toggle-base-border`]: `1px solid ` + this.theme.border.color,
-        [`--ui-toggle-base-border-radius`]: this.theme.border.radius,
-        [`--ui-toggle-base-color`]: this.theme.colors.input.text,
-        [`--ui-toggle-base-font-family`]: this.theme.fontFamily,
-        [`--ui-toggle-base-width`]: this.width + `px`,
-        [`--ui-toggle-base-focus-box-shadow`]: `0 0 2px ` + this.theme.outline.fadedColor + ` inset,
-                          0 0 2px ` + this.theme.outline.fadedColor,
-        [`--ui-toggle-base-focus-border-color`]: this.theme.outline.color,
-        [`--ui-toggle-base-focus-color`]: this.theme.outline.color,
-        [`--ui-toggle-base-disabled-background`]: this.theme.colors.disabled.background,
-        [`--ui-toggle-base-disabled-color`]: this.theme.colors.disabled.text
+        [`--ui-icon-path-svg-pointer-events`]: this.pointerEvents,
+        [`--ui-icon-path-svg-hover-fill`]: this.theme.hover.color,
+        [`--ui-icon-path-svg-hover-cursor`]: this.cursor
       }
-    }, [_createElement("div", {
-      className: `ui-toggle-label`,
-      style: {
-
-      }
-    }, [this.onLabel]), _createElement("div", {
-      className: `ui-toggle-label`,
-      style: {
-
-      }
-    }, [this.offLabel]), _createElement("div", {
-      className: `ui-toggle-overlay`,
-      style: {
-        [`--ui-toggle-overlay-background`]: this.theme.colors.primary.background,
-        [`--ui-toggle-overlay-border-radius`]: this.theme.border.radius,
-        [`--ui-toggle-overlay-left`]: this.left
-      }
+    }, [_createElement("path", {
+      "d": this.path
     })])
   }
 }
 
-$Ui_Toggle.displayName = "Ui.Toggle"
+$Ui_Icon_Path.displayName = "Ui.Icon.Path"
 
-$Ui_Toggle.defaultProps = {
-  onChange: ((value) => {
+$Ui_Icon_Path.defaultProps = {
+  onClick: ((event) => {
   return null
-  }),offLabel: `OFF`,onLabel: `ON`,disabled: false,readonly: false,checked: false,width: 100
+  }),clickable: true,viewbox: ``,height: ``,width: ``,path: ``
 }
 
-class $Ui_Calendar_Cell extends Component {
-  get colors() {
-    return (this.selected ? this.theme.colors.primary : this.theme.colors.inputSecondary)
+class $Ui_Toolbar_Separator extends Component {
+  render() {
+    return _createElement("div", {
+      className: `ui-toolbar-separator-base`,
+      style: {
+
+      }
+    })
+  }
+}
+
+$Ui_Toolbar_Separator.displayName = "Ui.Toolbar.Separator"
+
+class $Ui_Pagination extends Component {
+  get pages() {
+    return $Math.floor($Math.max(this.total - 1, 0) / this.perPage)
   }
 
-  get opacity() {
-    return (this.active ? `1` : `0.25`)
+  get buttonRange() {
+    return $Array.range($Math.max(1, this.page - this.sidePages), $Math.min(this.page + this.sidePages + 1, this.pages))
   }
 
-  get onClick () {
-    if (this.props.onClick != undefined) {
-      return this.props.onClick
+  get buttons() {
+    return $Array.map(((index) => {
+    return _createElement($Ui_Button, { "onClick": ((event) => {
+    return this.onChange(index)
+    }), "label": $Number.toString(index + 1), "key": $Number.toString(index), "outline": !_compare(index, this.page) })
+    }), this.buttonRange)
+  }
+
+  get previousButton() {
+    return (!_compare(this.page, 0) && this.pages > 0 ? _createElement($Ui_Button, { "onClick": ((event) => {
+    return this.onChange(this.page - 1)
+    }), "outline": true, "label": `Prev` }) : $Html.empty())
+  }
+
+  get nextButton() {
+    return (!_compare(this.page, this.pages) && this.pages > 0 ? _createElement($Ui_Button, { "onClick": ((event) => {
+    return this.onChange(this.page + 1)
+    }), "outline": true, "label": `Next` }) : $Html.empty())
+  }
+
+  get leftDots() {
+    return (this.sidePages < (this.page - 1) && this.pages > 0 ? _createElement("span", {
+      className: `ui-pagination-span`,
+      style: {
+
+      }
+    }) : $Html.empty())
+  }
+
+  get rightDots() {
+    return ((this.page + this.sidePages + 1 < this.pages) && this.pages > 0 ? _createElement("span", {
+      className: `ui-pagination-span`,
+      style: {
+
+      }
+    }) : $Html.empty())
+  }
+
+  get rightButton() {
+    return (this.pages > 1 ? _createElement($Ui_Button, { "onClick": ((event) => {
+    return this.onChange(this.pages)
+    }), "label": $Number.toString(this.pages + 1), "outline": !_compare(this.page, this.pages) }) : $Html.empty())
+  }
+
+  get leftButton() {
+    return (this.pages >= 1 ? _createElement($Ui_Button, { "onClick": ((event) => {
+    return this.onChange(0)
+    }), "outline": !_compare(this.page, 0), "label": `1` }) : $Html.empty())
+  }
+
+  get onChange () {
+    if (this.props.onChange != undefined) {
+      return this.props.onChange
     } else {
-      return ((day) => {
+      return ((page) => {
     return null
     })
     }
   }
 
-  get day () {
-    if (this.props.day != undefined) {
-      return this.props.day
+  get sidePages () {
+    if (this.props.sidePages != undefined) {
+      return this.props.sidePages
     } else {
-      return $Time.now()
+      return 2
     }
   }
 
-  get selected () {
-    if (this.props.selected != undefined) {
-      return this.props.selected
+  get perPage () {
+    if (this.props.perPage != undefined) {
+      return this.props.perPage
     } else {
-      return false
+      return 10
     }
   }
 
-  get active () {
-    if (this.props.active != undefined) {
-      return this.props.active
+  get total () {
+    if (this.props.total != undefined) {
+      return this.props.total
     } else {
-      return false
+      return 0
     }
   }
 
-  get theme () { return $Ui.theme }
-
-  componentWillUnmount () {
-    $Ui._unsubscribe(this)
-  }
-
-  componentDidMount () {
-    $Ui._subscribe(this)
+  get page () {
+    if (this.props.page != undefined) {
+      return this.props.page
+    } else {
+      return 0
+    }
   }
 
   render() {
     return _createElement("div", {
-      "title": $Time.format(`YYYY-MM-DD HH:mm:ss`, this.day),
-      "onClick": (event => (((event) => {
-      return this.onClick(this.day)
-      }))(_normalizeEvent(event))),
-      className: `ui-calendar-cell-style`,
+      className: `ui-pagination-base`,
       style: {
-        [`--ui-calendar-cell-style-border-radius`]: this.theme.border.radius,
-        [`--ui-calendar-cell-style-background`]: this.colors.background,
-        [`--ui-calendar-cell-style-color`]: this.colors.text,
-        [`--ui-calendar-cell-style-opacity`]: this.opacity,
-        [`--ui-calendar-cell-style-hover-background`]: this.theme.colors.primary.background,
-        [`--ui-calendar-cell-style-hover-color`]: this.theme.colors.primary.text
+
       }
-    }, [$Number.toString($Time.day(this.day))])
+    }, [this.previousButton, this.leftButton, this.leftDots, this.buttons, this.rightDots, this.rightButton, this.nextButton])
   }
 }
 
-$Ui_Calendar_Cell.displayName = "Ui.Calendar.Cell"
+$Ui_Pagination.displayName = "Ui.Pagination"
 
-$Ui_Calendar_Cell.defaultProps = {
-  onClick: ((day) => {
+$Ui_Pagination.defaultProps = {
+  onChange: ((page) => {
   return null
-  }),day: $Time.now(),selected: false,active: false
+  }),sidePages: 2,perPage: 10,total: 0,page: 0
+}
+
+class $Ui_Toolbar_Title extends Component {
+  get children () {
+    if (this.props.children != undefined) {
+      return this.props.children
+    } else {
+      return []
+    }
+  }
+
+  get href () {
+    if (this.props.href != undefined) {
+      return this.props.href
+    } else {
+      return ``
+    }
+  }
+
+  render() {
+    return _createElement("div", {
+      className: `ui-toolbar-title-base`,
+      style: {
+
+      }
+    }, [_createElement($Ui_Link, { "href": this.href }, _array(this.children))])
+  }
+}
+
+$Ui_Toolbar_Title.displayName = "Ui.Toolbar.Title"
+
+$Ui_Toolbar_Title.defaultProps = {
+  children: [],href: ``
 }
 
 class $Ui_Input extends Component {
@@ -6514,352 +6023,244 @@ $Ui_Input.defaultProps = {
   })
 }
 
-class $Ui_Card extends Component {
-  get children () {
-    if (this.props.children != undefined) {
-      return this.props.children
-    } else {
-      return []
-    }
-  }
-
-  render() {
-    return _createElement("div", {
-      className: `ui-card-base`,
-      style: {
-
-      }
-    }, [this.children])
-  }
-}
-
-$Ui_Card.displayName = "Ui.Card"
-
-$Ui_Card.defaultProps = {
-  children: []
-}
-
-class $Ui_Card_Image extends Component {
-  get src () {
-    if (this.props.src != undefined) {
-      return this.props.src
-    } else {
-      return ``
-    }
-  }
-
-  render() {
-    return _createElement("img", {
-      "src": this.src,
-      className: `ui-card-image-base`,
-      style: {
-
-      }
-    })
-  }
-}
-
-$Ui_Card_Image.displayName = "Ui.Card.Image"
-
-$Ui_Card_Image.defaultProps = {
-  src: ``
-}
-
-class $Ui_Card_Block extends Component {
-  get children () {
-    if (this.props.children != undefined) {
-      return this.props.children
-    } else {
-      return []
-    }
-  }
-
-  render() {
-    return _createElement("div", {
-      className: `ui-card-block-base`,
-      style: {
-
-      }
-    }, [this.children])
-  }
-}
-
-$Ui_Card_Block.displayName = "Ui.Card.Block"
-
-$Ui_Card_Block.defaultProps = {
-  children: []
-}
-
-class $Ui_Card_Title extends Component {
-  get children () {
-    if (this.props.children != undefined) {
-      return this.props.children
-    } else {
-      return []
-    }
-  }
-
-  render() {
-    return _createElement("div", {
-      className: `ui-card-title-base`,
-      style: {
-
-      }
-    }, [this.children])
-  }
-}
-
-$Ui_Card_Title.displayName = "Ui.Card.Title"
-
-$Ui_Card_Title.defaultProps = {
-  children: []
-}
-
-class $Ui_Card_Text extends Component {
-  get children () {
-    if (this.props.children != undefined) {
-      return this.props.children
-    } else {
-      return []
-    }
-  }
-
-  render() {
-    return _createElement("div", {
-      className: `ui-card-text-base`,
-      style: {
-
-      }
-    }, [this.children])
-  }
-}
-
-$Ui_Card_Text.displayName = "Ui.Card.Text"
-
-$Ui_Card_Text.defaultProps = {
-  children: []
-}
-
-class $Ui_Toolbar_Separator extends Component {
-  render() {
-    return _createElement("div", {
-      className: `ui-toolbar-separator-base`,
-      style: {
-
-      }
-    })
-  }
-}
-
-$Ui_Toolbar_Separator.displayName = "Ui.Toolbar.Separator"
-
-class $Ui_Table extends Component {
-  get headers () {
-    if (this.props.headers != undefined) {
-      return this.props.headers
-    } else {
-      return []
-    }
-  }
-
-  get rows () {
-    if (this.props.rows != undefined) {
-      return this.props.rows
-    } else {
-      return []
-    }
-  }
-
-  render() {
-    return _createElement("table", {}, [_createElement("thead", {}, [this.headers])])
-  }
-}
-
-$Ui_Table.displayName = "Ui.Table"
-
-$Ui_Table.defaultProps = {
-  headers: [],rows: []
-}
-
-class $Ui_Form_Label extends Component {
-  get fontSize () {
-    if (this.props.fontSize != undefined) {
-      return this.props.fontSize
-    } else {
-      return 16
-    }
-  }
-
-  get text () {
-    if (this.props.text != undefined) {
-      return this.props.text
-    } else {
-      return ``
-    }
-  }
-
-  get theme () { return $Ui.theme }
-
-  componentWillUnmount () {
-    $Ui._unsubscribe(this)
-  }
-
-  componentDidMount () {
-    $Ui._subscribe(this)
-  }
-
-  render() {
-    return _createElement("div", {
-      className: `ui-form-label-base`,
-      style: {
-        [`--ui-form-label-base-font-size`]: $Number.toString(this.fontSize) + `px`,
-        [`--ui-form-label-base-font-family`]: this.theme.fontFamily
-      }
-    }, [this.text])
-  }
-}
-
-$Ui_Form_Label.displayName = "Ui.Form.Label"
-
-$Ui_Form_Label.defaultProps = {
-  fontSize: 16,text: ``
-}
-
-class $Ui_Toolbar_Title extends Component {
-  get children () {
-    if (this.props.children != undefined) {
-      return this.props.children
-    } else {
-      return []
-    }
-  }
-
-  get href () {
-    if (this.props.href != undefined) {
-      return this.props.href
-    } else {
-      return ``
-    }
-  }
-
-  render() {
-    return _createElement("div", {
-      className: `ui-toolbar-title-base`,
-      style: {
-
-      }
-    }, [_createElement($Ui_Link, { "href": this.href }, _array(this.children))])
-  }
-}
-
-$Ui_Toolbar_Title.displayName = "Ui.Toolbar.Title"
-
-$Ui_Toolbar_Title.defaultProps = {
-  children: [],href: ``
-}
-
-class $Ui_Icon_Path extends Component {
+class $Ui_Pager_Page extends Component {
   get pointerEvents() {
-    return (this.clickable ? `` : `none`)
+    return (_compare(this.transition, `fade`) && _compare(this.opacity, 0) ? `none` : ``)
   }
 
-  get cursor() {
-    return (this.clickable ? `pointer` : ``)
+  get transform() {
+    return (_compare(this.transition, `slide`) ? `translate3d(0,0,0) translateX(` + $Number.toString(this.position) + `%)` : ``)
   }
 
-  get handler() {
-    return (this.clickable ? this.onClick : ((event) => {
-    return null
-    }))
+  get opacity() {
+    return (_compare(this.transition, `fade`) ? 1 - $Math.abs(this.position) / 100 : 1)
   }
 
-  get onClick () {
-    if (this.props.onClick != undefined) {
-      return this.props.onClick
+  get transitionDuration() {
+    return (this.transitioning ? this.duration : 0)
+  }
+
+  get transition () {
+    if (this.props.transition != undefined) {
+      return this.props.transition
     } else {
-      return ((event) => {
-    return null
-    })
+      return `slide`
     }
   }
 
-  get clickable () {
-    if (this.props.clickable != undefined) {
-      return this.props.clickable
+  get transitioning () {
+    if (this.props.transitioning != undefined) {
+      return this.props.transitioning
     } else {
-      return true
+      return false
     }
   }
 
-  get viewbox () {
-    if (this.props.viewbox != undefined) {
-      return this.props.viewbox
+  get children () {
+    if (this.props.children != undefined) {
+      return this.props.children
     } else {
-      return ``
+      return []
     }
   }
 
-  get height () {
-    if (this.props.height != undefined) {
-      return this.props.height
+  get duration () {
+    if (this.props.duration != undefined) {
+      return this.props.duration
     } else {
-      return ``
+      return 1000
     }
   }
 
-  get width () {
-    if (this.props.width != undefined) {
-      return this.props.width
+  get position () {
+    if (this.props.position != undefined) {
+      return this.props.position
     } else {
-      return ``
+      return 0
     }
-  }
-
-  get path () {
-    if (this.props.path != undefined) {
-      return this.props.path
-    } else {
-      return ``
-    }
-  }
-
-  get theme () { return $Ui.theme }
-
-  componentWillUnmount () {
-    $Ui._unsubscribe(this)
-  }
-
-  componentDidMount () {
-    $Ui._subscribe(this)
   }
 
   render() {
-    return _createElement("svg", {
-      "onClick": (event => (this.handler)(_normalizeEvent(event))),
-      "viewBox": this.viewbox,
-      "height": this.height,
-      "width": this.width,
-      className: `ui-icon-path-svg`,
+    return _createElement("div", {
+      className: `ui-pager-page-base`,
       style: {
-        [`--ui-icon-path-svg-pointer-events`]: this.pointerEvents,
-        [`--ui-icon-path-svg-hover-fill`]: this.theme.hover.color,
-        [`--ui-icon-path-svg-hover-cursor`]: this.cursor
+        [`--ui-pager-page-base-transition`]: this.transitionDuration + `ms`,
+        [`--ui-pager-page-base-pointer-events`]: this.pointerEvents,
+        [`--ui-pager-page-base-transform`]: this.transform,
+        [`--ui-pager-page-base-opacity`]: this.opacity
       }
-    }, [_createElement("path", {
-      "d": this.path
-    })])
+    }, [this.children])
   }
 }
 
-$Ui_Icon_Path.displayName = "Ui.Icon.Path"
+$Ui_Pager_Page.displayName = "Ui.Pager.Page"
 
-$Ui_Icon_Path.defaultProps = {
-  onClick: ((event) => {
-  return null
-  }),clickable: true,viewbox: ``,height: ``,width: ``,path: ``
+$Ui_Pager_Page.defaultProps = {
+  transition: `slide`,transitioning: false,children: [],duration: 1000,position: 0
 }
 
-class $Ui_Toolbar_Link extends Component {
+class $Ui_Pager extends Component {
+  constructor(props) {
+    super(props)
+    this.state = new Record({
+      transitioning: false,
+      left: ``,
+      center: ``
+    })
+  }
+
+  get isPage() {
+    return $Array.any(((item) => {
+    return _compare(item.name, this.state.center)
+    }), this.pages)
+  }
+
+  get hasPage() {
+    return $Array.any(((item) => {
+    return _compare(item.name, this.active)
+    }), this.pages)
+  }
+
+  get pages () {
+    if (this.props.pages != undefined) {
+      return this.props.pages
+    } else {
+      return []
+    }
+  }
+
+  get transition () {
+    if (this.props.transition != undefined) {
+      return this.props.transition
+    } else {
+      return `slide`
+    }
+  }
+
+  get duration () {
+    if (this.props.duration != undefined) {
+      return this.props.duration
+    } else {
+      return 1000
+    }
+  }
+
+  get active () {
+    if (this.props.active != undefined) {
+      return this.props.active
+    } else {
+      return ``
+    }
+  }
+
+  componentDidUpdate() {
+    return (!_compare(this.state.center, this.active) && this.hasPage ? (this.isPage ? this.switchPages.bind(this)() : new Promise((_resolve) => {
+      this.setState(_update(this.state, { center: this.active }), _resolve)
+    })) : null)
+  }
+
+  switchPages() {
+    return (async () => {
+      try {
+         await new Promise((_resolve) => {
+      this.setState(_update(this.state, { left: this.state.center, center: this.active, transitioning: true }), _resolve)
+    })
+
+     await (async ()=> {
+      try {
+        return await $Timer.timeout(this.duration, `a`)
+      } catch(_error) {
+        
+
+        throw new DoError
+      }
+    })()
+
+     await new Promise((_resolve) => {
+      this.setState(_update(this.state, { transitioning: false, left: `` }), _resolve)
+    })
+      }
+      catch(_error) {
+        if (_error instanceof DoError) {
+        } else {
+          console.warn(`Unhandled error in do statement`)
+          console.log(_error)
+        }
+      } 
+    })()
+  }
+
+  renderPage(item) {
+    let transitioning = (_compare(this.state.left, item.name) || _compare(this.state.center, item.name)) && this.state.transitioning
+
+    let position = (_compare(this.state.left, item.name) ? -100 : (_compare(this.state.center, item.name) ? 0 : 100))
+
+    return _createElement($Ui_Pager_Page, { "transitioning": transitioning, "transition": this.transition, "position": position, "duration": this.duration }, _array(item.contents))
+  }
+
+  render() {
+    return _createElement("div", {
+      className: `ui-pager-base`,
+      style: {
+
+      }
+    }, [$Array.map(this.renderPage.bind(this), this.pages)])
+  }
+}
+
+$Ui_Pager.displayName = "Ui.Pager"
+
+$Ui_Pager.defaultProps = {
+  pages: [],transition: `slide`,duration: 1000,active: ``
+}
+
+class $Ui_Link extends Component {
+  get colors() {
+    return (() => {
+      let __condition = this.type
+
+       if (_compare(__condition, `secondary`)) {
+        return this.theme.colors.secondary
+      } else if (_compare(__condition, `warning`)) {
+        return this.theme.colors.warning
+      } else if (_compare(__condition, `success`)) {
+        return this.theme.colors.success
+      } else if (_compare(__condition, `primary`)) {
+        return this.theme.colors.primary
+      } else if (_compare(__condition, `danger`)) {
+        return this.theme.colors.danger
+      } else if (_compare(__condition, `inherit`)) {
+        return new Record({
+        background: `inherit`,
+        focus: `inherit`,
+        text: `inherit`
+      })
+      } else {
+        return new Record({
+        background: ``,
+        focus: ``,
+        text: ``
+      })
+      }
+    })()
+  }
+
+  get children () {
+    if (this.props.children != undefined) {
+      return this.props.children
+    } else {
+      return []
+    }
+  }
+
+  get type () {
+    if (this.props.type != undefined) {
+      return this.props.type
+    } else {
+      return `primary`
+    }
+  }
+
   get target () {
     if (this.props.target != undefined) {
       return this.props.target
@@ -6884,34 +6285,348 @@ class $Ui_Toolbar_Link extends Component {
     }
   }
 
-  render() {
-    return _createElement("div", {
-      className: `ui-toolbar-link-base`,
-      style: {
+  get theme () { return $Ui.theme }
 
+  componentWillUnmount () {
+    $Ui._unsubscribe(this)
+  }
+
+  componentDidMount () {
+    $Ui._subscribe(this)
+  }
+
+  render() {
+    return _createElement("a", {
+      "target": this.target,
+      "href": this.href,
+      className: `ui-link-base`,
+      style: {
+        [`--ui-link-base-color`]: this.colors.background,
+        [`--ui-link-base-hover-color`]: this.colors.focus,
+        [`--ui-link-base-focus-color`]: this.colors.focus
       }
-    }, [_createElement($Ui_Link, { "target": this.target, "label": this.label, "href": this.href })])
+    }, [this.label, this.children])
   }
 }
 
-$Ui_Toolbar_Link.displayName = "Ui.Toolbar.Link"
+$Ui_Link.displayName = "Ui.Link"
 
-$Ui_Toolbar_Link.defaultProps = {
-  target: ``,label: ``,href: ``
+$Ui_Link.defaultProps = {
+  children: [],type: `primary`,target: ``,label: ``,href: ``
 }
 
-class $Ui_Toolbar_Spacer extends Component {
+class $Ui_Loader extends Component {
+  get pointerEvents() {
+    return (this.shown ? `` : `none`)
+  }
+
+  get opacity() {
+    return (this.shown ? 1 : 0)
+  }
+
+  get children () {
+    if (this.props.children != undefined) {
+      return this.props.children
+    } else {
+      return []
+    }
+  }
+
+  get shown () {
+    if (this.props.shown != undefined) {
+      return this.props.shown
+    } else {
+      return false
+    }
+  }
+
   render() {
     return _createElement("div", {
-      className: `ui-toolbar-spacer-base`,
+      className: `ui-loader-base`,
       style: {
 
       }
+    }, [this.children, _createElement("div", {
+      className: `ui-loader-loader`,
+      style: {
+        [`--ui-loader-loader-pointer-events`]: this.pointerEvents,
+        [`--ui-loader-loader-opacity`]: this.opacity
+      }
+    }, [`Loading...`])])
+  }
+}
+
+$Ui_Loader.displayName = "Ui.Loader"
+
+$Ui_Loader.defaultProps = {
+  children: [],shown: false
+}
+
+class $Ui_Toggle extends Component {
+  get left() {
+    return (this.checked ? `2px` : `50%`)
+  }
+
+  get onChange () {
+    if (this.props.onChange != undefined) {
+      return this.props.onChange
+    } else {
+      return ((value) => {
+    return null
+    })
+    }
+  }
+
+  get offLabel () {
+    if (this.props.offLabel != undefined) {
+      return this.props.offLabel
+    } else {
+      return `OFF`
+    }
+  }
+
+  get onLabel () {
+    if (this.props.onLabel != undefined) {
+      return this.props.onLabel
+    } else {
+      return `ON`
+    }
+  }
+
+  get disabled () {
+    if (this.props.disabled != undefined) {
+      return this.props.disabled
+    } else {
+      return false
+    }
+  }
+
+  get readonly () {
+    if (this.props.readonly != undefined) {
+      return this.props.readonly
+    } else {
+      return false
+    }
+  }
+
+  get checked () {
+    if (this.props.checked != undefined) {
+      return this.props.checked
+    } else {
+      return false
+    }
+  }
+
+  get width () {
+    if (this.props.width != undefined) {
+      return this.props.width
+    } else {
+      return 100
+    }
+  }
+
+  get theme () { return $Ui.theme }
+
+  componentWillUnmount () {
+    $Ui._unsubscribe(this)
+  }
+
+  componentDidMount () {
+    $Ui._subscribe(this)
+  }
+
+  toggle() {
+    return this.onChange($Bool.not(this.checked))
+  }
+
+  render() {
+    return _createElement("button", {
+      "onClick": (event => (((event) => {
+      return this.toggle.bind(this)()
+      }))(_normalizeEvent(event))),
+      className: `ui-toggle-base`,
+      style: {
+        [`--ui-toggle-base-background-color`]: this.theme.colors.input.background,
+        [`--ui-toggle-base-border`]: `1px solid ` + this.theme.border.color,
+        [`--ui-toggle-base-border-radius`]: this.theme.border.radius,
+        [`--ui-toggle-base-color`]: this.theme.colors.input.text,
+        [`--ui-toggle-base-font-family`]: this.theme.fontFamily,
+        [`--ui-toggle-base-width`]: this.width + `px`,
+        [`--ui-toggle-base-focus-box-shadow`]: `0 0 2px ` + this.theme.outline.fadedColor + ` inset,
+                          0 0 2px ` + this.theme.outline.fadedColor,
+        [`--ui-toggle-base-focus-border-color`]: this.theme.outline.color,
+        [`--ui-toggle-base-focus-color`]: this.theme.outline.color,
+        [`--ui-toggle-base-disabled-background`]: this.theme.colors.disabled.background,
+        [`--ui-toggle-base-disabled-color`]: this.theme.colors.disabled.text
+      }
+    }, [_createElement("div", {
+      className: `ui-toggle-label`,
+      style: {
+
+      }
+    }, [this.onLabel]), _createElement("div", {
+      className: `ui-toggle-label`,
+      style: {
+
+      }
+    }, [this.offLabel]), _createElement("div", {
+      className: `ui-toggle-overlay`,
+      style: {
+        [`--ui-toggle-overlay-background`]: this.theme.colors.primary.background,
+        [`--ui-toggle-overlay-border-radius`]: this.theme.border.radius,
+        [`--ui-toggle-overlay-left`]: this.left
+      }
+    })])
+  }
+}
+
+$Ui_Toggle.displayName = "Ui.Toggle"
+
+$Ui_Toggle.defaultProps = {
+  onChange: ((value) => {
+  return null
+  }),offLabel: `OFF`,onLabel: `ON`,disabled: false,readonly: false,checked: false,width: 100
+}
+
+class $Ui_Time extends Component {
+  constructor(props) {
+    super(props)
+    this.state = new Record({
+      now: $Time.now()
     })
   }
+
+  get date () {
+    if (this.props.date != undefined) {
+      return this.props.date
+    } else {
+      return $Time.now()
+    }
+  }
+
+  componentWillUnmount () {
+    $Provider_Tick._unsubscribe(this)
+  }
+
+  componentDidUpdate () {
+    if (true) {
+      $Provider_Tick._subscribe(this, new Record({
+      ticks: (() => {
+      return new Promise((_resolve) => {
+        this.setState(new Record({
+        now: $Time.now()
+      }), _resolve)
+      })
+      })
+    }))
+    } else {
+      $Provider_Tick._unsubscribe(this)
+    }
+  }
+
+  componentDidMount () {
+    if (true) {
+      $Provider_Tick._subscribe(this, new Record({
+      ticks: (() => {
+      return new Promise((_resolve) => {
+        this.setState(new Record({
+        now: $Time.now()
+      }), _resolve)
+      })
+      })
+    }))
+    } else {
+      $Provider_Tick._unsubscribe(this)
+    }
+  }
+
+  render() {
+    return _createElement("div", {
+      "title": $Time.toIso(this.date),
+      className: `ui-time-base`,
+      style: {
+
+      }
+    }, [$Time.relative(this.date, this.state.now)])
+  }
 }
 
-$Ui_Toolbar_Spacer.displayName = "Ui.Toolbar.Spacer"
+$Ui_Time.displayName = "Ui.Time"
+
+$Ui_Time.defaultProps = {
+  date: $Time.now()
+}
+
+class $Ui_Table_Td extends Component {
+  get borderBottom() {
+    return (this.header ? `2px solid ` + this.theme.border.color : ``)
+  }
+
+  get fontWeight() {
+    return (this.header ? `bold` : `normal`)
+  }
+
+  get children () {
+    if (this.props.children != undefined) {
+      return this.props.children
+    } else {
+      return []
+    }
+  }
+
+  get align () {
+    if (this.props.align != undefined) {
+      return this.props.align
+    } else {
+      return `left`
+    }
+  }
+
+  get width () {
+    if (this.props.width != undefined) {
+      return this.props.width
+    } else {
+      return `auto`
+    }
+  }
+
+  get header () {
+    if (this.props.header != undefined) {
+      return this.props.header
+    } else {
+      return false
+    }
+  }
+
+  get theme () { return $Ui.theme }
+
+  componentWillUnmount () {
+    $Ui._unsubscribe(this)
+  }
+
+  componentDidMount () {
+    $Ui._subscribe(this)
+  }
+
+  render() {
+    return _createElement("td", {
+      className: `ui-table-td-td`,
+      style: {
+        [`--ui-table-td-td-border`]: `1px solid ` + this.theme.border.color,
+        [`--ui-table-td-td-border-bottom`]: this.borderBottom,
+        [`--ui-table-td-td-font-weight`]: this.fontWeight,
+        [`--ui-table-td-td-text-align`]: this.align,
+        [`--ui-table-td-td-width`]: this.width
+      }
+    }, [this.children])
+  }
+}
+
+$Ui_Table_Td.displayName = "Ui.Table.Td"
+
+$Ui_Table_Td.defaultProps = {
+  children: [],align: `left`,width: `auto`,header: false
+}
 
 class $Ui_Button extends Component {
   get flexDirection() {
@@ -7125,7 +6840,438 @@ $Ui_Button.defaultProps = {
   })
 }
 
-class $Ui_Slider extends Component {
+class $Ui_Card extends Component {
+  get children () {
+    if (this.props.children != undefined) {
+      return this.props.children
+    } else {
+      return []
+    }
+  }
+
+  render() {
+    return _createElement("div", {
+      className: `ui-card-base`,
+      style: {
+
+      }
+    }, [this.children])
+  }
+}
+
+$Ui_Card.displayName = "Ui.Card"
+
+$Ui_Card.defaultProps = {
+  children: []
+}
+
+class $Ui_Card_Image extends Component {
+  get src () {
+    if (this.props.src != undefined) {
+      return this.props.src
+    } else {
+      return ``
+    }
+  }
+
+  render() {
+    return _createElement("img", {
+      "src": this.src,
+      className: `ui-card-image-base`,
+      style: {
+
+      }
+    })
+  }
+}
+
+$Ui_Card_Image.displayName = "Ui.Card.Image"
+
+$Ui_Card_Image.defaultProps = {
+  src: ``
+}
+
+class $Ui_Card_Block extends Component {
+  get children () {
+    if (this.props.children != undefined) {
+      return this.props.children
+    } else {
+      return []
+    }
+  }
+
+  render() {
+    return _createElement("div", {
+      className: `ui-card-block-base`,
+      style: {
+
+      }
+    }, [this.children])
+  }
+}
+
+$Ui_Card_Block.displayName = "Ui.Card.Block"
+
+$Ui_Card_Block.defaultProps = {
+  children: []
+}
+
+class $Ui_Card_Title extends Component {
+  get children () {
+    if (this.props.children != undefined) {
+      return this.props.children
+    } else {
+      return []
+    }
+  }
+
+  render() {
+    return _createElement("div", {
+      className: `ui-card-title-base`,
+      style: {
+
+      }
+    }, [this.children])
+  }
+}
+
+$Ui_Card_Title.displayName = "Ui.Card.Title"
+
+$Ui_Card_Title.defaultProps = {
+  children: []
+}
+
+class $Ui_Card_Text extends Component {
+  get children () {
+    if (this.props.children != undefined) {
+      return this.props.children
+    } else {
+      return []
+    }
+  }
+
+  render() {
+    return _createElement("div", {
+      className: `ui-card-text-base`,
+      style: {
+
+      }
+    }, [this.children])
+  }
+}
+
+$Ui_Card_Text.displayName = "Ui.Card.Text"
+
+$Ui_Card_Text.defaultProps = {
+  children: []
+}
+
+class $Ui_Calendar_Cell extends Component {
+  get colors() {
+    return (this.selected ? this.theme.colors.primary : this.theme.colors.inputSecondary)
+  }
+
+  get opacity() {
+    return (this.active ? `1` : `0.25`)
+  }
+
+  get onClick () {
+    if (this.props.onClick != undefined) {
+      return this.props.onClick
+    } else {
+      return ((day) => {
+    return null
+    })
+    }
+  }
+
+  get day () {
+    if (this.props.day != undefined) {
+      return this.props.day
+    } else {
+      return $Time.now()
+    }
+  }
+
+  get selected () {
+    if (this.props.selected != undefined) {
+      return this.props.selected
+    } else {
+      return false
+    }
+  }
+
+  get active () {
+    if (this.props.active != undefined) {
+      return this.props.active
+    } else {
+      return false
+    }
+  }
+
+  get theme () { return $Ui.theme }
+
+  componentWillUnmount () {
+    $Ui._unsubscribe(this)
+  }
+
+  componentDidMount () {
+    $Ui._subscribe(this)
+  }
+
+  render() {
+    return _createElement("div", {
+      "title": $Time.format(`YYYY-MM-DD HH:mm:ss`, this.day),
+      "onClick": (event => (((event) => {
+      return this.onClick(this.day)
+      }))(_normalizeEvent(event))),
+      className: `ui-calendar-cell-style`,
+      style: {
+        [`--ui-calendar-cell-style-border-radius`]: this.theme.border.radius,
+        [`--ui-calendar-cell-style-background`]: this.colors.background,
+        [`--ui-calendar-cell-style-color`]: this.colors.text,
+        [`--ui-calendar-cell-style-opacity`]: this.opacity,
+        [`--ui-calendar-cell-style-hover-background`]: this.theme.colors.primary.background,
+        [`--ui-calendar-cell-style-hover-color`]: this.theme.colors.primary.text
+      }
+    }, [$Number.toString($Time.day(this.day))])
+  }
+}
+
+$Ui_Calendar_Cell.displayName = "Ui.Calendar.Cell"
+
+$Ui_Calendar_Cell.defaultProps = {
+  onClick: ((day) => {
+  return null
+  }),day: $Time.now(),selected: false,active: false
+}
+
+class $Ui_Toolbar_Link extends Component {
+  get target () {
+    if (this.props.target != undefined) {
+      return this.props.target
+    } else {
+      return ``
+    }
+  }
+
+  get label () {
+    if (this.props.label != undefined) {
+      return this.props.label
+    } else {
+      return ``
+    }
+  }
+
+  get href () {
+    if (this.props.href != undefined) {
+      return this.props.href
+    } else {
+      return ``
+    }
+  }
+
+  render() {
+    return _createElement("div", {
+      className: `ui-toolbar-link-base`,
+      style: {
+
+      }
+    }, [_createElement($Ui_Link, { "target": this.target, "label": this.label, "href": this.href })])
+  }
+}
+
+$Ui_Toolbar_Link.displayName = "Ui.Toolbar.Link"
+
+$Ui_Toolbar_Link.defaultProps = {
+  target: ``,label: ``,href: ``
+}
+
+class $Ui_Dropdown extends Component {
+  constructor(props) {
+    super(props)
+    this.state = new Record({
+      uid: $Uid.generate(),
+      left: 0,
+      top: 0
+    })
+  }
+
+  get panel() {
+    return _createElement("div", {
+      "id": this.state.uid,
+      className: `ui-dropdown-panel`,
+      style: {
+        [`--ui-dropdown-panel-left`]: this.state.left + `px`,
+        [`--ui-dropdown-panel-top`]: this.state.top + `px`
+      }
+    }, [this.children])
+  }
+
+  get panelPortal() {
+    return (this.open ? _createElement($Html_Portals_Body, {  }, _array(this.panel)) : $Html.empty())
+  }
+
+  get element () {
+    if (this.props.element != undefined) {
+      return this.props.element
+    } else {
+      return $Html.empty()
+    }
+  }
+
+  get children () {
+    if (this.props.children != undefined) {
+      return this.props.children
+    } else {
+      return []
+    }
+  }
+
+  get open () {
+    if (this.props.open != undefined) {
+      return this.props.open
+    } else {
+      return true
+    }
+  }
+
+  componentWillUnmount () {
+    $Provider_Mouse._unsubscribe(this);$Provider_AnimationFrame._unsubscribe(this)
+  }
+
+  componentDidUpdate () {
+    if (this.open) {
+      $Provider_Mouse._subscribe(this, new Record({
+      clicks: ((event) => {
+      return null
+      }),
+      moves: ((data) => {
+      return null
+      }),
+      ups: ((data) => {
+      return null
+      })
+    }))
+    } else {
+      $Provider_Mouse._unsubscribe(this)
+    };if (this.open) {
+      $Provider_AnimationFrame._subscribe(this, new Record({
+      frames: this.updateDimensions.bind(this)
+    }))
+    } else {
+      $Provider_AnimationFrame._unsubscribe(this)
+    }
+  }
+
+  componentDidMount () {
+    if (this.open) {
+      $Provider_Mouse._subscribe(this, new Record({
+      clicks: ((event) => {
+      return null
+      }),
+      moves: ((data) => {
+      return null
+      }),
+      ups: ((data) => {
+      return null
+      })
+    }))
+    } else {
+      $Provider_Mouse._unsubscribe(this)
+    };if (this.open) {
+      $Provider_AnimationFrame._subscribe(this, new Record({
+      frames: this.updateDimensions.bind(this)
+    }))
+    } else {
+      $Provider_AnimationFrame._unsubscribe(this)
+    }
+  }
+
+  updateDimensions() {
+    let dom = $Maybe.withDefault($Dom.createElement(`div`), $Dom.getElementById(this.state.uid))
+
+    let width = $Window.width()
+
+    let height = $Window.height()
+
+    let panelDimensions = $Dom.getDimensions(dom)
+
+    let dimensions = $Dom.getDimensions(ReactDOM.findDOMNode(this))
+
+    let top = dimensions.top + dimensions.height
+
+    let left = dimensions.left
+
+    return new Promise((_resolve) => {
+      this.setState(_update(this.state, { top: top, left: left }), _resolve)
+    })
+  }
+
+  render() {
+    return [this.element, this.panelPortal]
+  }
+}
+
+$Ui_Dropdown.displayName = "Ui.Dropdown"
+
+$Ui_Dropdown.defaultProps = {
+  element: $Html.empty(),children: [],open: true
+}
+
+class $Ui_Form_Label extends Component {
+  get fontSize () {
+    if (this.props.fontSize != undefined) {
+      return this.props.fontSize
+    } else {
+      return 16
+    }
+  }
+
+  get text () {
+    if (this.props.text != undefined) {
+      return this.props.text
+    } else {
+      return ``
+    }
+  }
+
+  get theme () { return $Ui.theme }
+
+  componentWillUnmount () {
+    $Ui._unsubscribe(this)
+  }
+
+  componentDidMount () {
+    $Ui._subscribe(this)
+  }
+
+  render() {
+    return _createElement("div", {
+      className: `ui-form-label-base`,
+      style: {
+        [`--ui-form-label-base-font-size`]: $Number.toString(this.fontSize) + `px`,
+        [`--ui-form-label-base-font-family`]: this.theme.fontFamily
+      }
+    }, [this.text])
+  }
+}
+
+$Ui_Form_Label.displayName = "Ui.Form.Label"
+
+$Ui_Form_Label.defaultProps = {
+  fontSize: 16,text: ``
+}
+
+class $Ui_Checkbox extends Component {
+  get opacity() {
+    return (this.checked ? `1` : `0`)
+  }
+
+  get transform() {
+    return (this.checked ? `scale(1)` : `scale(0.4) rotate(45deg)`)
+  }
+
   get onChange () {
     if (this.props.onChange != undefined) {
       return this.props.onChange
@@ -7144,35 +7290,19 @@ class $Ui_Slider extends Component {
     }
   }
 
-  get max () {
-    if (this.props.max != undefined) {
-      return this.props.max
+  get readonly () {
+    if (this.props.readonly != undefined) {
+      return this.props.readonly
     } else {
-      return 100
+      return false
     }
   }
 
-  get value () {
-    if (this.props.value != undefined) {
-      return this.props.value
+  get checked () {
+    if (this.props.checked != undefined) {
+      return this.props.checked
     } else {
-      return 0
-    }
-  }
-
-  get step () {
-    if (this.props.step != undefined) {
-      return this.props.step
-    } else {
-      return 1
-    }
-  }
-
-  get min () {
-    if (this.props.min != undefined) {
-      return this.props.min
-    } else {
-      return 0
+      return false
     }
   }
 
@@ -7186,217 +7316,165 @@ class $Ui_Slider extends Component {
     $Ui._subscribe(this)
   }
 
-  changed(event) {
-    return this.onChange($Maybe.withDefault(0, $Number.fromString($Dom.getValue(event.target))))
+  toggle() {
+    return this.onChange($Bool.not(this.checked))
   }
 
   render() {
-    return _createElement("input", {
-      "value": $Number.toString(this.value),
-      "step": $Number.toString(this.step),
-      "max": $Number.toString(this.max),
-      "min": $Number.toString(this.min),
+    return _createElement("button", {
       "disabled": this.disabled,
-      "onChange": (event => (this.changed.bind(this))(_normalizeEvent(event))),
-      "type": `range`,
-      className: `ui-slider-base`,
+      "onClick": (event => (((event) => {
+      return this.toggle.bind(this)()
+      }))(_normalizeEvent(event))),
+      className: `ui-checkbox-base`,
       style: {
-        [`--ui-slider-base-webkit-slider-thumb-background-color`]: this.theme.colors.primary.background,
-        [`--ui-slider-base-webkit-slider-thumb-border-radius`]: this.theme.border.radius,
-        [`--ui-slider-base-moz-range-thumb-background-color`]: this.theme.colors.primary.background,
-        [`--ui-slider-base-moz-range-thumb-border-radius`]: this.theme.border.radius,
-        [`--ui-slider-base-ms-thumb-background-color`]: this.theme.colors.primary.background,
-        [`--ui-slider-base-ms-thumb-border-radius`]: this.theme.border.radius,
-        [`--ui-slider-base-focus-webkit-slider-thumb-background-color`]: this.theme.hover.color,
-        [`--ui-slider-base-focus-moz-range-thumb-background-color`]: this.theme.hover.color,
-        [`--ui-slider-base-focus-ms-thumb-background-color`]: this.theme.hover.color,
-        [`--ui-slider-base-webkit-slider-runnable-track-background-color`]: this.theme.colors.input.background,
-        [`--ui-slider-base-webkit-slider-runnable-track-border`]: `1px solid ` + this.theme.border.color,
-        [`--ui-slider-base-webkit-slider-runnable-track-border-radius`]: this.theme.border.radius,
-        [`--ui-slider-base-moz-range-track-background-color`]: this.theme.colors.input.background,
-        [`--ui-slider-base-moz-range-track-border`]: `1px solid ` + this.theme.border.color,
-        [`--ui-slider-base-moz-range-track-border-radius`]: this.theme.border.radius,
-        [`--ui-slider-base-ms-track-background-color`]: this.theme.colors.input.background,
-        [`--ui-slider-base-ms-track-border`]: `1px solid ` + this.theme.border.color,
-        [`--ui-slider-base-ms-track-border-radius`]: this.theme.border.radius,
-        [`--ui-slider-base-focus-webkit-slider-runnable-track-box-shadow`]: `0 0 2px ` + this.theme.outline.fadedColor + ` inset,
+        [`--ui-checkbox-base-background-color`]: this.theme.colors.input.background,
+        [`--ui-checkbox-base-border`]: `1px solid ` + this.theme.border.color,
+        [`--ui-checkbox-base-border-radius`]: this.theme.border.radius,
+        [`--ui-checkbox-base-color`]: this.theme.colors.input.text,
+        [`--ui-checkbox-base-focus-box-shadow`]: `0 0 2px ` + this.theme.outline.fadedColor + ` inset,
                           0 0 2px ` + this.theme.outline.fadedColor,
-        [`--ui-slider-base-focus-webkit-slider-runnable-track-border-color`]: this.theme.outline.color,
-        [`--ui-slider-base-focus-moz-range-track-box-shadow`]: `0 0 2px ` + this.theme.outline.fadedColor + ` inset,
-                          0 0 2px ` + this.theme.outline.fadedColor,
-        [`--ui-slider-base-focus-moz-range-track-border-color`]: this.theme.outline.color,
-        [`--ui-slider-base-focus-ms-track-box-shadow`]: `0 0 2px ` + this.theme.outline.fadedColor + ` inset,
-                          0 0 2px ` + this.theme.outline.fadedColor,
-        [`--ui-slider-base-focus-ms-track-border-color`]: this.theme.outline.color
+        [`--ui-checkbox-base-focus-border-color`]: this.theme.outline.color,
+        [`--ui-checkbox-base-focus-color`]: this.theme.outline.color,
+        [`--ui-checkbox-base-disabled-background`]: this.theme.colors.disabled.background,
+        [`--ui-checkbox-base-disabled-color`]: this.theme.colors.disabled.text
+      }
+    }, [_createElement("svg", {
+      "viewBox": `0 0 36 36`,
+      className: `ui-checkbox-icon`,
+      style: {
+        [`--ui-checkbox-icon-transform`]: this.transform,
+        [`--ui-checkbox-icon-opacity`]: this.opacity
+      }
+    }, [_createElement("path", {
+      "d": `M35.792 5.332L31.04 1.584c-.147-.12-.33-.208-.537-.208-.207 0-.398.087-.545.217l-17.286 22.21S5.877 17.27 5.687 17.08c-.19-.19-.442-.51-.822-.51-.38 0-.554.268-.753.467-.148.156-2.57 2.7-3.766 3.964-.07.077-.112.12-.173.18-.104.148-.173.313-.173.494 0 .19.07.347.173.494l.242.225s12.058 11.582 12.257 11.78c.2.2.442.45.797.45.345 0 .63-.37.795-.536l21.562-27.7c.104-.146.173-.31.173-.5 0-.217-.087-.4-.208-.555z`
+    })])])
+  }
+}
+
+$Ui_Checkbox.displayName = "Ui.Checkbox"
+
+$Ui_Checkbox.defaultProps = {
+  onChange: ((value) => {
+  return null
+  }),disabled: false,readonly: false,checked: false
+}
+
+class $Ui_Toolbar_Spacer extends Component {
+  render() {
+    return _createElement("div", {
+      className: `ui-toolbar-spacer-base`,
+      style: {
+
       }
     })
   }
 }
 
-$Ui_Slider.displayName = "Ui.Slider"
+$Ui_Toolbar_Spacer.displayName = "Ui.Toolbar.Spacer"
 
-$Ui_Slider.defaultProps = {
-  onChange: ((value) => {
-  return null
-  }),disabled: false,max: 100,value: 0,step: 1,min: 0
+class $Ui_Form_Separator extends Component {
+  render() {
+    return _createElement("div", {
+      className: `ui-form-separator-base`,
+      style: {
+
+      }
+    })
+  }
 }
 
-class $Ui_Pager_Page extends Component {
-  get pointerEvents() {
-    return (_compare(this.transition, `fade`) && _compare(this.opacity, 0) ? `none` : ``)
+$Ui_Form_Separator.displayName = "Ui.Form.Separator"
+
+class $Ui_Calendar extends Component {
+  get nextMonthIcon() {
+    return _createElement($Ui_Icon_Path, { "onClick": ((event) => {
+    return this.nextMonth.bind(this)()
+    }), "viewbox": `0 0 9 16`, "height": `16px`, "width": `9px`, "path": `M6 8L.1 1.78c-.14-.16-.14-.4.02-.57L1.17.13c.15-.16.4-.16.54 0l7.2 7.6c.07.07.1.18.1.28 0 .1-.03.2-.1.3l-7.2 7.6c-.14.14-.38.14-.53-.02l-1.05-1.1c-.16-.15-.16-.4 0-.56L5.98 8z` })
   }
 
-  get transform() {
-    return (_compare(this.transition, `slide`) ? `translate3d(0,0,0) translateX(` + $Number.toString(this.position) + `%)` : ``)
+  get previousMonthIcon() {
+    return _createElement($Ui_Icon_Path, { "onClick": ((event) => {
+    return this.previousMonth.bind(this)()
+    }), "viewbox": `0 0 9 16`, "height": `16px`, "width": `9px`, "path": `M3 8l5.9-6.22c.14-.16.14-.4-.02-.57L7.83.13c-.15-.16-.4-.16-.54 0L.1 7.7c-.07.07-.1.17-.1.28 0 .1.03.2.1.3l7.2 7.6c.14.14.38.14.53-.02l1.05-1.1c.16-.15.16-.4 0-.56L3.02 8z` })
   }
 
-  get opacity() {
-    return (_compare(this.transition, `fade`) ? 1 - $Math.abs(this.position) / 100 : 1)
-  }
-
-  get transitionDuration() {
-    return (this.transitioning ? this.duration : 0)
-  }
-
-  get transition () {
-    if (this.props.transition != undefined) {
-      return this.props.transition
+  get onMonthChange () {
+    if (this.props.onMonthChange != undefined) {
+      return this.props.onMonthChange
     } else {
-      return `slide`
+      return ((date) => {
+    return null
+    })
     }
   }
 
-  get transitioning () {
-    if (this.props.transitioning != undefined) {
-      return this.props.transitioning
+  get onChange () {
+    if (this.props.onChange != undefined) {
+      return this.props.onChange
+    } else {
+      return ((day) => {
+    return null
+    })
+    }
+  }
+
+  get changeMonthOnSelect () {
+    if (this.props.changeMonthOnSelect != undefined) {
+      return this.props.changeMonthOnSelect
     } else {
       return false
     }
   }
 
-  get children () {
-    if (this.props.children != undefined) {
-      return this.props.children
+  get month () {
+    if (this.props.month != undefined) {
+      return this.props.month
     } else {
-      return []
+      return $Time.today()
     }
   }
 
-  get duration () {
-    if (this.props.duration != undefined) {
-      return this.props.duration
+  get date () {
+    if (this.props.date != undefined) {
+      return this.props.date
     } else {
-      return 1000
+      return $Time.today()
     }
   }
 
-  get position () {
-    if (this.props.position != undefined) {
-      return this.props.position
+  get disabled () {
+    if (this.props.disabled != undefined) {
+      return this.props.disabled
     } else {
-      return 0
+      return false
     }
   }
 
-  render() {
-    return _createElement("div", {
-      className: `ui-pager-page-base`,
-      style: {
-        [`--ui-pager-page-base-transition`]: this.transitionDuration + `ms`,
-        [`--ui-pager-page-base-pointer-events`]: this.pointerEvents,
-        [`--ui-pager-page-base-transform`]: this.transform,
-        [`--ui-pager-page-base-opacity`]: this.opacity
-      }
-    }, [this.children])
-  }
-}
+  get theme () { return $Ui.theme }
 
-$Ui_Pager_Page.displayName = "Ui.Pager.Page"
-
-$Ui_Pager_Page.defaultProps = {
-  transition: `slide`,transitioning: false,children: [],duration: 1000,position: 0
-}
-
-class $Ui_Pager extends Component {
-  constructor(props) {
-    super(props)
-    this.state = new Record({
-      transitioning: false,
-      left: ``,
-      center: ``
-    })
+  componentWillUnmount () {
+    $Ui._unsubscribe(this)
   }
 
-  get isPage() {
-    return $Array.any(((item) => {
-    return _compare(item.name, this.state.center)
-    }), this.pages)
+  componentDidMount () {
+    $Ui._subscribe(this)
   }
 
-  get hasPage() {
-    return $Array.any(((item) => {
-    return _compare(item.name, this.active)
-    }), this.pages)
+  days() {
+    let startDate = $Time.startOf(`week`, $Time.startOf(`month`, this.month))
+
+    let endDate = $Time.endOf(`week`, $Time.endOf(`month`, this.month))
+
+    return $Time.range(startDate, endDate)
   }
 
-  get pages () {
-    if (this.props.pages != undefined) {
-      return this.props.pages
-    } else {
-      return []
-    }
-  }
-
-  get transition () {
-    if (this.props.transition != undefined) {
-      return this.props.transition
-    } else {
-      return `slide`
-    }
-  }
-
-  get duration () {
-    if (this.props.duration != undefined) {
-      return this.props.duration
-    } else {
-      return 1000
-    }
-  }
-
-  get active () {
-    if (this.props.active != undefined) {
-      return this.props.active
-    } else {
-      return ``
-    }
-  }
-
-  componentDidUpdate() {
-    return (!_compare(this.state.center, this.active) && this.hasPage ? (this.isPage ? this.switchPages.bind(this)() : new Promise((_resolve) => {
-      this.setState(_update(this.state, { center: this.active }), _resolve)
-    })) : null)
-  }
-
-  switchPages() {
-    return (async () => {
+  onCellClick(day) {
+    return (!_compare($Time.month(day), $Time.month(this.month)) && this.changeMonthOnSelect ? (async () => {
       try {
-         await new Promise((_resolve) => {
-      this.setState(_update(this.state, { left: this.state.center, center: this.active, transitioning: true }), _resolve)
-    })
+         await this.onMonthChange(day)
 
-     await (async ()=> {
-      try {
-        return await $Timer.timeout(this.duration, `a`)
-      } catch(_error) {
-        
-
-        throw new DoError
-      }
-    })()
-
-     await new Promise((_resolve) => {
-      this.setState(_update(this.state, { transitioning: false, left: `` }), _resolve)
-    })
+     await this.onChange(day)
       }
       catch(_error) {
         if (_error instanceof DoError) {
@@ -7405,219 +7483,111 @@ class $Ui_Pager extends Component {
           console.log(_error)
         }
       } 
-    })()
+    })() : this.onChange(day))
   }
 
-  renderPage(item) {
-    let transitioning = (_compare(this.state.left, item.name) || _compare(this.state.center, item.name)) && this.state.transitioning
+  cells() {
+    let range = $Time.range($Time.startOf(`month`, this.month), $Time.endOf(`month`, this.month))
 
-    let position = (_compare(this.state.left, item.name) ? -100 : (_compare(this.state.center, item.name) ? 0 : 100))
+    return $Array.map(((day) => {
+    return _createElement($Ui_Calendar_Cell, { "active": $Array.any(((item) => {
+    return _compare(day, item)
+    }), range), "selected": _compare(this.date, day), "onClick": this.onCellClick.bind(this), "day": day })
+    }), this.days.bind(this)())
+  }
 
-    return _createElement($Ui_Pager_Page, { "transitioning": transitioning, "transition": this.transition, "position": position, "duration": this.duration }, _array(item.contents))
+  dayName(day) {
+    return _createElement("div", {
+      className: `ui-calendar-day-name`,
+      style: {
+
+      }
+    }, [$Time.format(`ddd`, day)])
+  }
+
+  dayNames() {
+    return $Array.map(this.dayName.bind(this), $Time.range($Time.startOf(`week`, this.date), $Time.endOf(`week`, this.date)))
+  }
+
+  previousMonth() {
+    return this.onMonthChange($Time.previousMonth(this.month))
+  }
+
+  nextMonth() {
+    return this.onMonthChange($Time.nextMonth(this.month))
   }
 
   render() {
     return _createElement("div", {
-      className: `ui-pager-base`,
+      className: `ui-calendar-base`,
+      style: {
+        [`--ui-calendar-base-background`]: this.theme.colors.input.background,
+        [`--ui-calendar-base-border`]: `1px solid ` + this.theme.border.color,
+        [`--ui-calendar-base-border-radius`]: this.theme.border.radius,
+        [`--ui-calendar-base-color`]: this.theme.colors.input.text,
+        [`--ui-calendar-base-font-family`]: this.theme.fontFamily
+      }
+    }, [_createElement("div", {
+      className: `ui-calendar-header`,
       style: {
 
       }
-    }, [$Array.map(this.renderPage.bind(this), this.pages)])
+    }, [this.previousMonthIcon, _createElement("div", {
+      className: `ui-calendar-text`,
+      style: {
+
+      }
+    }, [$Time.format(`MMMM - YYYY`, this.month)]), this.nextMonthIcon]), _createElement("div", {
+      className: `ui-calendar-day-names`,
+      style: {
+        [`--ui-calendar-day-names-border-bottom`]: `1px dashed ` + this.theme.border.color,
+        [`--ui-calendar-day-names-border-top`]: `1px dashed ` + this.theme.border.color
+      }
+    }, [this.dayNames.bind(this)()]), _createElement("div", {
+      className: `ui-calendar-table`,
+      style: {
+
+      }
+    }, [this.cells.bind(this)()])])
   }
 }
 
-$Ui_Pager.displayName = "Ui.Pager"
+$Ui_Calendar.displayName = "Ui.Calendar"
 
-$Ui_Pager.defaultProps = {
-  pages: [],transition: `slide`,duration: 1000,active: ``
-}
-
-class $Ui_Pagination extends Component {
-  get pages() {
-    return $Math.floor($Math.max(this.total - 1, 0) / this.perPage)
-  }
-
-  get buttonRange() {
-    return $Array.range($Math.max(1, this.page - this.sidePages), $Math.min(this.page + this.sidePages + 1, this.pages))
-  }
-
-  get buttons() {
-    return $Array.map(((index) => {
-    return _createElement($Ui_Button, { "onClick": ((event) => {
-    return this.onChange(index)
-    }), "label": $Number.toString(index + 1), "key": $Number.toString(index), "outline": !_compare(index, this.page) })
-    }), this.buttonRange)
-  }
-
-  get previousButton() {
-    return (!_compare(this.page, 0) && this.pages > 0 ? _createElement($Ui_Button, { "onClick": ((event) => {
-    return this.onChange(this.page - 1)
-    }), "outline": true, "label": `Prev` }) : $Html.empty())
-  }
-
-  get nextButton() {
-    return (!_compare(this.page, this.pages) && this.pages > 0 ? _createElement($Ui_Button, { "onClick": ((event) => {
-    return this.onChange(this.page + 1)
-    }), "outline": true, "label": `Next` }) : $Html.empty())
-  }
-
-  get leftDots() {
-    return (this.sidePages < (this.page - 1) && this.pages > 0 ? _createElement("span", {
-      className: `ui-pagination-span`,
-      style: {
-
-      }
-    }) : $Html.empty())
-  }
-
-  get rightDots() {
-    return ((this.page + this.sidePages + 1 < this.pages) && this.pages > 0 ? _createElement("span", {
-      className: `ui-pagination-span`,
-      style: {
-
-      }
-    }) : $Html.empty())
-  }
-
-  get rightButton() {
-    return (this.pages > 1 ? _createElement($Ui_Button, { "onClick": ((event) => {
-    return this.onChange(this.pages)
-    }), "label": $Number.toString(this.pages + 1), "outline": !_compare(this.page, this.pages) }) : $Html.empty())
-  }
-
-  get leftButton() {
-    return (this.pages >= 1 ? _createElement($Ui_Button, { "onClick": ((event) => {
-    return this.onChange(0)
-    }), "outline": !_compare(this.page, 0), "label": `1` }) : $Html.empty())
-  }
-
-  get onChange () {
-    if (this.props.onChange != undefined) {
-      return this.props.onChange
-    } else {
-      return ((page) => {
-    return null
-    })
-    }
-  }
-
-  get sidePages () {
-    if (this.props.sidePages != undefined) {
-      return this.props.sidePages
-    } else {
-      return 2
-    }
-  }
-
-  get perPage () {
-    if (this.props.perPage != undefined) {
-      return this.props.perPage
-    } else {
-      return 10
-    }
-  }
-
-  get total () {
-    if (this.props.total != undefined) {
-      return this.props.total
-    } else {
-      return 0
-    }
-  }
-
-  get page () {
-    if (this.props.page != undefined) {
-      return this.props.page
-    } else {
-      return 0
-    }
-  }
-
-  render() {
-    return _createElement("div", {
-      className: `ui-pagination-base`,
-      style: {
-
-      }
-    }, [this.previousButton, this.leftButton, this.leftDots, this.buttons, this.rightDots, this.rightButton, this.nextButton])
-  }
-}
-
-$Ui_Pagination.displayName = "Ui.Pagination"
-
-$Ui_Pagination.defaultProps = {
-  onChange: ((page) => {
+$Ui_Calendar.defaultProps = {
+  onMonthChange: ((date) => {
   return null
-  }),sidePages: 2,perPage: 10,total: 0,page: 0
+  }),onChange: ((day) => {
+  return null
+  }),changeMonthOnSelect: false,month: $Time.today(),date: $Time.today(),disabled: false
 }
 
-class $Ui_Time extends Component {
-  constructor(props) {
-    super(props)
-    this.state = new Record({
-      now: $Time.now()
-    })
-  }
-
-  get date () {
-    if (this.props.date != undefined) {
-      return this.props.date
+class $Ui_Table extends Component {
+  get headers () {
+    if (this.props.headers != undefined) {
+      return this.props.headers
     } else {
-      return $Time.now()
+      return []
     }
   }
 
-  componentWillUnmount () {
-    $Provider_Tick._unsubscribe(this)
-  }
-
-  componentDidUpdate () {
-    if (true) {
-      $Provider_Tick._subscribe(this, new Record({
-      ticks: (() => {
-      return new Promise((_resolve) => {
-        this.setState(new Record({
-        now: $Time.now()
-      }), _resolve)
-      })
-      })
-    }))
+  get rows () {
+    if (this.props.rows != undefined) {
+      return this.props.rows
     } else {
-      $Provider_Tick._unsubscribe(this)
-    }
-  }
-
-  componentDidMount () {
-    if (true) {
-      $Provider_Tick._subscribe(this, new Record({
-      ticks: (() => {
-      return new Promise((_resolve) => {
-        this.setState(new Record({
-        now: $Time.now()
-      }), _resolve)
-      })
-      })
-    }))
-    } else {
-      $Provider_Tick._unsubscribe(this)
+      return []
     }
   }
 
   render() {
-    return _createElement("div", {
-      "title": $Time.toIso(this.date),
-      className: `ui-time-base`,
-      style: {
-
-      }
-    }, [$Time.relative(this.date, this.state.now)])
+    return _createElement("table", {}, [_createElement("thead", {}, [this.headers])])
   }
 }
 
-$Ui_Time.displayName = "Ui.Time"
+$Ui_Table.displayName = "Ui.Table"
 
-$Ui_Time.defaultProps = {
-  date: $Time.now()
+$Ui_Table.defaultProps = {
+  headers: [],rows: []
 }
 
 class $Ui_Form_Field extends Component {
@@ -7724,6 +7694,128 @@ $Ui_Form_Field.defaultProps = {
   orientation: `vertical`,children: [],label: ``
 }
 
+class $Ui_Breadcrumb extends Component {
+  get children () {
+    if (this.props.children != undefined) {
+      return this.props.children
+    } else {
+      return []
+    }
+  }
+
+  get target () {
+    if (this.props.target != undefined) {
+      return this.props.target
+    } else {
+      return ``
+    }
+  }
+
+  get label () {
+    if (this.props.label != undefined) {
+      return this.props.label
+    } else {
+      return ``
+    }
+  }
+
+  get type () {
+    if (this.props.type != undefined) {
+      return this.props.type
+    } else {
+      return ``
+    }
+  }
+
+  get href () {
+    if (this.props.href != undefined) {
+      return this.props.href
+    } else {
+      return ``
+    }
+  }
+
+  get theme () { return $Ui.theme }
+
+  componentWillUnmount () {
+    $Ui._unsubscribe(this)
+  }
+
+  componentDidMount () {
+    $Ui._subscribe(this)
+  }
+
+  render() {
+    return _createElement("div", {
+      className: `ui-breadcrumb-base`,
+      style: {
+        [`--ui-breadcrumb-base-hover-color`]: this.theme.hover.color,
+        [`--ui-breadcrumb-base-a-focus-color`]: this.theme.hover.color
+      }
+    }, [_createElement($Ui_Link, { "children": this.children, "target": this.target, "type": `inherit`, "label": this.label, "href": this.href })])
+  }
+}
+
+$Ui_Breadcrumb.displayName = "Ui.Breadcrumb"
+
+$Ui_Breadcrumb.defaultProps = {
+  children: [],target: ``,label: ``,type: ``,href: ``
+}
+
+class $Ui_Breadcrumbs extends Component {
+  get span() {
+    return _createElement("span", {
+      className: `ui-breadcrumbs-separator`,
+      style: {
+
+      }
+    }, [this.separator])
+  }
+
+  get children () {
+    if (this.props.children != undefined) {
+      return this.props.children
+    } else {
+      return []
+    }
+  }
+
+  get separator () {
+    if (this.props.separator != undefined) {
+      return this.props.separator
+    } else {
+      return `|`
+    }
+  }
+
+  get theme () { return $Ui.theme }
+
+  componentWillUnmount () {
+    $Ui._unsubscribe(this)
+  }
+
+  componentDidMount () {
+    $Ui._subscribe(this)
+  }
+
+  render() {
+    return _createElement("div", {
+      className: `ui-breadcrumbs-base`,
+      style: {
+        [`--ui-breadcrumbs-base-background`]: this.theme.colors.inputSecondary.background,
+        [`--ui-breadcrumbs-base-color`]: this.theme.colors.inputSecondary.text,
+        [`--ui-breadcrumbs-base-font-family`]: this.theme.fontFamily
+      }
+    }, [$Array.intersperse(this.span, this.children)])
+  }
+}
+
+$Ui_Breadcrumbs.displayName = "Ui.Breadcrumbs"
+
+$Ui_Breadcrumbs.defaultProps = {
+  children: [],separator: `|`
+}
+
 class $Html_Portals_Body extends Component {
   get children () {
     if (this.props.children != undefined) {
@@ -7745,6 +7837,201 @@ $Html_Portals_Body.defaultProps = {
 }
 
 _insertStyles(`
+  .title-base {
+    font-family: Josefin Sans;
+    text-transform: uppercase;
+    font-weight: 600;
+    font-size: 26px;
+    line-height: 1;
+    color: #222;
+  }
+
+  .users-table-table {
+    border: var(--users-table-table-border);
+    color: var(--users-table-table-color);
+    font-family: var(--users-table-table-font-family);
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    table-layout: fixed;
+    width: 100%;
+  }
+
+  .users-table-left {
+    text-align: left;
+  }
+
+  .users-table-header {
+    justify-content: space-between;
+    margin-bottom: 20px;
+    align-items: center;
+    display: flex;
+  }
+
+  .users-table-title {
+    font-weight: bold;
+    font-size: 24px;
+  }
+
+  .users-table-empty {
+    justify-content: center;
+    align-items: center;
+    min-height: 550px;
+    display: flex;
+  }
+
+  .code-mirror-base {
+    flex-direction: column;
+    display: flex;
+    flex: 1;
+  }
+
+  .code-mirror-base > * {
+    flex: 1;
+  }
+
+  .sub-title-base {
+    margin: 10px 0;
+  }
+
+  .example-frame {
+    border: 1px solid #DDD;
+    min-height: 500px;
+    background: #FFF;
+    margin-top: 20px;
+  }
+
+  .feature-title {
+    border-bottom: 1px dashed #CCC;
+    padding-bottom: 10px;
+    align-items: center;
+    margin-bottom: 10px;
+    position: relative;
+    font-weight: bold;
+    display: flex;
+  }
+
+  .feature-text {
+    position: relative;
+    z-index: 1;
+  }
+
+  .feature-base {
+    position: relative;
+    background: #FFF;
+    overflow: hidden;
+    padding: 20px;
+  }
+
+  .feature-star {
+    margin-right: 10px;
+    fill: #2f9e59;
+    height: 14px;
+    width: 14px;
+  }
+
+  .features-base {
+    padding: 70px 0;
+    padding-bottom: 90px;
+  }
+
+  .features-grid {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-gap: 20px;
+    display: grid;
+  }
+
+  .features-title {
+    font-family: Josefin Sans;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+    text-align: center;
+    font-size: 32px;
+  }
+
+  .features-subtitle {
+    margin-bottom: 50px;
+    text-align: center;
+    opacity: 0.5;
+  }
+
+  .features-container {
+    max-width: 1040px;
+    padding: 0 20px;
+    margin: 0 auto;
+  }
+
+  .logo-base {
+    height: var(--logo-base-height);
+    width: var(--logo-base-width);
+  }
+
+  .user-row-tr {
+
+  }
+
+  .user-row-tr a {
+    text-decoration: var(--user-row-tr-a-text-decoration);
+  }
+
+  .user-row-tr:nth-child(odd) {
+    background: #f9f9f9;
+  }
+
+  .user-row-checkbox {
+    text-align: center;
+  }
+
+  .footer-base {
+    min-height: 200px;
+    background: #222;
+    margin-top: auto;
+    color: #BBB;
+  }
+
+  .footer-wrapper {
+    grid-template-columns: repeat(auto-fill, 220px);
+    grid-gap: 20px 50px;
+    display: grid;
+    padding: 30px 20px;
+    max-width: 1040px;
+    margin: 0 auto;
+  }
+
+  .footer-column {
+    width: 200px;
+  }
+
+  .footer-link {
+    text-decoration: none;
+    margin-top: 5px;
+    display: block;
+    color: inherit;
+  }
+
+  .footer-title {
+    border-bottom: 1px dashed #444;
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+    font-family: Amiko;
+    font-weight: 600;
+    color: #EEE;
+  }
+
+  .counter-base {
+    background: var(--counter-base-background);
+    border-radius: 5px;
+    transition: 320ms;
+    display: flex;
+    padding: 20px;
+    margin: 20px;
+  }
+
+  .counter-counter {
+    font-family: sans;
+    font-size: 20px;
+    padding: 0 20px;
+  }
+
   .examples-file-handling-pre {
     word-break: break-word;
     white-space: pre-wrap;
@@ -7769,8 +8056,143 @@ _insertStyles(`
     fill: white;
   }
 
-  .sub-title-base {
-    margin: 10px 0;
+  .button-base {
+    text-transform: uppercase;
+    border: 2px solid #2f9e59;
+    text-decoration: none;
+    border-radius: 30px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 20px;
+    line-height: 1;
+    color: #2f9e59;
+    padding: 15px 40px;
+    padding-bottom: 16px;
+  }
+
+  .button-base:hover {
+    background: #2f9e59;
+    color: #FFF;
+  }
+
+  .examples-example-base {
+    border: 1px solid #EEE;
+    background: #FFF;
+    cursor: pointer;
+    padding: 20px;
+    color: #444;
+  }
+
+  .examples-example-description {
+    line-height: 1.5;
+    font-size: 14px;
+  }
+
+  .examples-example-title {
+    border-bottom: 1px solid #EEE;
+    padding-bottom: 7px;
+    margin-bottom: 7px;
+    font-weight: bold;
+    font-size: 18px;
+  }
+
+  .examples-example-title > a {
+    color: inherit;
+  }
+
+  .examples-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-gap: 20px 20px;
+    display: grid;
+  }
+
+  .examples-hr {
+    margin: 20px 0;
+    border: 0;
+    border-top: 1px solid #EEE;
+  }
+
+  .header-base {
+    border-bottom: 2px solid #29894e;
+    background: #2f9e59;
+    color: #FFF;
+  }
+
+  .header-wrapper {
+    align-items: center;
+    max-width: 1040px;
+    padding: 0 20px;
+    margin: 0 auto;
+    display: flex;
+    height: 50px;
+  }
+
+  .header-desktop {
+    align-items: center;
+    display: none;
+  }
+
+  .header-brand {
+    font-family: Josefin Sans;
+    text-decoration: none;
+    align-items: center;
+    font-weight: 400;
+    font-size: 20px;
+    display: flex;
+    color: #FFF;
+  }
+
+  .header-brand > div {
+    margin-left: 5px;
+    height: 15px;
+  }
+
+  .header-link {
+    text-transform: uppercase;
+    font-family: Josefin Sans;
+    text-decoration: none;
+    font-weight: 400;
+    font-size: 14px;
+    color: inherit;
+    height: 10px;
+  }
+
+  .users-layout-wrapper {
+    max-width: 1040px;
+    padding: 0 20px;
+    margin: 0 auto;
+  }
+
+  .users-layout-content {
+    padding: 24px 0;
+  }
+
+  .drag-base {
+    transform: var(--drag-base-transform);
+    justify-content: center;
+    background: orangered;
+    align-items: center;
+    border-radius: 10px;
+    position: absolute;
+    display: flex;
+    height: 100px;
+    width: 100px;
+    cursor: move;
+    color: white;
+    z-index: 10;
+  }
+
+  .showcase-highlight-base {
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+    background: var(--showcase-highlight-base-background);
+    border-radius: 2px;
+    border: var(--showcase-highlight-base-border);
+    padding: 3px 5px;
+    cursor: pointer;
+    display: inline;
+    color: var(--showcase-highlight-base-color);
   }
 
   .showcase-block-base {
@@ -7797,17 +8219,34 @@ _insertStyles(`
     padding-left: 15px;
   }
 
-  .showcase-highlight-base {
-    -webkit-tap-highlight-color: rgba(0,0,0,0);
-    -webkit-box-decoration-break: clone;
-    box-decoration-break: clone;
-    background: var(--showcase-highlight-base-background);
-    border-radius: 2px;
-    border: var(--showcase-highlight-base-border);
-    padding: 3px 5px;
-    cursor: pointer;
-    display: inline;
-    color: var(--showcase-highlight-base-color);
+  .github-base {
+    flex-direction: column;
+    align-items: center;
+    background: white;
+    display: flex;
+    padding: 80px 0;
+    padding-bottom: 140px;
+  }
+
+  .github-image {
+    width: 300px;
+  }
+
+  .github-title {
+    font-family: Josefin Sans;
+    text-transform: uppercase;
+    text-align: center;
+    font-weight: 600;
+    margin-top: 30px;
+    font-size: 26px;
+  }
+
+  .github-text {
+    margin-bottom: 50px;
+    text-align: center;
+    line-height: 1.5em;
+    margin-top: 20px;
+    font-size: 18px;
   }
 
   .showcase-row {
@@ -7892,50 +8331,64 @@ _insertStyles(`
     font-size: 22px;
   }
 
-  .github-base {
+  .pages-try-base {
+    min-height: 90vh;
+    display: flex;
+    flex: 1;
+  }
+
+  .pages-try-iframe {
+    background: white;
+    border: 0;
+    flex: 1;
+  }
+
+  .pages-try-source {
+    border-right: 2px solid #DDD;
     flex-direction: column;
+    display: flex;
+    flex: 1;
+  }
+
+  .pages-try-loader {
+    justify-content: center;
     align-items: center;
     display: flex;
-    padding: 80px 0;
-    padding-bottom: 140px;
+    flex: 1;
   }
 
-  .github-image {
-    width: 300px;
+  .pages-try-toolbar {
+    border-bottom: 2px solid #DDD;
+    align-items: center;
+    padding: 10px;
+    display: flex;
+    height: 40px;
   }
 
-  .github-title {
-    font-family: Josefin Sans;
-    text-transform: uppercase;
-    text-align: center;
-    font-weight: 600;
-    margin-top: 30px;
-    font-size: 26px;
-  }
-
-  .github-text {
-    margin-bottom: 50px;
-    text-align: center;
-    line-height: 1.5em;
-    margin-top: 20px;
-    font-size: 18px;
-  }
-
-  .user-form-title {
-    border-bottom: 2px solid #CCC;
-    padding-bottom: 10px;
-    margin-bottom: 15px;
+  .pages-try-file {
+    font-family: monospace;
     font-weight: bold;
-    font-size: 20px;
-    opacity: 0.8;
+    font-size: 14px;
+    flex: 1;
   }
 
-  .user-form-form {
-
+  .pages-try-button {
+    text-transform: uppercase;
+    border: 2px solid #2f9e59;
+    text-decoration: none;
+    border-radius: 30px;
+    padding: 5px 10px;
+    background: none;
+    font-weight: 600;
+    font-size: 12px;
+    cursor: pointer;
+    line-height: 1;
+    color: #2f9e59;
   }
 
-  .user-form-form > * {
-    margin-bottom: 15px;
+  .pages-try-button:hover {
+    background: #2f9e59;
+    color: #FFF;
   }
 
   .install-hr {
@@ -7998,82 +8451,55 @@ _insertStyles(`
     width: 24px;
   }
 
-  .pages-try-base {
-    min-height: 90vh;
-    display: flex;
-    flex: 1;
-  }
-
-  .pages-try-iframe {
-    background: white;
-    border: 0;
-    flex: 1;
-  }
-
-  .pages-try-source {
-    border-right: 2px solid #DDD;
-    flex-direction: column;
-    display: flex;
-    flex: 1;
-  }
-
-  .pages-try-loader {
+  .home-hero {
+    background: url(hero.png);
     justify-content: center;
+    flex-direction: column;
     align-items: center;
     display: flex;
-    flex: 1;
+    height: 80vh;
   }
 
-  .pages-try-toolbar {
-    border-bottom: 2px solid #DDD;
-    align-items: center;
-    padding: 10px;
+  .home-slogan {
+    font-weight: normal;
+    font-size: 18px;
+    opacity: 0.75;
+    margin: 0;
+  }
+
+  .home-buttons {
+    margin-top: 30px;
     display: flex;
-    height: 40px;
   }
 
-  .pages-try-file {
-    font-family: monospace;
-    font-weight: bold;
-    font-size: 14px;
-    flex: 1;
+  .home-separator {
+
   }
 
-  .pages-try-button {
-    text-transform: uppercase;
-    border: 2px solid #2f9e59;
-    text-decoration: none;
-    border-radius: 30px;
-    padding: 5px 10px;
-    background: none;
-    font-weight: 600;
-    font-size: 12px;
-    cursor: pointer;
+  .home-base {
+    color: #333;
+  }
+
+  .home-logo {
+    flex-direction: column;
+    align-items: center;
+    display: flex;
+  }
+
+  .home-h1 {
+    font-family: Josefin Sans;
+    font-weight: 300;
+    font-size: 70px;
     line-height: 1;
-    color: #2f9e59;
+    margin: 0;
+    margin-top: 30px;
   }
 
-  .pages-try-button:hover {
-    background: #2f9e59;
-    color: #FFF;
-  }
-
-  .roadmap-version-title {
-    border-bottom: 2px solid #EEE;
-    padding-bottom: 5px;
-    margin-bottom: 15px;
-    font-family: Amiko;
-    margin-top: 40px;
-    font-size: 24px;
-    color: #222;
-  }
-
-  .roadmap-version-features {
-
-  }
-
-  .roadmap-version-features > * + * {
-    margin-top: 20px;
+  .home-compiles {
+    margin-bottom: 20px;
+    font-style: italic;
+    margin-top: 10px;
+    opacity: 0.5;
   }
 
   .pages-roadmap-feature-base {
@@ -8115,116 +8541,39 @@ _insertStyles(`
     margin-top: 7px;
   }
 
-  .home-hero {
-    background: url(hero.png);
-    justify-content: center;
-    flex-direction: column;
-    align-items: center;
-    display: flex;
-    height: 80vh;
-  }
-
-  .home-slogan {
-    font-weight: normal;
-    font-size: 18px;
-    opacity: 0.75;
-    margin: 0;
-    margin-bottom: 20px;
-  }
-
-  .home-buttons {
-    margin-top: 30px;
-    display: flex;
-  }
-
-  .home-separator {
-
-  }
-
-  .home-base {
-    color: #333;
-  }
-
-  .home-logo {
-    flex-direction: column;
-    align-items: center;
-    display: flex;
-  }
-
-  .home-h1 {
-    font-family: Josefin Sans;
-    font-weight: 300;
-    font-size: 70px;
-    line-height: 1;
-    margin: 0;
-    margin-top: 30px;
-  }
-
-  .logo-base {
-    height: var(--logo-base-height);
-    width: var(--logo-base-width);
-  }
-
-  .examples-example-base {
-    border: 1px solid #EEE;
-    background: #FFF;
-    cursor: pointer;
-    padding: 20px;
-    color: #444;
-  }
-
-  .examples-example-description {
-    line-height: 1.5;
-    font-size: 14px;
-  }
-
-  .examples-example-title {
-    border-bottom: 1px solid #EEE;
-    padding-bottom: 7px;
-    margin-bottom: 7px;
-    font-weight: bold;
-    font-size: 18px;
-  }
-
-  .examples-example-title > a {
-    color: inherit;
-  }
-
-  .examples-grid {
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    grid-gap: 20px 20px;
-    display: grid;
-  }
-
-  .examples-hr {
-    margin: 20px 0;
-    border: 0;
-    border-top: 1px solid #EEE;
-  }
-
-  .title-base {
-    font-family: Josefin Sans;
-    text-transform: uppercase;
-    font-weight: 600;
-    font-size: 26px;
-    line-height: 1;
+  .roadmap-version-title {
+    border-bottom: 2px solid #EEE;
+    padding-bottom: 5px;
+    margin-bottom: 15px;
+    font-family: Amiko;
+    margin-top: 40px;
+    font-size: 24px;
     color: #222;
   }
 
-  .user-row-tr {
+  .roadmap-version-features {
 
   }
 
-  .user-row-tr a {
-    text-decoration: var(--user-row-tr-a-text-decoration);
+  .roadmap-version-features > * + * {
+    margin-top: 20px;
   }
 
-  .user-row-tr:nth-child(odd) {
-    background: #f9f9f9;
+  .user-form-title {
+    border-bottom: 2px solid #CCC;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+    font-weight: bold;
+    font-size: 20px;
+    opacity: 0.8;
   }
 
-  .user-row-checkbox {
-    text-align: center;
+  .user-form-form {
+
+  }
+
+  .user-form-form > * {
+    margin-bottom: 15px;
   }
 
   .page-base {
@@ -8236,366 +8585,6 @@ _insertStyles(`
     padding-bottom: 100px;
   }
 
-  .users-layout-wrapper {
-    max-width: 1040px;
-    padding: 0 20px;
-    margin: 0 auto;
-  }
-
-  .users-layout-content {
-    padding: 24px 0;
-  }
-
-  .users-table-table {
-    border: var(--users-table-table-border);
-    color: var(--users-table-table-color);
-    font-family: var(--users-table-table-font-family);
-    border-collapse: collapse;
-    margin-bottom: 20px;
-    table-layout: fixed;
-    width: 100%;
-  }
-
-  .users-table-left {
-    text-align: left;
-  }
-
-  .users-table-header {
-    justify-content: space-between;
-    margin-bottom: 20px;
-    align-items: center;
-    display: flex;
-  }
-
-  .users-table-title {
-    font-weight: bold;
-    font-size: 24px;
-  }
-
-  .users-table-empty {
-    justify-content: center;
-    align-items: center;
-    min-height: 550px;
-    display: flex;
-  }
-
-  .header-base {
-    border-bottom: 2px solid #29894e;
-    background: #2f9e59;
-    color: #FFF;
-  }
-
-  .header-wrapper {
-    align-items: center;
-    max-width: 1040px;
-    padding: 0 20px;
-    margin: 0 auto;
-    display: flex;
-    height: 50px;
-  }
-
-  .header-desktop {
-    align-items: center;
-    display: none;
-  }
-
-  .header-brand {
-    font-family: Josefin Sans;
-    text-decoration: none;
-    align-items: center;
-    font-weight: 400;
-    font-size: 20px;
-    display: flex;
-    color: #FFF;
-  }
-
-  .header-brand > div {
-    margin-left: 5px;
-    height: 15px;
-  }
-
-  .header-link {
-    text-transform: uppercase;
-    font-family: Josefin Sans;
-    text-decoration: none;
-    font-weight: 400;
-    font-size: 14px;
-    color: inherit;
-    height: 10px;
-  }
-
-  .footer-base {
-    min-height: 200px;
-    background: #222;
-    margin-top: auto;
-    color: #BBB;
-  }
-
-  .footer-wrapper {
-    grid-template-columns: repeat(auto-fill, 220px);
-    grid-gap: 20px 50px;
-    display: grid;
-    padding: 30px 20px;
-    max-width: 1040px;
-    margin: 0 auto;
-  }
-
-  .footer-column {
-    width: 200px;
-  }
-
-  .footer-link {
-    text-decoration: none;
-    margin-top: 5px;
-    display: block;
-    color: inherit;
-  }
-
-  .footer-title {
-    border-bottom: 1px dashed #444;
-    padding-bottom: 5px;
-    margin-bottom: 10px;
-    font-family: Amiko;
-    font-weight: 600;
-    color: #EEE;
-  }
-
-  .button-base {
-    text-transform: uppercase;
-    border: 2px solid #2f9e59;
-    text-decoration: none;
-    border-radius: 30px;
-    text-align: center;
-    font-weight: 600;
-    font-size: 20px;
-    line-height: 1;
-    color: #2f9e59;
-    padding: 15px 40px;
-    padding-bottom: 16px;
-  }
-
-  .button-base:hover {
-    background: #2f9e59;
-    color: #FFF;
-  }
-
-  .example-frame {
-    border: 1px solid #DDD;
-    min-height: 500px;
-    background: #FFF;
-    margin-top: 20px;
-  }
-
-  .code-mirror-base {
-    flex-direction: column;
-    display: flex;
-    flex: 1;
-  }
-
-  .code-mirror-base > * {
-    flex: 1;
-  }
-
-  .counter-base {
-    background: var(--counter-base-background);
-    border-radius: 5px;
-    transition: 320ms;
-    display: flex;
-    padding: 20px;
-    margin: 20px;
-  }
-
-  .counter-counter {
-    font-family: sans;
-    font-size: 20px;
-    padding: 0 20px;
-  }
-
-  .drag-base {
-    transform: var(--drag-base-transform);
-    justify-content: center;
-    background: orangered;
-    align-items: center;
-    border-radius: 10px;
-    position: absolute;
-    display: flex;
-    height: 100px;
-    width: 100px;
-    cursor: move;
-    color: white;
-    z-index: 10;
-  }
-
-  .ui-table-td-td {
-    border: var(--ui-table-td-td-border);
-    border-bottom: var(--ui-table-td-td-border-bottom);
-    font-weight: var(--ui-table-td-td-font-weight);
-    text-align: var(--ui-table-td-td-text-align);
-    padding: 7px 10px;
-    width: var(--ui-table-td-td-width);
-  }
-
-  .ui-loader-base {
-    position: relative;
-  }
-
-  .ui-loader-loader {
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    left: 0;
-    top: 0;
-    background: rgba(255,255,255,0.8);
-    transition-delay: 320ms;
-    transition: 320ms;
-    pointer-events: var(--ui-loader-loader-pointer-events);
-    opacity: var(--ui-loader-loader-opacity);
-    justify-content: center;
-    align-items: center;
-    display: flex;
-  }
-
-  .ui-link-base {
-    color: var(--ui-link-base-color);
-    text-decoration: none;
-    outline: none;
-  }
-
-  .ui-link-base:hover {
-    text-decoration: underline;
-    color: var(--ui-link-base-hover-color);
-  }
-
-  .ui-link-base:focus {
-    text-decoration: underline;
-    color: var(--ui-link-base-focus-color);
-  }
-
-  .ui-checkbox-base {
-    -webkit-tap-highlight-color: rgba(0,0,0,0);
-    -webkit-touch-callout: none;
-    background-color: var(--ui-checkbox-base-background-color);
-    border: var(--ui-checkbox-base-border);
-    border-radius: var(--ui-checkbox-base-border-radius);
-    color: var(--ui-checkbox-base-color);
-    justify-content: center;
-    display: inline-flex;
-    align-items: center;
-    cursor: pointer;
-    outline: none;
-    height: 34px;
-    width: 34px;
-    padding: 0;
-  }
-
-  .ui-checkbox-base::-moz-focus-inner {
-    border: 0;
-  }
-
-  .ui-checkbox-base:focus {
-    box-shadow: var(--ui-checkbox-base-focus-box-shadow);
-    border-color: var(--ui-checkbox-base-focus-border-color);
-    color: var(--ui-checkbox-base-focus-color);
-  }
-
-  .ui-checkbox-base:disabled {
-    background: var(--ui-checkbox-base-disabled-background);
-    color: var(--ui-checkbox-base-disabled-color);
-    cursor: not-allowed;
-  }
-
-  .ui-checkbox-icon {
-    transform: var(--ui-checkbox-icon-transform);
-    opacity: var(--ui-checkbox-icon-opacity);
-    fill: currentColor;
-    transition: 200ms;
-    height: 16px;
-    width: 16px;
-  }
-
-  .ui-form-separator-base {
-    border-top: 1px solid #EEE;
-  }
-
-  .ui-calendar-base {
-    -moz-user-select: none;
-    user-select: none;
-    background: var(--ui-calendar-base-background);
-    border: var(--ui-calendar-base-border);
-    border-radius: var(--ui-calendar-base-border-radius);
-    color: var(--ui-calendar-base-color);
-    font-family: var(--ui-calendar-base-font-family);
-    padding: 10px;
-    width: 300px;
-  }
-
-  .ui-calendar-table {
-    grid-template-columns: repeat(7, 1fr);
-    grid-gap: 10px;
-    display: grid;
-    width: 100%;
-  }
-
-  .ui-calendar-header {
-    align-items: center;
-    display: flex;
-    height: 26px;
-  }
-
-  .ui-calendar-text {
-    text-align: center;
-    flex: 1;
-  }
-
-  .ui-calendar-day-name {
-    text-transform: uppercase;
-    text-align: center;
-    font-weight: bold;
-    font-size: 12px;
-    opacity: 0.5;
-    width: 34px;
-  }
-
-  .ui-calendar-day-names {
-    border-bottom: var(--ui-calendar-day-names-border-bottom);
-    border-top: var(--ui-calendar-day-names-border-top);
-    justify-content: space-between;
-    padding: 6px 0;
-    margin: 10px 0;
-    display: flex;
-  }
-
-  .ui-dropdown-panel {
-    position: fixed;
-    left: var(--ui-dropdown-panel-left);
-    top: var(--ui-dropdown-panel-top);
-  }
-
-  .ui-breadcrumb-base {
-    display: inline-block;
-  }
-
-  .ui-breadcrumb-base:hover {
-    color: var(--ui-breadcrumb-base-hover-color);
-  }
-
-  .ui-breadcrumb-base a:focus {
-    color: var(--ui-breadcrumb-base-a-focus-color);
-  }
-
-  .ui-breadcrumbs-separator {
-    display: inline-block;
-    margin: 0 12px;
-    opacity: 0.4;
-  }
-
-  .ui-breadcrumbs-base {
-    background: var(--ui-breadcrumbs-base-background);
-    color: var(--ui-breadcrumbs-base-color);
-    font-family: var(--ui-breadcrumbs-base-font-family);
-    padding: 14px 24px;
-  }
-
   .ui-toolbar-base {
     border-bottom: 2px solid rgba(0,0,0,0.1);
     background: var(--ui-toolbar-base-background);
@@ -8604,311 +8593,6 @@ _insertStyles(`
     padding: 0 24px;
     display: flex;
     height: 56px;
-  }
-
-  .ui-toggle-base {
-    -webkit-tap-highlight-color: rgba(0,0,0,0);
-    -webkit-touch-callout: none;
-    -webkit-appearance: none;
-    appearance: none;
-    background-color: var(--ui-toggle-base-background-color);
-    border: var(--ui-toggle-base-border);
-    border-radius: var(--ui-toggle-base-border-radius);
-    color: var(--ui-toggle-base-color);
-    font-family: var(--ui-toggle-base-font-family);
-    display: inline-flex;
-    position: relative;
-    font-weight: bold;
-    width: var(--ui-toggle-base-width);
-    cursor: pointer;
-    font-size: 14px;
-    outline: none;
-    height: 34px;
-    padding: 0;
-  }
-
-  .ui-toggle-base::-moz-focus-inner {
-    border: 0;
-  }
-
-  .ui-toggle-base:focus {
-    box-shadow: var(--ui-toggle-base-focus-box-shadow);
-    border-color: var(--ui-toggle-base-focus-border-color);
-    color: var(--ui-toggle-base-focus-color);
-  }
-
-  .ui-toggle-base:disabled {
-    background: var(--ui-toggle-base-disabled-background);
-    color: var(--ui-toggle-base-disabled-color);
-    cursor: not-allowed;
-  }
-
-  .ui-toggle-label {
-    text-align: center;
-    width: 50%;
-  }
-
-  .ui-toggle-overlay {
-    background: var(--ui-toggle-overlay-background);
-    border-radius: var(--ui-toggle-overlay-border-radius);
-    width: calc(50% - 2px);
-    position: absolute;
-    transition: 320ms;
-    left: var(--ui-toggle-overlay-left);
-    bottom: 2px;
-    top: 2px;
-  }
-
-  .ui-calendar-cell-style {
-    border-radius: var(--ui-calendar-cell-style-border-radius);
-    justify-content: center;
-    line-height: 34px;
-    cursor: pointer;
-    display: flex;
-    height: 34px;
-    width: 34px;
-    background: var(--ui-calendar-cell-style-background);
-    color: var(--ui-calendar-cell-style-color);
-    opacity: var(--ui-calendar-cell-style-opacity);
-  }
-
-  .ui-calendar-cell-style:hover {
-    background: var(--ui-calendar-cell-style-hover-background);
-    color: var(--ui-calendar-cell-style-hover-color);
-  }
-
-  .ui-input-input {
-    -webkit-tap-highlight-color: rgba(0,0,0,0);
-    -webkit-touch-callout: none;
-    background-color: var(--ui-input-input-background-color);
-    border: var(--ui-input-input-border);
-    border-radius: var(--ui-input-input-border-radius);
-    color: var(--ui-input-input-color);
-    font-family: var(--ui-input-input-font-family);
-    line-height: 14px;
-    font-size: 14px;
-    outline: none;
-    height: 34px;
-    width: 100%;
-    padding: 6px 9px;
-    padding-right: var(--ui-input-input-padding-right);
-  }
-
-  .ui-input-input:disabled {
-    background-color: var(--ui-input-input-disabled-background-color);
-    color: var(--ui-input-input-disabled-color);
-    border-color: transparent;
-    cursor: not-allowed;
-    user-select: none;
-  }
-
-  .ui-input-input:-moz-read-only::-moz-selection {
-    background: transparent;
-  }
-
-  .ui-input-input:read-only::selection {
-    background: transparent;
-  }
-
-  .ui-input-input::-webkit-input-placeholder {
-    opacity: 0.5;
-  }
-
-  .ui-input-input:-ms-input-placeholder {
-    opacity: 0.5;
-  }
-
-  .ui-input-input::-moz-placeholder {
-    opacity: 0.5;
-  }
-
-  .ui-input-input:-moz-placeholder {
-    opacity: 0.5;
-  }
-
-  .ui-input-input:focus {
-    box-shadow: var(--ui-input-input-focus-box-shadow);
-    border-color: var(--ui-input-input-focus-border-color);
-  }
-
-  .ui-input-base {
-    -webkit-tap-highlight-color: rgba(0,0,0,0);
-    -webkit-touch-callout: none;
-    display: inline-block;
-    position: relative;
-  }
-
-  .ui-input-icon {
-    fill: var(--ui-input-icon-fill);
-    position: absolute;
-    cursor: pointer;
-    height: 12px;
-    width: 12px;
-    right: 12px;
-    top: 11px;
-  }
-
-  .ui-input-icon:hover {
-    fill: var(--ui-input-icon-hover-fill);
-  }
-
-  .ui-card-base {
-    border: 1px solid #e4e4e4;
-    flex-direction: column;
-    border-radius: 4px;
-    display: flex;
-  }
-
-  .ui-card-image-base {
-    display: block;
-    width: 100%;
-    border: 0;
-  }
-
-  .ui-card-image-base:first-child {
-    border-top-right-radius: 4px;
-    border-top-left-radius: 4px;
-    width: calc(100% + 2px);
-    margin-left: -1px;
-    margin-top: -1px;
-  }
-
-  .ui-card-block-base {
-    padding: 1.25em;
-    flex: 1;
-  }
-
-  .ui-card-title-base {
-    margin-bottom: 0.75em;
-    font-size: 1.25em;
-    font-weight: bold;
-  }
-
-  .ui-card-text-base {
-    line-height: 1.5;
-  }
-
-  .ui-toolbar-separator-base {
-    border-left: 1px solid rgba(255, 255, 255, 0.1);
-    margin: 0 15px;
-    height: 30px;
-  }
-
-  .ui-form-label-base {
-    font-size: var(--ui-form-label-base-font-size);
-    font-family: var(--ui-form-label-base-font-family);
-    font-weight: bold;
-    opacity: 0.8;
-    color: #333;
-    flex: 1;
-  }
-
-  .ui-toolbar-title-base {
-    font-family: sans;
-    font-weight: bold;
-    font-size: 22px;
-  }
-
-  .ui-toolbar-title-base > a {
-    color: inherit;
-  }
-
-  .ui-toolbar-title-base:hover > a {
-    color: inherit;
-  }
-
-  .ui-toolbar-title-base > a:focus {
-    color: inherit;
-  }
-
-  .ui-toolbar-title-base:not(:first-child) {
-    margin-left: 15px;
-  }
-
-  .ui-icon-path-svg {
-    pointer-events: var(--ui-icon-path-svg-pointer-events);
-    fill: currentColor;
-  }
-
-  .ui-icon-path-svg:hover {
-    fill: var(--ui-icon-path-svg-hover-fill);
-    cursor: var(--ui-icon-path-svg-hover-cursor);
-  }
-
-  .ui-toolbar-link-base {
-    font-size: 18px;
-  }
-
-  .ui-toolbar-link-base a {
-    cursor: pointer;
-    display: block;
-    color: inherit;
-  }
-
-  .ui-toolbar-link-base a:focus {
-    color: inherit;
-  }
-
-  .ui-toolbar-link-base a:hover {
-    color: inherit;
-  }
-
-  .ui-toolbar-spacer-base {
-    flex: 1;
-  }
-
-  .ui-button-styles {
-    -webkit-tap-highlight-color: rgba(0,0,0,0);
-    -webkit-touch-callout: none;
-    -webkit-appearance: none;
-    appearance: none;
-    border-radius: var(--ui-button-styles-border-radius);
-    font-family: var(--ui-button-styles-font-family);
-    display: inline-flex;
-    white-space: nowrap;
-    font-weight: bold;
-    user-select: none;
-    cursor: pointer;
-    outline: none;
-    height: var(--ui-button-styles-height);
-    flexDirection: var(--ui-button-styles-flexDirection);
-    padding: var(--ui-button-styles-padding);
-    background: var(--ui-button-styles-background);
-    color: var(--ui-button-styles-color);
-    font-size: var(--ui-button-styles-font-size);
-    border: var(--ui-button-styles-border);
-  }
-
-  .ui-button-styles::-moz-focus-inner {
-    border: 0;
-  }
-
-  .ui-button-styles:focus {
-    box-shadow: var(--ui-button-styles-focus-box-shadow);
-    background: var(--ui-button-styles-focus-background);
-    border: var(--ui-button-styles-focus-border);
-    color: var(--ui-button-styles-focus-color);
-  }
-
-  .ui-button-styles:disabled {
-    background: var(--ui-button-styles-disabled-background);
-    color: var(--ui-button-styles-disabled-color);
-    cursor: not-allowed;
-  }
-
-  .ui-button-label {
-    text-overflow: ellipsis;
-    grid-area: label;
-    overflow: hidden;
-  }
-
-  .ui-button-icon {
-    height: var(--ui-button-icon-height);
-    width: var(--ui-button-icon-width);
-  }
-
-  .ui-button-gutter {
-    width: var(--ui-button-gutter-width);
   }
 
   .ui-slider-base {
@@ -9005,23 +8689,20 @@ _insertStyles(`
     border: 0;
   }
 
-  .ui-pager-page-base {
-    transition: var(--ui-pager-page-base-transition);
-    pointer-events: var(--ui-pager-page-base-pointer-events);
-    transform: var(--ui-pager-page-base-transform);
-    position: absolute;
-    opacity: var(--ui-pager-page-base-opacity);
-    display: grid;
-    bottom: 0;
-    right: 0;
-    left: 0;
-    top: 0;
+  .ui-icon-path-svg {
+    pointer-events: var(--ui-icon-path-svg-pointer-events);
+    fill: currentColor;
   }
 
-  .ui-pager-base {
-    position: relative;
-    overflow: hidden;
-    flex: 1;
+  .ui-icon-path-svg:hover {
+    fill: var(--ui-icon-path-svg-hover-fill);
+    cursor: var(--ui-icon-path-svg-hover-cursor);
+  }
+
+  .ui-toolbar-separator-base {
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+    margin: 0 15px;
+    height: 30px;
   }
 
   .ui-pagination-base {
@@ -9042,8 +8723,461 @@ _insertStyles(`
     line-height: 8px;
   }
 
+  .ui-toolbar-title-base {
+    font-family: sans;
+    font-weight: bold;
+    font-size: 22px;
+  }
+
+  .ui-toolbar-title-base > a {
+    color: inherit;
+  }
+
+  .ui-toolbar-title-base:hover > a {
+    color: inherit;
+  }
+
+  .ui-toolbar-title-base > a:focus {
+    color: inherit;
+  }
+
+  .ui-toolbar-title-base:not(:first-child) {
+    margin-left: 15px;
+  }
+
+  .ui-input-input {
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    -webkit-touch-callout: none;
+    background-color: var(--ui-input-input-background-color);
+    border: var(--ui-input-input-border);
+    border-radius: var(--ui-input-input-border-radius);
+    color: var(--ui-input-input-color);
+    font-family: var(--ui-input-input-font-family);
+    line-height: 14px;
+    font-size: 14px;
+    outline: none;
+    height: 34px;
+    width: 100%;
+    padding: 6px 9px;
+    padding-right: var(--ui-input-input-padding-right);
+  }
+
+  .ui-input-input:disabled {
+    background-color: var(--ui-input-input-disabled-background-color);
+    color: var(--ui-input-input-disabled-color);
+    border-color: transparent;
+    cursor: not-allowed;
+    user-select: none;
+  }
+
+  .ui-input-input:-moz-read-only::-moz-selection {
+    background: transparent;
+  }
+
+  .ui-input-input:read-only::selection {
+    background: transparent;
+  }
+
+  .ui-input-input::-webkit-input-placeholder {
+    opacity: 0.5;
+  }
+
+  .ui-input-input:-ms-input-placeholder {
+    opacity: 0.5;
+  }
+
+  .ui-input-input::-moz-placeholder {
+    opacity: 0.5;
+  }
+
+  .ui-input-input:-moz-placeholder {
+    opacity: 0.5;
+  }
+
+  .ui-input-input:focus {
+    box-shadow: var(--ui-input-input-focus-box-shadow);
+    border-color: var(--ui-input-input-focus-border-color);
+  }
+
+  .ui-input-base {
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    -webkit-touch-callout: none;
+    display: inline-block;
+    position: relative;
+  }
+
+  .ui-input-icon {
+    fill: var(--ui-input-icon-fill);
+    position: absolute;
+    cursor: pointer;
+    height: 12px;
+    width: 12px;
+    right: 12px;
+    top: 11px;
+  }
+
+  .ui-input-icon:hover {
+    fill: var(--ui-input-icon-hover-fill);
+  }
+
+  .ui-pager-page-base {
+    transition: var(--ui-pager-page-base-transition);
+    pointer-events: var(--ui-pager-page-base-pointer-events);
+    transform: var(--ui-pager-page-base-transform);
+    position: absolute;
+    opacity: var(--ui-pager-page-base-opacity);
+    display: grid;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    top: 0;
+  }
+
+  .ui-pager-base {
+    position: relative;
+    overflow: hidden;
+    flex: 1;
+  }
+
+  .ui-link-base {
+    color: var(--ui-link-base-color);
+    text-decoration: none;
+    outline: none;
+  }
+
+  .ui-link-base:hover {
+    text-decoration: underline;
+    color: var(--ui-link-base-hover-color);
+  }
+
+  .ui-link-base:focus {
+    text-decoration: underline;
+    color: var(--ui-link-base-focus-color);
+  }
+
+  .ui-loader-base {
+    position: relative;
+  }
+
+  .ui-loader-loader {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    top: 0;
+    background: rgba(255,255,255,0.8);
+    transition-delay: 320ms;
+    transition: 320ms;
+    pointer-events: var(--ui-loader-loader-pointer-events);
+    opacity: var(--ui-loader-loader-opacity);
+    justify-content: center;
+    align-items: center;
+    display: flex;
+  }
+
+  .ui-toggle-base {
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    -webkit-touch-callout: none;
+    -webkit-appearance: none;
+    appearance: none;
+    background-color: var(--ui-toggle-base-background-color);
+    border: var(--ui-toggle-base-border);
+    border-radius: var(--ui-toggle-base-border-radius);
+    color: var(--ui-toggle-base-color);
+    font-family: var(--ui-toggle-base-font-family);
+    display: inline-flex;
+    position: relative;
+    font-weight: bold;
+    width: var(--ui-toggle-base-width);
+    cursor: pointer;
+    font-size: 14px;
+    outline: none;
+    height: 34px;
+    padding: 0;
+  }
+
+  .ui-toggle-base::-moz-focus-inner {
+    border: 0;
+  }
+
+  .ui-toggle-base:focus {
+    box-shadow: var(--ui-toggle-base-focus-box-shadow);
+    border-color: var(--ui-toggle-base-focus-border-color);
+    color: var(--ui-toggle-base-focus-color);
+  }
+
+  .ui-toggle-base:disabled {
+    background: var(--ui-toggle-base-disabled-background);
+    color: var(--ui-toggle-base-disabled-color);
+    cursor: not-allowed;
+  }
+
+  .ui-toggle-label {
+    text-align: center;
+    width: 50%;
+  }
+
+  .ui-toggle-overlay {
+    background: var(--ui-toggle-overlay-background);
+    border-radius: var(--ui-toggle-overlay-border-radius);
+    width: calc(50% - 2px);
+    position: absolute;
+    transition: 320ms;
+    left: var(--ui-toggle-overlay-left);
+    bottom: 2px;
+    top: 2px;
+  }
+
   .ui-time-base {
     display: inline-block;
+  }
+
+  .ui-table-td-td {
+    border: var(--ui-table-td-td-border);
+    border-bottom: var(--ui-table-td-td-border-bottom);
+    font-weight: var(--ui-table-td-td-font-weight);
+    text-align: var(--ui-table-td-td-text-align);
+    padding: 7px 10px;
+    width: var(--ui-table-td-td-width);
+  }
+
+  .ui-button-styles {
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    -webkit-touch-callout: none;
+    -webkit-appearance: none;
+    appearance: none;
+    border-radius: var(--ui-button-styles-border-radius);
+    font-family: var(--ui-button-styles-font-family);
+    display: inline-flex;
+    white-space: nowrap;
+    font-weight: bold;
+    user-select: none;
+    cursor: pointer;
+    outline: none;
+    height: var(--ui-button-styles-height);
+    flexDirection: var(--ui-button-styles-flexDirection);
+    padding: var(--ui-button-styles-padding);
+    background: var(--ui-button-styles-background);
+    color: var(--ui-button-styles-color);
+    font-size: var(--ui-button-styles-font-size);
+    border: var(--ui-button-styles-border);
+  }
+
+  .ui-button-styles::-moz-focus-inner {
+    border: 0;
+  }
+
+  .ui-button-styles:focus {
+    box-shadow: var(--ui-button-styles-focus-box-shadow);
+    background: var(--ui-button-styles-focus-background);
+    border: var(--ui-button-styles-focus-border);
+    color: var(--ui-button-styles-focus-color);
+  }
+
+  .ui-button-styles:disabled {
+    background: var(--ui-button-styles-disabled-background);
+    color: var(--ui-button-styles-disabled-color);
+    cursor: not-allowed;
+  }
+
+  .ui-button-label {
+    text-overflow: ellipsis;
+    grid-area: label;
+    overflow: hidden;
+  }
+
+  .ui-button-icon {
+    height: var(--ui-button-icon-height);
+    width: var(--ui-button-icon-width);
+  }
+
+  .ui-button-gutter {
+    width: var(--ui-button-gutter-width);
+  }
+
+  .ui-card-base {
+    border: 1px solid #e4e4e4;
+    flex-direction: column;
+    border-radius: 4px;
+    display: flex;
+  }
+
+  .ui-card-image-base {
+    display: block;
+    width: 100%;
+    border: 0;
+  }
+
+  .ui-card-image-base:first-child {
+    border-top-right-radius: 4px;
+    border-top-left-radius: 4px;
+    width: calc(100% + 2px);
+    margin-left: -1px;
+    margin-top: -1px;
+  }
+
+  .ui-card-block-base {
+    padding: 1.25em;
+    flex: 1;
+  }
+
+  .ui-card-title-base {
+    margin-bottom: 0.75em;
+    font-size: 1.25em;
+    font-weight: bold;
+  }
+
+  .ui-card-text-base {
+    line-height: 1.5;
+  }
+
+  .ui-calendar-cell-style {
+    border-radius: var(--ui-calendar-cell-style-border-radius);
+    justify-content: center;
+    line-height: 34px;
+    cursor: pointer;
+    display: flex;
+    height: 34px;
+    width: 34px;
+    background: var(--ui-calendar-cell-style-background);
+    color: var(--ui-calendar-cell-style-color);
+    opacity: var(--ui-calendar-cell-style-opacity);
+  }
+
+  .ui-calendar-cell-style:hover {
+    background: var(--ui-calendar-cell-style-hover-background);
+    color: var(--ui-calendar-cell-style-hover-color);
+  }
+
+  .ui-toolbar-link-base {
+    font-size: 18px;
+  }
+
+  .ui-toolbar-link-base a {
+    cursor: pointer;
+    display: block;
+    color: inherit;
+  }
+
+  .ui-toolbar-link-base a:focus {
+    color: inherit;
+  }
+
+  .ui-toolbar-link-base a:hover {
+    color: inherit;
+  }
+
+  .ui-dropdown-panel {
+    position: fixed;
+    left: var(--ui-dropdown-panel-left);
+    top: var(--ui-dropdown-panel-top);
+  }
+
+  .ui-form-label-base {
+    font-size: var(--ui-form-label-base-font-size);
+    font-family: var(--ui-form-label-base-font-family);
+    font-weight: bold;
+    opacity: 0.8;
+    color: #333;
+    flex: 1;
+  }
+
+  .ui-checkbox-base {
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    -webkit-touch-callout: none;
+    background-color: var(--ui-checkbox-base-background-color);
+    border: var(--ui-checkbox-base-border);
+    border-radius: var(--ui-checkbox-base-border-radius);
+    color: var(--ui-checkbox-base-color);
+    justify-content: center;
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    outline: none;
+    height: 34px;
+    width: 34px;
+    padding: 0;
+  }
+
+  .ui-checkbox-base::-moz-focus-inner {
+    border: 0;
+  }
+
+  .ui-checkbox-base:focus {
+    box-shadow: var(--ui-checkbox-base-focus-box-shadow);
+    border-color: var(--ui-checkbox-base-focus-border-color);
+    color: var(--ui-checkbox-base-focus-color);
+  }
+
+  .ui-checkbox-base:disabled {
+    background: var(--ui-checkbox-base-disabled-background);
+    color: var(--ui-checkbox-base-disabled-color);
+    cursor: not-allowed;
+  }
+
+  .ui-checkbox-icon {
+    transform: var(--ui-checkbox-icon-transform);
+    opacity: var(--ui-checkbox-icon-opacity);
+    fill: currentColor;
+    transition: 200ms;
+    height: 16px;
+    width: 16px;
+  }
+
+  .ui-toolbar-spacer-base {
+    flex: 1;
+  }
+
+  .ui-form-separator-base {
+    border-top: 1px solid #EEE;
+  }
+
+  .ui-calendar-base {
+    -moz-user-select: none;
+    user-select: none;
+    background: var(--ui-calendar-base-background);
+    border: var(--ui-calendar-base-border);
+    border-radius: var(--ui-calendar-base-border-radius);
+    color: var(--ui-calendar-base-color);
+    font-family: var(--ui-calendar-base-font-family);
+    padding: 10px;
+    width: 300px;
+  }
+
+  .ui-calendar-table {
+    grid-template-columns: repeat(7, 1fr);
+    grid-gap: 10px;
+    display: grid;
+    width: 100%;
+  }
+
+  .ui-calendar-header {
+    align-items: center;
+    display: flex;
+    height: 26px;
+  }
+
+  .ui-calendar-text {
+    text-align: center;
+    flex: 1;
+  }
+
+  .ui-calendar-day-name {
+    text-transform: uppercase;
+    text-align: center;
+    font-weight: bold;
+    font-size: 12px;
+    opacity: 0.5;
+    width: 34px;
+  }
+
+  .ui-calendar-day-names {
+    border-bottom: var(--ui-calendar-day-names-border-bottom);
+    border-top: var(--ui-calendar-day-names-border-top);
+    justify-content: space-between;
+    padding: 6px 0;
+    margin: 10px 0;
+    display: flex;
   }
 
   .ui-form-field-base {
@@ -9058,13 +9192,50 @@ _insertStyles(`
 
   .ui-form-field-base > *:last-child {
     margin-bottom: var(--ui-form-field-base-last-child-margin-bottom);
+  }
+
+  .ui-breadcrumb-base {
+    display: inline-block;
+  }
+
+  .ui-breadcrumb-base:hover {
+    color: var(--ui-breadcrumb-base-hover-color);
+  }
+
+  .ui-breadcrumb-base a:focus {
+    color: var(--ui-breadcrumb-base-a-focus-color);
+  }
+
+  .ui-breadcrumbs-separator {
+    display: inline-block;
+    margin: 0 12px;
+    opacity: 0.4;
+  }
+
+  .ui-breadcrumbs-base {
+    background: var(--ui-breadcrumbs-base-background);
+    color: var(--ui-breadcrumbs-base-color);
+    font-family: var(--ui-breadcrumbs-base-font-family);
+    padding: 14px 24px;
   }  @media (max-width: 600px)  {
+    .title-base-media-0 {
+      font-size: 24px;
+    }
+
     .sub-title-base-media-0 {
       font-size: 14px;
     }
 
+    .button-base-media-0 {
+      padding: 15px 30px;
+    }
+
     .showcase-highlight-block-base-media-0 {
       white-space: pre-wrap;
+    }
+
+    .github-base-media-0 {
+      padding: 60px 20px;
     }
 
     .showcase-base-media-0 {
@@ -9090,10 +9261,6 @@ _insertStyles(`
 
     .showcase-section-title-media-0 {
       font-size: 18px;
-    }
-
-    .github-base-media-0 {
-      padding: 60px 20px;
     }
 
     .install-list-media-0 {
@@ -9123,32 +9290,24 @@ _insertStyles(`
       margin-top: 15px;
     }
 
-    .title-base-media-0 {
-      font-size: 24px;
-    }
-
     .page-base-media-0 {
       padding: 20px;
       padding-top: 25px;
-    }
-
-    .button-base-media-0 {
-      padding: 15px 30px;
-    }}
-
-  @media (min-width: 600px)  {
-    .home-separator-media-0 {
-      margin-left: 30px;
-    }
-
-    .header-desktop-media-0 {
-      display: flex;
     }}
 
   @media (max-width: 500px)  {
     .logo-base-media-0 {
       height: var(--logo-base-media-0-height);
       width: var(--logo-base-media-0-width);
+    }}
+
+  @media (min-width: 600px)  {
+    .header-desktop-media-0 {
+      display: flex;
+    }
+
+    .home-separator-media-0 {
+      margin-left: 30px;
     }}
 `)
 _program.render($Main)
