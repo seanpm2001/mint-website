@@ -35,7 +35,14 @@ var Mint=function(){"use strict";function e(e,t){return e(t={exports:{}},t.expor
 
   class DoError extends Error {}
 
-  $Http_Error_NetworkError = Symbol.for(`Http_Error_NetworkError`)
+  $Page_NotFound = Symbol.for(`Page_NotFound`)
+$Page_Examples = Symbol.for(`Page_Examples`)
+$Page_Install = Symbol.for(`Page_Install`)
+$Page_Roadmap = Symbol.for(`Page_Roadmap`)
+$Page_Home = Symbol.for(`Page_Home`)
+$Page_Try = Symbol.for(`Page_Try`)
+
+$Http_Error_NetworkError = Symbol.for(`Http_Error_NetworkError`)
 $Http_Error_Aborted = Symbol.for(`Http_Error_Aborted`)
 $Http_Error_Timeout = Symbol.for(`Http_Error_Timeout`)
 $Http_Error_BadUrl = Symbol.for(`Http_Error_BadUrl`)
@@ -44,35 +51,6 @@ $Storage_Error_SecurityError = Symbol.for(`Storage_Error_SecurityError`)
 $Storage_Error_QuotaExceeded = Symbol.for(`Storage_Error_QuotaExceeded`)
 $Storage_Error_NotFound = Symbol.for(`Storage_Error_NotFound`)
 $Storage_Error_Unkown = Symbol.for(`Storage_Error_Unkown`)
-
-const $$User = (input) => {
-  let firstName = Decoder.field(`first_name`, Decoder.string)(input)
-  if (firstName instanceof Err) { return firstName }
-
-  let lastName = Decoder.field(`last_name`, Decoder.string)(input)
-  if (lastName instanceof Err) { return lastName }
-
-  let createdAt = Decoder.field(`created_at`, Decoder.time)(input)
-  if (createdAt instanceof Err) { return createdAt }
-
-  let updatedAt = Decoder.field(`updated_at`, Decoder.time)(input)
-  if (updatedAt instanceof Err) { return updatedAt }
-
-  let status = Decoder.field(`status`, Decoder.string)(input)
-  if (status instanceof Err) { return status }
-
-  let id = Decoder.field(`id`, Decoder.number)(input)
-  if (id instanceof Err) { return id }
-
-  return new Ok({
-    firstName: firstName.value,
-    lastName: lastName.value,
-    createdAt: createdAt.value,
-    updatedAt: updatedAt.value,
-    status: status.value,
-    id: id.value
-  })
-}
 
 const $$Asset = (input) => {
   let url = Decoder.field(`browser_download_url`, Decoder.string)(input)
@@ -237,9 +215,9 @@ _program.addRoutes([{
   handler: (() => {
     (async () => {
   try {
-     await $Application.setPage(`new`)
+     await $Application.setPage($Page_Try)
 
- await $Users_List.resetUser()
+ await $Stores_Try.init(`/sources/counter.mint`)
   }
   catch(_error) {
     if (_error instanceof DoError) {
@@ -251,60 +229,14 @@ _program.addRoutes([{
 })()
   }),
   mapping: [],
-  path: `/users/new`
-}, {
-  handler: ((id) => {
-    (async () => {
-  try {
-     await $Application.setPage(`user`)
-
- await $Users_List.resetUser()
-
- await $Users_List.getUser(id)
-  }
-  catch(_error) {
-    if (_error instanceof DoError) {
-    } else {
-      console.warn(`Unhandled error in do statement`)
-      console.log(_error)
-    }
-  } 
-})()
-  }),
-  mapping: ['id'],
-  path: `/users/:id`
-}, {
-  handler: ((page) => {
-    (async () => {
-  try {
-     await $Application.setPage(`index`)
-
- await $Users_List.refresh()
-
-let actualPage = await $Maybe.withDefault(0, $Number.fromString(page))
-
- await $Users_List.setPage(actualPage)
-  }
-  catch(_error) {
-    if (_error instanceof DoError) {
-    } else {
-      console.warn(`Unhandled error in do statement`)
-      console.log(_error)
-    }
-  } 
-})()
-  }),
-  mapping: ['page'],
-  path: `/users?page=:page`
+  path: `/examples/counter`
 }, {
   handler: (() => {
     (async () => {
   try {
-     await $Application.setPage(`index`)
+     await $Application.setPage($Page_Try)
 
- await $Users_List.refresh()
-
- await $Users_List.setPage(0)
+ await $Stores_Try.init(`/sources/drag.mint`)
   }
   catch(_error) {
     if (_error instanceof DoError) {
@@ -316,28 +248,23 @@ let actualPage = await $Maybe.withDefault(0, $Number.fromString(page))
 })()
   }),
   mapping: [],
-  path: `/users`
+  path: `/examples/drag`
 }, {
   handler: (() => {
-    $Application.setPage(`counter`)
-  }),
-  mapping: [],
-  path: `/counter`
-}, {
-  handler: (() => {
-    $Application.setPage(`drag`)
-  }),
-  mapping: [],
-  path: `/drag`
-}, {
-  handler: (() => {
-    $Application.setPage(`examples`)
-  }),
-  mapping: [],
-  path: `/examples`
-}, {
-  handler: (() => {
-    $Application.setPage(`file-handling`)
+    (async () => {
+  try {
+     await $Application.setPage($Page_Try)
+
+ await $Stores_Try.init(`/sources/file-handling.mint`)
+  }
+  catch(_error) {
+    if (_error instanceof DoError) {
+    } else {
+      console.warn(`Unhandled error in do statement`)
+      console.log(_error)
+    }
+  } 
+})()
   }),
   mapping: [],
   path: `/examples/file-handling`
@@ -345,49 +272,9 @@ let actualPage = await $Maybe.withDefault(0, $Number.fromString(page))
   handler: (() => {
     (async () => {
   try {
-     await $Application.setPage(`install`)
+     await $Application.setPage($Page_Try)
 
- await $Versions.refresh()
-  }
-  catch(_error) {
-    if (_error instanceof DoError) {
-    } else {
-      console.warn(`Unhandled error in do statement`)
-      console.log(_error)
-    }
-  } 
-})()
-  }),
-  mapping: [],
-  path: `/install`
-}, {
-  handler: (() => {
-    (async () => {
-  try {
-     await $Application.setPage(`roadmap`)
-
- await $Versions.refresh()
-  }
-  catch(_error) {
-    if (_error instanceof DoError) {
-    } else {
-      console.warn(`Unhandled error in do statement`)
-      console.log(_error)
-    }
-  } 
-})()
-  }),
-  mapping: [],
-  path: `/roadmap`
-}, {
-  handler: (() => {
-    (async () => {
-  try {
-     await $Application.setPage(`try`)
-
- await $Stores_Try.init()
-
- await $Stores_Try.compile()
+ await $Stores_Try.init(`/sources/counter.mint`)
   }
   catch(_error) {
     if (_error instanceof DoError) {
@@ -402,30 +289,87 @@ let actualPage = await $Maybe.withDefault(0, $Number.fromString(page))
   path: `/try`
 }, {
   handler: (() => {
-    (async () => {
-  try {
-     await $Application.setPage(`home`)
-
- await $Showcase_Store.setActive(`store`)
-  }
-  catch(_error) {
-    if (_error instanceof DoError) {
-    } else {
-      console.warn(`Unhandled error in do statement`)
-      console.log(_error)
-    }
-  } 
-})()
+    $Application.setPage($Page_Examples)
+  }),
+  mapping: [],
+  path: `/examples`
+}, {
+  handler: (() => {
+    $Application.setPage($Page_Install)
+  }),
+  mapping: [],
+  path: `/install`
+}, {
+  handler: (() => {
+    $Application.setPage($Page_Roadmap)
+  }),
+  mapping: [],
+  path: `/roadmap`
+}, {
+  handler: (() => {
+    $Application.setPage($Page_Home)
   }),
   mapping: [],
   path: `/`
 }, {
   handler: (() => {
-    $Application.setPage(`not_found`)
+    $Application.setPage($Page_NotFound)
   }),
   mapping: [],
   path: `*`
 }])
+
+const $Icons = new(class {
+  navigation() {
+    return _createElement("svg", {
+      "width": `24`,
+      "height": `24`,
+      "xmlns": `http://www.w3.org/2000/svg`,
+      "fill-rule": `evenodd`,
+      "clip-rule": `evenodd`
+    }, [_createElement("path", {
+      "d": `M24 18v1h-24v-1h24zm0-6v1h-24v-1h24zm0-6v1h-24v-1h24z`,
+      "fill": `#1040e2`
+    }), _createElement("path", {
+      "d": `M24 19h-24v-1h24v1zm0-6h-24v-1h24v1zm0-6h-24v-1h24v1z`
+    })])
+  }
+
+  star() {
+    return _createElement("svg", {
+      "xmlns": `http://www.w3.org/2000/svg`,
+      "viewBox": `0 0 24 24`,
+      "height": `24`,
+      "width": `24`
+    }, [_createElement("path", {
+      "d": `M12 .288l2.833 8.718h9.167l-7.417 5.389 2.833 8.718-7.416-5.388-7.417 5.388 2.833-8.718-7.416-5.389h9.167z`
+    })])
+  }
+
+  checkmark() {
+    return _createElement("svg", {
+      "xmlns": `http://www.w3.org/2000/svg`,
+      "viewBox": `0 0 24 24`,
+      "height": `24`,
+      "width": `24`
+    }, [_createElement("path", {
+      "d": `M20.285 2l-11.285 11.567-5.286-5.011-3.714 3.716 9 8.728 15-15.285z`
+    })])
+  }
+
+  diamond() {
+    return _createElement("svg", {
+      "xmlns": `http://www.w3.org/2000/svg`,
+      "viewBox": `0 0 24 24`,
+      "fillRule": `evenodd`,
+      "clipRule": `evenodd`,
+      "height": `24`,
+      "width": `24`
+    }, [_createElement("path", {
+      "d": `M12 0l-12 12.001 12 11.999 12.001-11.999-12.001-12.001zm-9.171 12.001l9.171-9.172 9.172 9.172-9.172 9.172-9.171-9.172z`
+    })])
+  }
+})
 
 const $AssetLoader = new(class {
   loadStyle(url) {
@@ -1929,435 +1873,11 @@ const $Maybe = new(class {
   }
 })
 
-const $Users_List = new (class extends Store {
-    constructor() {
-    super()
-    this.props = {
-        users: [],user: new Record({
-      createdAt: $Time.now(),
-      updatedAt: $Time.now(),
-      firstName: ``,
-      lastName: ``,
-      status: ``,
-      id: 0
-    }),loading: false,stale: true,error: ``,perPage: 10,page: 0
-    }
-  }
-
-  get users () {
-    if (this.props.users != undefined) {
-      return this.props.users
-    } else {
-      return []
-    }
-  }
-
-  get user () {
-    if (this.props.user != undefined) {
-      return this.props.user
-    } else {
-      return new Record({
-      createdAt: $Time.now(),
-      updatedAt: $Time.now(),
-      firstName: ``,
-      lastName: ``,
-      status: ``,
-      id: 0
-    })
-    }
-  }
-
-  get loading () {
-    if (this.props.loading != undefined) {
-      return this.props.loading
-    } else {
-      return false
-    }
-  }
-
-  get stale () {
-    if (this.props.stale != undefined) {
-      return this.props.stale
-    } else {
-      return true
-    }
-  }
-
-  get error () {
-    if (this.props.error != undefined) {
-      return this.props.error
-    } else {
-      return ``
-    }
-  }
-
-  get perPage () {
-    if (this.props.perPage != undefined) {
-      return this.props.perPage
-    } else {
-      return 10
-    }
-  }
-
-  get page () {
-    if (this.props.page != undefined) {
-      return this.props.page
-    } else {
-      return 0
-    }
-  }
-
-  get state () {
-    return {
-    users: this.users,
-    user: this.user,
-    loading: this.loading,
-    stale: this.stale,
-    error: this.error,
-    perPage: this.perPage,
-    page: this.page
-    }
-  }
-
-  endpoint() {
-    return `https://mint-website.herokuapp.com/`
-  }
-
-  refresh() {
-    return (this.stale ? $Users_List.load.bind($Users_List)() : null)
-  }
-
-  load() {
-    return (async () => {
-      try {
-         await new Promise((_resolve) => {
-      this.setState(_update(this.state, { loading: true }), _resolve)
-    })
-
-    let response = await (async ()=> {
-      try {
-        return await $Http.send($Http.get($Users_List.endpoint.bind($Users_List)() + `users`))
-      } catch(_error) {
-        let error = _error;
-     new Promise((_resolve) => {
-      this.setState(_update(this.state, { error: `Error` }), _resolve)
-    })
-
-        throw new DoError
-      }
-    })()
-
-    let _2 = $Maybe.toResult(`Json error!`, $Json.parse(response.body))
-
-    if (_2 instanceof Err) {
-      let _error = _2.value
-
-      let error = _error;
-     new Promise((_resolve) => {
-      this.setState(_update(this.state, { error: error }), _resolve)
-    })
-
-      throw new DoError
-    }
-
-    let object = _2.value
-
-    let _3 = Decoder.array($$User)(object)
-
-    if (_3 instanceof Err) {
-      let _error = _3.value
-
-      let error = _error;
-     new Promise((_resolve) => {
-      this.setState(_update(this.state, { error: `Error` }), _resolve)
-    })
-
-      throw new DoError
-    }
-
-    let users = _3.value
-
-    let sortedUsers = await $Array.sort(((a, b) => {
-    return a.id - b.id
-    }), users)
-
-     await new Promise((_resolve) => {
-      this.setState(_update(this.state, { stale: false, users: sortedUsers, error: `` }), _resolve)
-    })
-      }
-      catch(_error) {
-        if (_error instanceof DoError) {
-        } else {
-          console.warn(`Unhandled error in do statement`)
-          console.log(_error)
-        }
-      } finally {
-    new Promise((_resolve) => {
-      this.setState(_update(this.state, { loading: false }), _resolve)
-    })
-    }
-    })()
-  }
-
-  resetUser() {
-    return new Promise((_resolve) => {
-      this.setState(_update(this.state, { user: new Record({
-      createdAt: $Time.now(),
-      updatedAt: $Time.now(),
-      status: `active`,
-      firstName: ``,
-      lastName: ``,
-      id: 0
-    }), error: `` }), _resolve)
-    })
-  }
-
-  saveUser() {
-    return (async () => {
-      try {
-         await new Promise((_resolve) => {
-      this.setState(_update(this.state, { loading: true }), _resolve)
-    })
-
-     await (async ()=> {
-      try {
-        return await $Http.send($Http.stringBody($Users_List.stringifyUser.bind($Users_List)(), $Http.header(`Content-Type`, `application/json`, $Http.put($Users_List.endpoint.bind($Users_List)() + `users/` + $Number.toString(this.user.id)))))
-      } catch(_error) {
-        let error = _error;
-     new Promise((_resolve) => {
-      this.setState(_update(this.state, { error: `Error` }), _resolve)
-    })
-
-        throw new DoError
-      }
-    })()
-
-     await new Promise((_resolve) => {
-      this.setState(_update(this.state, { stale: true }), _resolve)
-    })
-      }
-      catch(_error) {
-        if (_error instanceof DoError) {
-        } else {
-          console.warn(`Unhandled error in do statement`)
-          console.log(_error)
-        }
-      } finally {
-    new Promise((_resolve) => {
-      this.setState(_update(this.state, { loading: false }), _resolve)
-    })
-    }
-    })()
-  }
-
-  deleteUser() {
-    return (async () => {
-      try {
-         await new Promise((_resolve) => {
-      this.setState(_update(this.state, { loading: true }), _resolve)
-    })
-
-     await (async ()=> {
-      try {
-        return await $Http.send($Http.delete($Users_List.endpoint.bind($Users_List)() + `users/` + $Number.toString(this.user.id)))
-      } catch(_error) {
-        let error = _error;
-     new Promise((_resolve) => {
-      this.setState(_update(this.state, { error: `Error` }), _resolve)
-    })
-
-        throw new DoError
-      }
-    })()
-
-     await new Promise((_resolve) => {
-      this.setState(_update(this.state, { stale: true }), _resolve)
-    })
-      }
-      catch(_error) {
-        if (_error instanceof DoError) {
-        } else {
-          console.warn(`Unhandled error in do statement`)
-          console.log(_error)
-        }
-      } finally {
-    new Promise((_resolve) => {
-      this.setState(_update(this.state, { loading: false }), _resolve)
-    })
-    }
-    })()
-  }
-
-  createUser() {
-    return (async () => {
-      try {
-         await new Promise((_resolve) => {
-      this.setState(_update(this.state, { loading: true }), _resolve)
-    })
-
-     await (async ()=> {
-      try {
-        return await $Http.send($Http.stringBody($Users_List.stringifyUser.bind($Users_List)(), $Http.header(`Content-Type`, `application/json`, $Http.post($Users_List.endpoint.bind($Users_List)() + `users`))))
-      } catch(_error) {
-        let error = _error;
-     new Promise((_resolve) => {
-      this.setState(_update(this.state, { error: `Error` }), _resolve)
-    })
-
-        throw new DoError
-      }
-    })()
-
-     await new Promise((_resolve) => {
-      this.setState(_update(this.state, { stale: true }), _resolve)
-    })
-      }
-      catch(_error) {
-        if (_error instanceof DoError) {
-        } else {
-          console.warn(`Unhandled error in do statement`)
-          console.log(_error)
-        }
-      } finally {
-    new Promise((_resolve) => {
-      this.setState(_update(this.state, { loading: false }), _resolve)
-    })
-    }
-    })()
-  }
-
-  stringifyUser() {
-    return $Json.stringify($Object_Encode.object.bind($Object_Encode)([$Object_Encode.field.bind($Object_Encode)(`first_name`, $Object_Encode.string.bind($Object_Encode)(this.user.firstName)), $Object_Encode.field.bind($Object_Encode)(`last_name`, $Object_Encode.string.bind($Object_Encode)(this.user.lastName)), $Object_Encode.field.bind($Object_Encode)(`status`, $Object_Encode.string.bind($Object_Encode)(this.user.status))]))
-  }
-
-  getUser(id) {
-    return (async () => {
-      try {
-         await new Promise((_resolve) => {
-      this.setState(_update(this.state, { loading: true }), _resolve)
-    })
-
-    let response = await (async ()=> {
-      try {
-        return await $Http.send($Http.get($Users_List.endpoint.bind($Users_List)() + `users/` + $Number.toString(id)))
-      } catch(_error) {
-        let error = _error;
-     new Promise((_resolve) => {
-      this.setState(_update(this.state, { error: `error` }), _resolve)
-    })
-
-        throw new DoError
-      }
-    })()
-
-    let _2 = $Maybe.toResult(`Json Error`, $Json.parse(response.body))
-
-    if (_2 instanceof Err) {
-      let _error = _2.value
-
-      let error = _error;
-     new Promise((_resolve) => {
-      this.setState(_update(this.state, { error: error }), _resolve)
-    })
-
-      throw new DoError
-    }
-
-    let object = _2.value
-
-    let _3 = $$User(object)
-
-    if (_3 instanceof Err) {
-      let _error = _3.value
-
-      let error = _error;
-     new Promise((_resolve) => {
-      this.setState(_update(this.state, { error: `error` }), _resolve)
-    })
-
-      throw new DoError
-    }
-
-    let user = _3.value
-
-     await new Promise((_resolve) => {
-      this.setState(_update(this.state, { user: user }), _resolve)
-    })
-      }
-      catch(_error) {
-        if (_error instanceof DoError) {
-        } else {
-          console.warn(`Unhandled error in do statement`)
-          console.log(_error)
-        }
-      } finally {
-    new Promise((_resolve) => {
-      this.setState(_update(this.state, { loading: false }), _resolve)
-    })
-    }
-    })()
-  }
-
-  updateUserStatus(user, isLocked) {
-    return (async () => {
-      try {
-         await $Users_List.setUser.bind($Users_List)(user)
-
-     await $Users_List.setStatus.bind($Users_List)(isLocked)
-
-     await $Users_List.saveUser.bind($Users_List)()
-
-     await $Users_List.refresh.bind($Users_List)()
-      }
-      catch(_error) {
-        if (_error instanceof DoError) {
-        } else {
-          console.warn(`Unhandled error in do statement`)
-          console.log(_error)
-        }
-      } 
-    })()
-  }
-
-  setPage(page) {
-    return new Promise((_resolve) => {
-      this.setState(_update(this.state, { page: page }), _resolve)
-    })
-  }
-
-  setFirstName(firstName) {
-    return new Promise((_resolve) => {
-      this.setState(_update(this.state, { user: _update(this.user, { firstName: firstName }) }), _resolve)
-    })
-  }
-
-  setLastName(lastName) {
-    return new Promise((_resolve) => {
-      this.setState(_update(this.state, { user: _update(this.user, { lastName: lastName }) }), _resolve)
-    })
-  }
-
-  setStatus(isLocked) {
-    let newStatus = (isLocked ? `locked` : `active`)
-
-    return new Promise((_resolve) => {
-      this.setState(_update(this.state, { user: _update(this.user, { status: newStatus }) }), _resolve)
-    })
-  }
-
-  setUser(user) {
-    return new Promise((_resolve) => {
-      this.setState(_update(this.state, { user: user }), _resolve)
-    })
-  }
-})
-$Users_List.__displayName = `Users.List`
-
 const $Stores_Try = new (class extends Store {
     constructor() {
     super()
     this.props = {
-        initialized: false,compiling: false,source: ``,src: ``
+        initialized: false,compiling: false,error: ``,source: ``,src: ``
     }
   }
 
@@ -2374,6 +1894,14 @@ const $Stores_Try = new (class extends Store {
       return this.props.compiling
     } else {
       return false
+    }
+  }
+
+  get error () {
+    if (this.props.error != undefined) {
+      return this.props.error
+    } else {
+      return ``
     }
   }
 
@@ -2397,30 +1925,16 @@ const $Stores_Try = new (class extends Store {
     return {
     initialized: this.initialized,
     compiling: this.compiling,
+    error: this.error,
     source: this.source,
     src: this.src
     }
   }
 
-  init() {
-    return (this.initialized ? null : (async () => {
+  init(url) {
+    return (this.initialized ? $Stores_Try.loadSource.bind($Stores_Try)(url) : (async () => {
       try {
-        let response = await (async ()=> {
-      try {
-        return await $Http.send($Http.get(`/example.mint`))
-      } catch(_error) {
-        let response = _error;
-     null
-
-        throw new DoError
-      }
-    })()
-
-     await new Promise((_resolve) => {
-      this.setState(_update(this.state, { source: response.body }), _resolve)
-    })
-
-     await (async ()=> {
+         await (async ()=> {
       try {
         return await $AssetLoader.loadScript(`/codemirror.min.js`)
       } catch(_error) {
@@ -2453,6 +1967,8 @@ const $Stores_Try = new (class extends Store {
      await new Promise((_resolve) => {
       this.setState(_update(this.state, { initialized: true }), _resolve)
     })
+
+     await $Stores_Try.loadSource.bind($Stores_Try)(url)
       }
       catch(_error) {
         if (_error instanceof DoError) {
@@ -2462,6 +1978,36 @@ const $Stores_Try = new (class extends Store {
         }
       } 
     })())
+  }
+
+  loadSource(url) {
+    return (async () => {
+      try {
+        let response = await (async ()=> {
+      try {
+        return await $Http.send($Http.get(url))
+      } catch(_error) {
+        let response = _error;
+     new Promise((_resolve) => {
+      this.setState(_update(this.state, { error: `Could not load souce file!` }), _resolve)
+    })
+
+        throw new DoError
+      }
+    })()
+
+     await $Stores_Try.setSource.bind($Stores_Try)(response.body)
+
+     await $Stores_Try.compile.bind($Stores_Try)()
+      }
+      catch(_error) {
+        if (_error instanceof DoError) {
+        } else {
+          console.warn(`Unhandled error in do statement`)
+          console.log(_error)
+        }
+      } 
+    })()
   }
 
   setSource(source) {
@@ -2485,7 +2031,7 @@ const $Stores_Try = new (class extends Store {
     return (async () => {
       try {
          await new Promise((_resolve) => {
-      this.setState(_update(this.state, { compiling: true }), _resolve)
+      this.setState(_update(this.state, { compiling: true, error: `` }), _resolve)
     })
 
     let response = await (async ()=> {
@@ -2493,7 +2039,9 @@ const $Stores_Try = new (class extends Store {
         return await $Http.send($Http.stringBody(this.source, $Http.post(`https://mint-website.herokuapp.com/compile`)))
       } catch(_error) {
         let response = _error;
-     null
+     new Promise((_resolve) => {
+      this.setState(_update(this.state, { error: `Compiling failed!` }), _resolve)
+    })
 
         throw new DoError
       }
@@ -2505,8 +2053,10 @@ const $Stores_Try = new (class extends Store {
       try {
         let url = await $Stores_Try.createObjectUrl.bind($Stores_Try)(response.body, `application/javascript`)
 
+    let src = await $Stores_Try.createObjectUrl.bind($Stores_Try)($Stores_Try.html.bind($Stores_Try)(url), `text/html`)
+
      await new Promise((_resolve) => {
-      this.setState(_update(this.state, { src: $Stores_Try.createObjectUrl.bind($Stores_Try)($Stores_Try.html.bind($Stores_Try)(url), `text/html`) }), _resolve)
+      this.setState(_update(this.state, { src: src }), _resolve)
     })
       }
       catch(_error) {
@@ -2534,11 +2084,11 @@ const $Stores_Try = new (class extends Store {
 })
 $Stores_Try.__displayName = `Stores.Try`
 
-const $Versions = new (class extends Store {
+const $Stores_Versions = new (class extends Store {
     constructor() {
     super()
     this.props = {
-        versions: [],loading: true,stale: true
+        versions: [],loading: true,initialized: false,errored: false
     }
   }
 
@@ -2558,11 +2108,19 @@ const $Versions = new (class extends Store {
     }
   }
 
-  get stale () {
-    if (this.props.stale != undefined) {
-      return this.props.stale
+  get initialized () {
+    if (this.props.initialized != undefined) {
+      return this.props.initialized
     } else {
-      return true
+      return false
+    }
+  }
+
+  get errored () {
+    if (this.props.errored != undefined) {
+      return this.props.errored
+    } else {
+      return false
     }
   }
 
@@ -2570,7 +2128,8 @@ const $Versions = new (class extends Store {
     return {
     versions: this.versions,
     loading: this.loading,
-    stale: this.stale
+    initialized: this.initialized,
+    errored: this.errored
     }
   }
 
@@ -2579,14 +2138,14 @@ const $Versions = new (class extends Store {
   }
 
   refresh() {
-    return (this.stale ? $Versions.load.bind($Versions)() : null)
+    return (this.initialized ? null : $Stores_Versions.load.bind($Stores_Versions)())
   }
 
   load() {
     return (async () => {
       try {
          await new Promise((_resolve) => {
-      this.setState(_update(this.state, { loading: true }), _resolve)
+      this.setState(_update(this.state, { errored: false, loading: true }), _resolve)
     })
 
     let response = await (async ()=> {
@@ -2594,7 +2153,9 @@ const $Versions = new (class extends Store {
         return await $Http.send($Http.get(`https://mint-website.herokuapp.com/releases`))
       } catch(_error) {
         let error = _error;
-     $Debug.log(error)
+     new Promise((_resolve) => {
+      this.setState(_update(this.state, { errored: true }), _resolve)
+    })
 
         throw new DoError
       }
@@ -2606,7 +2167,9 @@ const $Versions = new (class extends Store {
       let _error = _2.value
 
       let error = _error;
-     $Debug.log(error)
+     new Promise((_resolve) => {
+      this.setState(_update(this.state, { errored: true }), _resolve)
+    })
 
       throw new DoError
     }
@@ -2619,7 +2182,9 @@ const $Versions = new (class extends Store {
       let _error = _3.value
 
       let error = _error;
-     $Debug.log(error)
+     new Promise((_resolve) => {
+      this.setState(_update(this.state, { errored: true }), _resolve)
+    })
 
       throw new DoError
     }
@@ -2631,7 +2196,7 @@ const $Versions = new (class extends Store {
     }), versions))
 
      await new Promise((_resolve) => {
-      this.setState(_update(this.state, { versions: sortedVersions, stale: false }), _resolve)
+      this.setState(_update(this.state, { versions: sortedVersions, initialized: true }), _resolve)
     })
       }
       catch(_error) {
@@ -2648,170 +2213,7 @@ const $Versions = new (class extends Store {
     })()
   }
 })
-$Versions.__displayName = `Versions`
-
-const $Counter_Store = new (class extends Store {
-    constructor() {
-    super()
-    this.props = {
-        counter: 0
-    }
-  }
-
-  get counter () {
-    if (this.props.counter != undefined) {
-      return this.props.counter
-    } else {
-      return 0
-    }
-  }
-
-  get state () {
-    return {
-    counter: this.counter
-    }
-  }
-
-  increment() {
-    return new Promise((_resolve) => {
-      this.setState(_update(this.state, { counter: this.counter + 1 }), _resolve)
-    })
-  }
-
-  decrement() {
-    return new Promise((_resolve) => {
-      this.setState(_update(this.state, { counter: this.counter - 1 }), _resolve)
-    })
-  }
-})
-$Counter_Store.__displayName = `Counter.Store`
-
-const $Examples_Store = new (class extends Store {
-    constructor() {
-    super()
-    this.props = {
-        userManagement: new Record({
-      title: `User Management`,
-      href: `/users`,
-      description: `This example contains an implementation of a table of users with client side pagination and forms for creating new users and editing existsing ones through an HTTP API.`,
-      src: `https://github.com/mint-lang/mint-website/blob/master/source/UserForm.mint`
-    }),drag: new Record({
-      title: `Drag and Drop`,
-      href: `/drag`,
-      description: `This example shows how to drag and drop an HTML element on the page.`,
-      src: `https://github.com/mint-lang/mint-website/blob/master/source/Drag.mint`
-    }),fileHandling: new Record({
-      title: `File Handling`,
-      href: `/examples/file-handling`,
-      description: `This example shows how to implement a component which loads and shows a file from the users computer and then uploads it to a server via HTTP.`,
-      src: `https://github.com/mint-lang/mint-website/blob/master/source/Examples.FileHandling.mint`
-    }),counter: new Record({
-      title: `Counter`,
-      href: `/counter`,
-      description: `This example shows a counter which stored in a store with two buttons one for incrementing th counter and one for decrementing it.`,
-      src: `https://github.com/mint-lang/mint-website/blob/master/source/Examples.Counter.mint`
-    })
-    }
-  }
-
-  get userManagement () {
-    if (this.props.userManagement != undefined) {
-      return this.props.userManagement
-    } else {
-      return new Record({
-      title: `User Management`,
-      href: `/users`,
-      description: `This example contains an implementation of a table of users with client side pagination and forms for creating new users and editing existsing ones through an HTTP API.`,
-      src: `https://github.com/mint-lang/mint-website/blob/master/source/UserForm.mint`
-    })
-    }
-  }
-
-  get drag () {
-    if (this.props.drag != undefined) {
-      return this.props.drag
-    } else {
-      return new Record({
-      title: `Drag and Drop`,
-      href: `/drag`,
-      description: `This example shows how to drag and drop an HTML element on the page.`,
-      src: `https://github.com/mint-lang/mint-website/blob/master/source/Drag.mint`
-    })
-    }
-  }
-
-  get fileHandling () {
-    if (this.props.fileHandling != undefined) {
-      return this.props.fileHandling
-    } else {
-      return new Record({
-      title: `File Handling`,
-      href: `/examples/file-handling`,
-      description: `This example shows how to implement a component which loads and shows a file from the users computer and then uploads it to a server via HTTP.`,
-      src: `https://github.com/mint-lang/mint-website/blob/master/source/Examples.FileHandling.mint`
-    })
-    }
-  }
-
-  get counter () {
-    if (this.props.counter != undefined) {
-      return this.props.counter
-    } else {
-      return new Record({
-      title: `Counter`,
-      href: `/counter`,
-      description: `This example shows a counter which stored in a store with two buttons one for incrementing th counter and one for decrementing it.`,
-      src: `https://github.com/mint-lang/mint-website/blob/master/source/Examples.Counter.mint`
-    })
-    }
-  }
-
-  get state () {
-    return {
-    userManagement: this.userManagement,
-    drag: this.drag,
-    fileHandling: this.fileHandling,
-    counter: this.counter
-    }
-  }
-})
-$Examples_Store.__displayName = `Examples.Store`
-
-const $DragStore = new (class extends Store {
-    constructor() {
-    super()
-    this.props = {
-        position: new Record({
-      top: 0,
-      left: 0
-    })
-    }
-  }
-
-  get position () {
-    if (this.props.position != undefined) {
-      return this.props.position
-    } else {
-      return new Record({
-      top: 0,
-      left: 0
-    })
-    }
-  }
-
-  get state () {
-    return {
-    position: this.position
-    }
-  }
-
-  setPosition(value) {
-    return new Promise((_resolve) => {
-      this.setState(_update(this.state, { position: value }), _resolve)
-    })
-  }
-})
-$DragStore.__displayName = `DragStore`
+$Stores_Versions.__displayName = `Stores.Versions`
 
 const $Showcase_Store = new (class extends Store {
     constructor() {
@@ -2862,7 +2264,7 @@ const $Application = new (class extends Store {
     constructor() {
     super()
     this.props = {
-        page: ``
+        page: $Page_Home,menu: false
     }
   }
 
@@ -2870,23 +2272,44 @@ const $Application = new (class extends Store {
     if (this.props.page != undefined) {
       return this.props.page
     } else {
-      return ``
+      return $Page_Home
+    }
+  }
+
+  get menu () {
+    if (this.props.menu != undefined) {
+      return this.props.menu
+    } else {
+      return false
     }
   }
 
   get state () {
     return {
-    page: this.page
+    page: this.page,
+    menu: this.menu
     }
   }
 
-  setPage(a) {
+  toggleMenu() {
+    return new Promise((_resolve) => {
+      this.setState(_update(this.state, { menu: !this.menu }), _resolve)
+    })
+  }
+
+  closeMenu() {
+    return new Promise((_resolve) => {
+      this.setState(_update(this.state, { menu: false }), _resolve)
+    })
+  }
+
+  setPage(page) {
     return (async () => {
       try {
          await $Http.abortAll()
 
      await new Promise((_resolve) => {
-      this.setState(_update(this.state, { page: a }), _resolve)
+      this.setState(_update(this.state, { page: page, menu: false }), _resolve)
     })
       }
       catch(_error) {
@@ -3063,6 +2486,46 @@ const $Ui = new (class extends Store {
 })
 $Ui.__displayName = `Ui`
 
+class $Main extends Component {
+  get content() {
+    return (() => {
+      let __condition = this.page
+
+       if (_compare(__condition, $Page_Examples)) {
+        return _createElement($Pages_Examples, {  })
+      } else if (_compare(__condition, $Page_NotFound)) {
+        return _createElement($Pages_NotFound, {  })
+      } else if (_compare(__condition, $Page_Roadmap)) {
+        return _createElement($Pages_Roadmap, {  })
+      } else if (_compare(__condition, $Page_Install)) {
+        return _createElement($Pages_Install, {  })
+      } else if (_compare(__condition, $Page_Home)) {
+        return _createElement($Pages_Home, {  })
+      } else if (_compare(__condition, $Page_Try)) {
+        return _createElement($Pages_Try, {  })
+      }
+    })()
+  }
+
+  get page () { return $Application.page }
+
+  setPage (...params) { return $Application.setPage(...params) }
+
+  componentWillUnmount () {
+    $Application._unsubscribe(this)
+  }
+
+  componentDidMount () {
+    $Application._subscribe(this)
+  }
+
+  render() {
+    return _createElement($Layout, {  }, _array(this.content))
+  }
+}
+
+$Main.displayName = "Main"
+
 class $Title extends Component {
   get children () {
     if (this.props.children != undefined) {
@@ -3085,158 +2548,14 @@ $Title.defaultProps = {
   children: []
 }
 
-class $Main extends Component {
-  get pages() {
-    return [new Record({
-      name: `home`,
-      contents: _createElement($Home, {  })
-    }), new Record({
-      name: `try`,
-      contents: _createElement($Pages_Try, {  })
-    }), new Record({
-      name: `install`,
-      contents: _createElement($Install, {  })
-    }), new Record({
-      name: `examples`,
-      contents: _createElement($Examples, {  })
-    }), new Record({
-      name: `roadmap`,
-      contents: _createElement($Roadmap, {  })
-    }), new Record({
-      name: `file-handling`,
-      contents: _createElement($Example, { "subTitle": this.fileHandling.description, "title": this.fileHandling.title, "src": this.fileHandling.src }, _array(_createElement($Examples_FileHandling, {  })))
-    }), new Record({
-      name: `counter`,
-      contents: _createElement($Example, { "subTitle": this.counter.description, "title": this.counter.title, "src": this.counter.src }, _array(_createElement($Counter, {  })))
-    }), new Record({
-      name: `drag`,
-      contents: _createElement($Example, { "subTitle": this.drag.description, "title": this.drag.title, "src": this.drag.src }, _array(_createElement($Drag, {  })))
-    }), new Record({
-      name: `index`,
-      contents: _createElement($Example, { "subTitle": this.userManagement.description, "title": this.userManagement.title, "src": this.userManagement.src }, _array(_createElement($Users_Layout, {  }, _array(_createElement($Users_Table, {  })))))
-    }), new Record({
-      name: `new`,
-      contents: _createElement($Example, { "subTitle": this.userManagement.description, "title": this.userManagement.title }, _array(_createElement($Users_Layout, {  }, _array(_createElement($UserForm, { "isNew": true })))))
-    }), new Record({
-      name: `user`,
-      contents: _createElement($Example, { "subTitle": this.userManagement.description, "title": this.userManagement.title }, _array(_createElement($Users_Layout, {  }, _array(_createElement($UserForm, { "isNew": false })))))
-    }), new Record({
-      name: `not_found`,
-      contents: _createElement("div", {}, [`404`])
-    })]
-  }
-
-  get userManagement () { return $Examples_Store.userManagement }
-
-  get drag () { return $Examples_Store.drag }
-
-  get fileHandling () { return $Examples_Store.fileHandling }
-
-  get counter () { return $Examples_Store.counter }
-
-  get page () { return $Application.page }
-
-  setPage (...params) { return $Application.setPage(...params) }
-
-  get theme () { return $Ui.theme }
-
-  componentWillUnmount () {
-    $Examples_Store._unsubscribe(this);$Application._unsubscribe(this);$Ui._unsubscribe(this)
-  }
-
-  componentDidMount() {
-    $Examples_Store._subscribe(this);$Application._subscribe(this);$Ui._subscribe(this)
-
-    return (async () => {
-      try {
-         await $Ui.setFontFamily(`Open Sans`)
-      }
-      catch(_error) {
-        if (_error instanceof DoError) {
-        } else {
-          console.warn(`Unhandled error in do statement`)
-          console.log(_error)
-        }
-      } 
-    })()
-  }
-
-  render() {
-    let content = $Maybe.withDefault(_createElement("div", {}), $Maybe.map(((item) => {
-    return item.contents
-    }), $Array.find(((item) => {
-    return _compare(item.name, this.page)
-    }), this.pages)))
-
-    return _createElement($Layout, {  }, _array(content))
-  }
-}
-
-$Main.displayName = "Main"
-
-class $Users_Table extends Component {
-  get loading () { return $Users_List.loading }
-
-  get users () { return $Users_List.users }
-
-  get page () { return $Users_List.page }
-
-  get perPage () { return $Users_List.perPage }
-
-  get error () { return $Users_List.error }
-
-  get theme () { return $Ui.theme }
-
-  componentWillUnmount () {
-    $Users_List._unsubscribe(this);$Ui._unsubscribe(this)
-  }
-
-  componentDidMount () {
-    $Users_List._subscribe(this);$Ui._subscribe(this)
-  }
-
-  setPage(a) {
-    return $Window.navigate(`/users?page=` + $Number.toString(a))
-  }
-
-  renderItem(item) {
-    return _createElement($UserRow, { "key": $Number.toString(item.id), "user": item })
-  }
-
-  render() {
-    let slicedUsers = $Array.slice(this.page * this.perPage, (this.page + 1) * this.perPage, this.users)
-
-    let rows = ($Array.isEmpty(slicedUsers) ? [_createElement("tr", {}, [_createElement("td", {
-      "colspan": `5`
-    }, [_createElement("div", {
-      className: `users-table-empty`
-    }, [`There are no users to display!`])])])] : $Array.map(this.renderItem.bind(this), slicedUsers))
-
-    return _createElement($Ui_Loader, { "shown": this.loading }, _array(_createElement("div", {}, [_createElement("div", {
-      className: `users-table-header`
-    }, [_createElement("div", {
-      className: `users-table-title`
-    }, [`Users`])]), _createElement("table", {
-      className: `users-table-table`,
-      style: {
-        [`--users-table-table-border`]: `1px solid ` + this.theme.border.color,
-        [`--users-table-table-color`]: this.theme.colors.input.text,
-        [`--users-table-table-font-family`]: this.theme.fontFamily
-      }
-    }, [_createElement("thead", {}, [_createElement("tr", {}, [_createElement($Ui_Table_Th, { "width": `40px` }, _array(`Id`)), _createElement($Ui_Table_Th, {  }, _array(`Name`)), _createElement($Ui_Table_Th, {  }, _array(`Status`)), _createElement($Ui_Table_Th, {  }, _array(`Last Updated`)), _createElement($Ui_Table_Th, { "align": `center`, "width": `70px` }, _array(`Active`))])]), _createElement("tbody", {}, [rows])]), _createElement($Ui_Pagination, { "onChange": this.setPage.bind(this), "page": this.page, "total": $Array.size(this.users) })])))
-  }
-}
-
-$Users_Table.displayName = "Users.Table"
-
 class $CodeMirror extends Component {
   get onChange () {
     if (this.props.onChange != undefined) {
       return this.props.onChange
     } else {
-      return ((value) => {
+      return (((value) => {
     return null
-    })
+    }))
     }
   }
 
@@ -3263,11 +2582,14 @@ class $CodeMirror extends Component {
   initRef(element) {
     return (() => {
           if (!window.CodeMirror) { return }
+
           if (this.editor) { return }
+
           this.editor = CodeMirror.fromTextArea(element, {
             lineNumbers: true,
             theme: "neo"
           })
+
           this.editor.on('change', (value) => {
             this.onChange(this.editor.getValue())
           })
@@ -3286,9 +2608,9 @@ class $CodeMirror extends Component {
 $CodeMirror.displayName = "CodeMirror"
 
 $CodeMirror.defaultProps = {
-  onChange: ((value) => {
+  onChange: (((value) => {
   return null
-  }),value: ``
+  })),value: ``
 }
 
 class $SubTitle extends Component {
@@ -3311,102 +2633,6 @@ $SubTitle.displayName = "SubTitle"
 
 $SubTitle.defaultProps = {
   children: []
-}
-
-class $Example extends Component {
-  get children () {
-    if (this.props.children != undefined) {
-      return this.props.children
-    } else {
-      return []
-    }
-  }
-
-  get subTitle () {
-    if (this.props.subTitle != undefined) {
-      return this.props.subTitle
-    } else {
-      return ``
-    }
-  }
-
-  get title () {
-    if (this.props.title != undefined) {
-      return this.props.title
-    } else {
-      return ``
-    }
-  }
-
-  get src () {
-    if (this.props.src != undefined) {
-      return this.props.src
-    } else {
-      return ``
-    }
-  }
-
-  render() {
-    return _createElement($Page, {  }, _array(_createElement($Title, {  }, _array(this.title)), _createElement($SubTitle, {  }, _array(this.subTitle)), _createElement("div", {
-      className: `example-frame`
-    }, [this.children]), _createElement("a", {
-      "href": this.src,
-      "target": `_blank`,
-      className: `example-link`
-    }, [`Source`])))
-  }
-}
-
-$Example.displayName = "Example"
-
-$Example.defaultProps = {
-  children: [],subTitle: ``,title: ``,src: ``
-}
-
-class $Feature extends Component {
-  get star() {
-    return _createElement("svg", {
-      "xmlns": `http://www.w3.org/2000/svg`,
-      "viewBox": `0 0 24 24`,
-      "height": `24`,
-      "width": `24`,
-      className: `feature-star`
-    }, [_createElement("path", {
-      "d": `M12 .288l2.833 8.718h9.167l-7.417 5.389 2.833 8.718-7.416-5.388-7.417 5.388 2.833-8.718-7.416-5.389h9.167z`
-    })])
-  }
-
-  get title () {
-    if (this.props.title != undefined) {
-      return this.props.title
-    } else {
-      return ``
-    }
-  }
-
-  get text () {
-    if (this.props.text != undefined) {
-      return this.props.text
-    } else {
-      return ``
-    }
-  }
-
-  render() {
-    return _createElement("div", {
-      className: `feature-base`
-    }, [_createElement("div", {
-      className: `feature-title`
-    }, [this.star, this.title]), _createElement("div", {
-      className: `feature-text`
-    }, [this.text])])
-  }
-}
-
-$Feature.displayName = "Feature"
-
-$Feature.defaultProps = {
-  title: ``,text: ``
 }
 
 class $Features extends Component {
@@ -3477,13 +2703,13 @@ class $Logo extends Component {
         [`--logo-base-media-0-width`]: this.size + `px`
       }
     }, [_createElement("defs", {}, [_createElement("linearGradient", {
+      "gradientTransform": `translate(-132.333 374.602)`,
       "gradientUnits": `userSpaceOnUse`,
       "y2": `435.85`,
       "x2": `260.59`,
       "y1": `665.136`,
       "x1": `260.59`,
-      "id": this.id,
-      "gradientTransform": `translate(-132.333 374.602)`
+      "id": this.id
     }, [_createElement("stop", {
       "offset": `0`,
       "stop-color": this.bottomColor
@@ -3492,9 +2718,9 @@ class $Logo extends Component {
       "stop-color": this.topColor
     })])]), _createElement("path", {
       "d": `M127.999 810.452c-2.961 11.304-28.25 18.524-30 32.857l-2.855-8.57c-14.89 18.963-13.573 28.57-13.573 28.57l-1.25-6.875c-10.869 18.17-8.567 27.072-7.312 29.786l.527.93s-.235-.3-.527-.93l-2.865-5.053c-11.286 31.219-1.43 40.803-1.43 40.803l-6.07-7.053c-2.683 23.92 4.285 33.75 4.285 33.75l-4.375-4.108c-.557 16.247 10.09 25.893 10.09 25.893l-7.018-4.812c13.505 58.995 40.317 60.584 43.775 60.539l-10.687.345c7.127 7.63 16.225 10.59 22.379 11.748 3.356-17.796 6.44-60.887 6.906-173.808.466 112.912 3.552 156.005 6.908 173.805 6.155-1.16 15.253-4.12 22.38-11.748l-10.686-.344c3.463.044 30.27-1.552 43.773-60.54l-7.018 4.813s10.647-9.646 10.09-25.893l-4.375 4.108s6.968-9.83 4.285-33.75l-6.07 7.053s9.856-9.584-1.43-40.803l-2.863 5.047c-.293.634-.53.933-.53.933l.53-.933c1.256-2.72 3.548-11.62-7.314-29.78l-1.25 6.875s1.318-9.609-13.573-28.572L158 843.307c-1.75-14.332-27.037-21.552-30-32.855z`,
+      "transform": `translate(0 -796.362)`,
       "fill": `url(#` + this.id + `)`,
-      "fill-rule": `evenodd`,
-      "transform": `translate(0 -796.362)`
+      "fill-rule": `evenodd`
     })])
   }
 }
@@ -3503,71 +2729,6 @@ $Logo.displayName = "Logo"
 
 $Logo.defaultProps = {
   mobileSize: 90,invert: false,size: 90
-}
-
-class $UserRow extends Component {
-  get textDecoration() {
-    return (() => {
-      let __condition = this.user.status
-
-       if (_compare(__condition, `locked`)) {
-        return `line-through`
-      } else {
-        return ``
-      }
-    })()
-  }
-
-  get user () {
-    if (this.props.user != undefined) {
-      return this.props.user
-    } else {
-      return new Record({
-      createdAt: $Time.now(),
-      updatedAt: $Time.now(),
-      firstName: ``,
-      lastName: ``,
-      status: ``,
-      id: 0
-    })
-    }
-  }
-
-  updateUserStatus (...params) { return $Users_List.updateUserStatus(...params) }
-
-  componentWillUnmount () {
-    $Users_List._unsubscribe(this)
-  }
-
-  componentDidMount () {
-    $Users_List._subscribe(this)
-  }
-
-  onChange(isLocked) {
-    return this.updateUserStatus.bind(this)(this.user, isLocked)
-  }
-
-  render() {
-    return _createElement("tr", {
-      className: `user-row-tr`,
-      style: {
-        [`--user-row-tr-a-text-decoration`]: this.textDecoration
-      }
-    }, [_createElement($Ui_Table_Td, {  }, _array(_createElement($Ui_Link, { "href": `/users/` + $Number.toString(this.user.id) }, _array($Number.toString(this.user.id))))), _createElement($Ui_Table_Td, {  }, _array(_createElement($Ui_Link, { "href": `/users/` + $Number.toString(this.user.id) }, _array(this.user.firstName + ` ` + this.user.lastName)))), _createElement($Ui_Table_Td, {  }, _array($String.capitalize(this.user.status))), _createElement($Ui_Table_Td, {  }, _array(_createElement($Ui_Time, { "date": this.user.updatedAt }))), _createElement($Ui_Table_Td, { "align": `center` }, _array(_createElement($Ui_Checkbox, { "checked": _compare(this.user.status, `locked`), "onChange": this.onChange.bind(this) })))])
-  }
-}
-
-$UserRow.displayName = "UserRow"
-
-$UserRow.defaultProps = {
-  user: new Record({
-    createdAt: $Time.now(),
-    updatedAt: $Time.now(),
-    firstName: ``,
-    lastName: ``,
-    status: ``,
-    id: 0
-  })
 }
 
 class $Footer extends Component {
@@ -3614,160 +2775,6 @@ class $Footer extends Component {
 
 $Footer.displayName = "Footer"
 
-class $Counter extends Component {
-  get background() {
-    return (this.counter >= 10 ? `lightgreen` : (this.counter < 0 ? `orangered` : `#F2F2F2`))
-  }
-
-  get disabled () {
-    if (this.props.disabled != undefined) {
-      return this.props.disabled
-    } else {
-      return false
-    }
-  }
-
-  increment (...params) { return $Counter_Store.increment(...params) }
-
-  decrement (...params) { return $Counter_Store.decrement(...params) }
-
-  get counter () { return $Counter_Store.counter }
-
-  componentWillUnmount () {
-    $Counter_Store._unsubscribe(this)
-  }
-
-  componentDidMount () {
-    $Counter_Store._subscribe(this)
-  }
-
-  render() {
-    return _createElement("div", {
-      className: `counter-base`,
-      style: {
-        [`--counter-base-background`]: this.background
-      }
-    }, [_createElement("button", {
-      "onClick": (event => (((event) => {
-      return this.decrement.bind(this)()
-      }))(_normalizeEvent(event))),
-      "disabled": this.disabled
-    }, [`Decrement`]), _createElement("span", {
-      className: `counter-counter`
-    }, [$Number.toString(this.counter)]), _createElement("button", {
-      "onClick": (event => (((event) => {
-      return this.increment.bind(this)()
-      }))(_normalizeEvent(event))),
-      "disabled": this.disabled
-    }, [`Increment`])])
-  }
-}
-
-$Counter.displayName = "Counter"
-
-$Counter.defaultProps = {
-  disabled: false
-}
-
-class $Examples_FileHandling extends Component {
-  constructor(props) {
-    super(props)
-    this.state = new Record({
-      file: $Maybe.nothing(),
-      contents: ``
-    })
-  }
-
-  openDialog() {
-    return (async () => {
-      try {
-        let file = await (async ()=> {
-      try {
-        return await $File.select(`application/json`)
-      } catch(_error) {
-        
-
-        throw new DoError
-      }
-    })()
-
-    let contents = await (async ()=> {
-      try {
-        return await $File.readAsDataURL(file)
-      } catch(_error) {
-        
-
-        throw new DoError
-      }
-    })()
-
-     await new Promise((_resolve) => {
-      this.setState(_update(this.state, { contents: contents, file: $Maybe.just(file) }), _resolve)
-    })
-      }
-      catch(_error) {
-        if (_error instanceof DoError) {
-        } else {
-          console.warn(`Unhandled error in do statement`)
-          console.log(_error)
-        }
-      } 
-    })()
-  }
-
-  upload() {
-    let formData = (() => { let _0 = $Maybe.toResult(`Got Nothing`, this.state.file)
-
-             if (_0 instanceof Err) {
-                let _error = _0.value
-                let error = _error
-     return $FormData.empty()
-             }
-
-             let file = _0.value
-
-    return $FormData.addFile(`file`, file, $FormData.empty()) })()
-
-    return (async () => {
-      try {
-        let response = await (async ()=> {
-      try {
-        return await $Http.send($Http.formDataBody(formData, $Http.post(``)))
-      } catch(_error) {
-        let error = _error;
-     $Debug.log(error)
-
-        throw new DoError
-      }
-    })()
-      }
-      catch(_error) {
-        if (_error instanceof DoError) {
-        } else {
-          console.warn(`Unhandled error in do statement`)
-          console.log(_error)
-        }
-      } 
-    })()
-  }
-
-  render() {
-    let file = $Maybe.withDefault(_createElement("div", {}), $Maybe.map(((file) => {
-    return _createElement("div", {}, [$File.name(file)])
-    }), this.state.file))
-
-    return _createElement("div", {}, [_createElement($Ui_Button, { "onClick": ((event) => {
-    return this.openDialog.bind(this)()
-    }), "label": `Open Browse Dialog` }), _createElement($Ui_Button, { "onClick": ((event) => {
-    return this.upload.bind(this)()
-    }), "label": `Upload`, "disabled": $Maybe.isNothing(this.state.file) }), file, _createElement("pre", {
-      className: `examples-file-handling-pre`
-    }, [this.state.contents])])
-  }
-}
-
-$Examples_FileHandling.displayName = "Examples.FileHandling"
-
 class $Layout extends Component {
   get children () {
     if (this.props.children != undefined) {
@@ -3775,16 +2782,6 @@ class $Layout extends Component {
     } else {
       return []
     }
-  }
-
-  get theme () { return $Ui.theme }
-
-  componentWillUnmount () {
-    $Ui._unsubscribe(this)
-  }
-
-  componentDidMount () {
-    $Ui._subscribe(this)
   }
 
   render() {
@@ -3840,15 +2837,114 @@ $Button.defaultProps = {
   children: [],target: ``,href: ``
 }
 
-class $Examples_Example extends Component {
-  get description () {
-    if (this.props.description != undefined) {
-      return this.props.description
+class $Header extends Component {
+  get transform() {
+    return (this.menu ? `translateY(0)` : `translateY(-120%)`)
+  }
+
+  toggleMenu (...params) { return $Application.toggleMenu(...params) }
+
+  closeMenu (...params) { return $Application.closeMenu(...params) }
+
+  get menu () { return $Application.menu }
+
+  componentWillUnmount () {
+    $Application._unsubscribe(this);$Provider_Scroll._unsubscribe(this)
+  }
+
+  componentDidUpdate () {
+    if (true) {
+      $Provider_Scroll._subscribe(this, new Record({
+      scrolls: ((event) => {
+      return this.closeMenu.bind(this)()
+      })
+    }))
     } else {
-      return ``
+      $Provider_Scroll._unsubscribe(this)
     }
   }
 
+  componentDidMount () {
+    $Application._subscribe(this);if (true) {
+      $Provider_Scroll._subscribe(this, new Record({
+      scrolls: ((event) => {
+      return this.closeMenu.bind(this)()
+      })
+    }))
+    } else {
+      $Provider_Scroll._unsubscribe(this)
+    }
+  }
+
+  render() {
+    return [_createElement("div", {
+      className: `header-base`
+    }, [_createElement("div", {
+      className: `header-wrapper`
+    }, [_createElement("a", {
+      "href": `/`,
+      className: `header-brand`
+    }, [_createElement($Logo, { "mobileSize": 20, "invert": true, "size": 20 }), _createElement("div", {}, [`MINT`])]), _createElement("div", {
+      className: `header-spacer`
+    }), _createElement("div", {
+      className: `header-desktop-media-0 header-desktop`
+    }, [_createElement("a", {
+      "href": `/try`,
+      className: `header-link`
+    }, [`Try`]), _createElement("div", {
+      className: `header-separator`
+    }), _createElement("a", {
+      "href": `/install`,
+      className: `header-link`
+    }, [`Install`]), _createElement("div", {
+      className: `header-separator`
+    }), _createElement("a", {
+      "href": `https://guide.mint-lang.com`,
+      "target": `_blank`,
+      className: `header-link`
+    }, [`Learn`]), _createElement("div", {
+      className: `header-separator`
+    }), _createElement("a", {
+      "href": `/examples`,
+      className: `header-link`
+    }, [`Examples`]), _createElement("div", {
+      className: `header-separator`
+    }), _createElement("a", {
+      "href": `/roadmap`,
+      className: `header-link`
+    }, [`Roadmap`])]), _createElement("div", {
+      "onClick": (event => (((event) => {
+      return this.toggleMenu.bind(this)()
+      }))(_normalizeEvent(event))),
+      className: `header-mobile-media-0 header-mobile`
+    }, [$Icons.navigation()])])]), _createElement("div", {
+      className: `header-mobile-menu`,
+      style: {
+        [`--header-mobile-menu-transform`]: this.transform
+      }
+    }, [_createElement("a", {
+      "href": `/try`,
+      className: `header-mobile-link`
+    }, [`Try`]), _createElement("a", {
+      "href": `/install`,
+      className: `header-mobile-link`
+    }, [`Install`]), _createElement("a", {
+      "href": `https://guide.mint-lang.com`,
+      "target": `_blank`,
+      className: `header-mobile-link`
+    }, [`Learn`]), _createElement("a", {
+      "href": `/examples`,
+      className: `header-mobile-link`
+    }, [`Examples`]), _createElement("a", {
+      "href": `/roadmap`,
+      className: `header-mobile-link`
+    }, [`Roadmap`])])]
+  }
+}
+
+$Header.displayName = "Header"
+
+class $Feature extends Component {
   get title () {
     if (this.props.title != undefined) {
       return this.props.title
@@ -3857,9 +2953,9 @@ class $Examples_Example extends Component {
     }
   }
 
-  get href () {
-    if (this.props.href != undefined) {
-      return this.props.href
+  get text () {
+    if (this.props.text != undefined) {
+      return this.props.text
     } else {
       return ``
     }
@@ -3867,232 +2963,20 @@ class $Examples_Example extends Component {
 
   render() {
     return _createElement("div", {
-      "onClick": (event => (((event) => {
-      return $Window.navigate(this.href)
-      }))(_normalizeEvent(event))),
-      className: `examples-example-base`
+      className: `feature-base`
     }, [_createElement("div", {
-      className: `examples-example-title`
-    }, [this.title]), _createElement("div", {
-      className: `examples-example-description`
-    }, [this.description])])
+      className: `feature-title`
+    }, [$Icons.star(), this.title]), _createElement("div", {
+      className: `feature-text`
+    }, [this.text])])
   }
 }
 
-$Examples_Example.displayName = "Examples.Example"
+$Feature.displayName = "Feature"
 
-$Examples_Example.defaultProps = {
-  description: ``,title: ``,href: ``
+$Feature.defaultProps = {
+  title: ``,text: ``
 }
-
-class $Examples extends Component {
-  get userManagement () { return $Examples_Store.userManagement }
-
-  get drag () { return $Examples_Store.drag }
-
-  get fileHandling () { return $Examples_Store.fileHandling }
-
-  get counter () { return $Examples_Store.counter }
-
-  componentWillUnmount () {
-    $Examples_Store._unsubscribe(this)
-  }
-
-  componentDidMount () {
-    $Examples_Store._subscribe(this)
-  }
-
-  render() {
-    return _createElement($Page, {  }, _array(_createElement($Title, {  }, _array(`Examples`)), _createElement($SubTitle, {  }, _array(`Here you can find some examples that showcase the language features.`)), _createElement("hr", {
-      className: `examples-hr`
-    }), _createElement("div", {
-      className: `examples-grid`
-    }, [_createElement($Examples_Example, { "description": this.userManagement.description, "title": this.userManagement.title, "href": this.userManagement.href }), _createElement($Examples_Example, { "description": this.drag.description, "title": this.drag.title, "href": this.drag.href }), _createElement($Examples_Example, { "description": this.counter.description, "title": this.counter.title, "href": this.counter.href }), _createElement($Examples_Example, { "description": this.fileHandling.description, "title": this.fileHandling.title, "href": this.fileHandling.href })])))
-  }
-}
-
-$Examples.displayName = "Examples"
-
-class $Header extends Component {
-  render() {
-    return _createElement("div", {
-      className: `header-base`
-    }, [_createElement("div", {
-      className: `header-wrapper`
-    }, [_createElement("a", {
-      "href": `/`,
-      className: `header-brand`
-    }, [_createElement($Logo, { "mobileSize": 20, "invert": true, "size": 20 }), _createElement("div", {}, [`MINT`])]), _createElement($Ui_Toolbar_Spacer, {  }), _createElement("div", {
-      className: `header-desktop-media-0 header-desktop`
-    }, [_createElement("a", {
-      "href": `/try`,
-      className: `header-link`
-    }, [`Try`]), _createElement($Ui_Toolbar_Separator, {  }), _createElement("a", {
-      "href": `/install`,
-      className: `header-link`
-    }, [`Install`]), _createElement($Ui_Toolbar_Separator, {  }), _createElement("a", {
-      "href": `https://guide.mint-lang.com`,
-      "target": `_blank`,
-      className: `header-link`
-    }, [`Learn`]), _createElement($Ui_Toolbar_Separator, {  }), _createElement("a", {
-      "href": `/examples`,
-      className: `header-link`
-    }, [`Examples`]), _createElement($Ui_Toolbar_Separator, {  }), _createElement("a", {
-      "href": `/roadmap`,
-      className: `header-link`
-    }, [`Roadmap`])])])])
-  }
-}
-
-$Header.displayName = "Header"
-
-class $Users_Layout extends Component {
-  get children () {
-    if (this.props.children != undefined) {
-      return this.props.children
-    } else {
-      return []
-    }
-  }
-
-  render() {
-    return _createElement("div", {}, [_createElement($Ui_Breadcrumbs, { "separator": `|` }, _array(_createElement($Ui_Breadcrumb, { "label": `Home`, "href": `/users` }), _createElement($Ui_Breadcrumb, { "label": `New User`, "href": `/users/new` }))), _createElement("div", {
-      className: `users-layout-wrapper`
-    }, [_createElement("div", {
-      className: `users-layout-content`
-    }, [this.children])])])
-  }
-}
-
-$Users_Layout.displayName = "Users.Layout"
-
-$Users_Layout.defaultProps = {
-  children: []
-}
-
-class $Drag extends Component {
-  constructor(props) {
-    super(props)
-    this.state = new Record({
-      mousePosition: new Record({
-        left: 0,
-        top: 0
-      }),
-      startPosition: new Record({
-        left: 0,
-        top: 0
-      }),
-      dragging: false
-    })
-  }
-
-  setPosition (...params) { return $DragStore.setPosition(...params) }
-
-  get position () { return $DragStore.position }
-
-  componentWillUnmount () {
-    $DragStore._unsubscribe(this);$Provider_Mouse._unsubscribe(this)
-  }
-
-  componentDidUpdate () {
-    if (this.state.dragging) {
-      $Provider_Mouse._subscribe(this, new Record({
-      moves: ((data) => {
-      return this.move.bind(this)(data)
-      }),
-      clicks: ((data) => {
-      return null
-      }),
-      ups: ((data) => {
-      return this.end.bind(this)()
-      })
-    }))
-    } else {
-      $Provider_Mouse._unsubscribe(this)
-    }
-  }
-
-  componentDidMount () {
-    $DragStore._subscribe(this);if (this.state.dragging) {
-      $Provider_Mouse._subscribe(this, new Record({
-      moves: ((data) => {
-      return this.move.bind(this)(data)
-      }),
-      clicks: ((data) => {
-      return null
-      }),
-      ups: ((data) => {
-      return this.end.bind(this)()
-      })
-    }))
-    } else {
-      $Provider_Mouse._unsubscribe(this)
-    }
-  }
-
-  move(data) {
-    let diff = new Record({
-      left: this.state.mousePosition.left - data.pageX,
-      top: this.state.mousePosition.top - data.pageY
-    })
-
-    return (this.state.dragging ? this.setPosition.bind(this)(new Record({
-      left: this.state.startPosition.left - diff.left,
-      top: this.state.startPosition.top - diff.top
-    })) : new Promise((_resolve) => {
-      this.setState(this.state, _resolve)
-    }))
-  }
-
-  end() {
-    return new Promise((_resolve) => {
-      this.setState(_update(this.state, { dragging: false }), _resolve)
-    })
-  }
-
-  start(event) {
-    let mousePosition = new Record({
-      left: event.pageX,
-      top: event.pageY
-    })
-
-    let startPosition = new Record({
-      left: this.position.left,
-      top: this.position.top
-    })
-
-    return (async () => {
-      try {
-         await $Html_Event.preventDefault(event)
-
-     await new Promise((_resolve) => {
-      this.setState(_update(this.state, { mousePosition: mousePosition, startPosition: startPosition, dragging: true }), _resolve)
-    })
-      }
-      catch(_error) {
-        if (_error instanceof DoError) {
-        } else {
-          console.warn(`Unhandled error in do statement`)
-          console.log(_error)
-        }
-      } 
-    })()
-  }
-
-  render() {
-    return _createElement("div", {
-      "onMouseDown": (event => (((event) => {
-      return this.start.bind(this)(event)
-      }))(_normalizeEvent(event))),
-      className: `drag-base`,
-      style: {
-        [`--drag-base-transform`]: `translate3d(` + this.position.left + `px,` + this.position.top + `px, 0)`
-      }
-    }, [`DragMe`])
-  }
-}
-
-$Drag.displayName = "Drag"
 
 class $Showcase_Highlight extends Component {
   get border() {
@@ -4123,13 +3007,13 @@ class $Showcase_Highlight extends Component {
     }
   }
 
-  get active () { return $Showcase_Store.active }
-
-  get over () { return $Showcase_Store.over }
-
   setActive (...params) { return $Showcase_Store.setActive(...params) }
 
   setOver (...params) { return $Showcase_Store.setOver(...params) }
+
+  get active () { return $Showcase_Store.active }
+
+  get over () { return $Showcase_Store.over }
 
   componentWillUnmount () {
     $Showcase_Store._unsubscribe(this)
@@ -4307,13 +3191,13 @@ class $Showcase_HighlightBlock extends Component {
     }
   }
 
-  get active () { return $Showcase_Store.active }
-
-  get over () { return $Showcase_Store.over }
-
   setActive (...params) { return $Showcase_Store.setActive(...params) }
 
   setOver (...params) { return $Showcase_Store.setOver(...params) }
+
+  get active () { return $Showcase_Store.active }
+
+  get over () { return $Showcase_Store.over }
 
   componentWillUnmount () {
     $Showcase_Store._unsubscribe(this)
@@ -4546,27 +3430,53 @@ class $Showcase extends Component {
 
 $Showcase.displayName = "Showcase"
 
+class $Page extends Component {
+  get children () {
+    if (this.props.children != undefined) {
+      return this.props.children
+    } else {
+      return []
+    }
+  }
+
+  render() {
+    return _createElement("div", {
+      className: `page-base-media-0 page-base`
+    }, [this.children])
+  }
+}
+
+$Page.displayName = "Page"
+
+$Page.defaultProps = {
+  children: []
+}
+
 class $Pages_Try extends Component {
   get frame() {
     return (this.compiling ? _createElement("div", {
       className: `pages-try-loader`
-    }, [`Compiling...`]) : _createElement("iframe", {
+    }, [`Compiling...`]) : ($String.isEmpty(this.error) ? _createElement("iframe", {
       "src": this.src,
       className: `pages-try-iframe`
-    }))
+    }) : _createElement("div", {
+      className: `pages-try-loader`
+    }, [this.error])))
   }
 
-  get src () { return $Stores_Try.src }
-
-  setSource (...params) { return $Stores_Try.setSource(...params) }
-
-  get source () { return $Stores_Try.source }
-
-  compile (...params) { return $Stores_Try.compile(...params) }
+  get initialized () { return $Stores_Try.initialized }
 
   get compiling () { return $Stores_Try.compiling }
 
-  get initialized () { return $Stores_Try.initialized }
+  setSource (...params) { return $Stores_Try.setSource(...params) }
+
+  compile (...params) { return $Stores_Try.compile(...params) }
+
+  get source () { return $Stores_Try.source }
+
+  get error () { return $Stores_Try.error }
+
+  get src () { return $Stores_Try.src }
 
   componentWillUnmount () {
     $Stores_Try._unsubscribe(this)
@@ -4588,7 +3498,7 @@ class $Pages_Try extends Component {
     return (this.initialized ? _createElement("div", {
       className: `pages-try-base`
     }, [_createElement("div", {
-      className: `pages-try-source`
+      className: `pages-try-source-media-0 pages-try-source`
     }, [_createElement("div", {
       className: `pages-try-toolbar`
     }, [_createElement("div", {
@@ -4598,141 +3508,259 @@ class $Pages_Try extends Component {
       className: `pages-try-button`
     }, [`Compile`])]), _createElement($CodeMirror, { "onChange": this.handleChange.bind(this), "value": this.source })]), this.frame]) : _createElement("div", {
       className: `pages-try-loader`
-    }, [`Initializing`]))
+    }, [($String.isEmpty(this.error) ? `Initializing...` : this.error)]))
   }
 }
 
 $Pages_Try.displayName = "Pages.Try"
 
-class $Install extends Component {
+class $Pages_NotFound extends Component {
+  render() {
+    return _createElement($Page, {  }, _array(_createElement("div", {
+      className: `pages-not-found-base`
+    }, [_createElement("div", {
+      className: `pages-not-found-title`
+    }, [`404`]), _createElement("div", {
+      className: `pages-not-found-text`
+    }, [`There is nothing here...`]), _createElement($Button, { "href": `/` }, _array(`Home`))])))
+  }
+}
+
+$Pages_NotFound.displayName = "Pages.NotFound"
+
+class $Pages_Install extends Component {
   get content() {
     return (this.loading ? _createElement("ul", {
-      className: `install-files`
-    }, [_createElement("li", {}, [`Loading linux version...`]), _createElement("li", {}, [`Loading osx version...`])]) : _createElement("ul", {
-      className: `install-files`
-    }, [this.files]))
+      className: `pages-install-files`
+    }, [_createElement("li", {}, [`Loading linux version...`]), _createElement("li", {}, [`Loading osx version...`])]) : (this.errored ? _createElement("ul", {
+      className: `pages-install-files`
+    }, [_createElement("li", {}, [`Something went wrong when trying to load the binaries...`])]) : _createElement("ul", {
+      className: `pages-install-files`
+    }, [this.files])))
   }
 
   get files() {
     return (this.loading ? [] : $Array.map(this.renderFile.bind(this), this.latest.assets))
   }
 
-  get loading () { return $Versions.loading }
+  get errored () { return $Stores_Versions.errored }
 
-  get latest () { return $Versions.latest }
+  get loading () { return $Stores_Versions.loading }
+
+  refresh (...params) { return $Stores_Versions.refresh(...params) }
+
+  get latest () { return $Stores_Versions.latest }
 
   componentWillUnmount () {
-    $Versions._unsubscribe(this)
+    $Stores_Versions._unsubscribe(this)
   }
 
-  componentDidMount () {
-    $Versions._subscribe(this)
+  componentDidMount() {
+    $Stores_Versions._subscribe(this)
+
+    return this.refresh.bind(this)()
   }
 
   renderFile(asset) {
     return _createElement("li", {}, [_createElement("a", {
       "href": asset.url,
-      className: `install-link`
+      className: `pages-install-link`
     }, [asset.name])])
   }
 
   render() {
     return _createElement($Page, {  }, _array(_createElement($Title, {  }, _array(`Install Binaries`)), _createElement($SubTitle, {  }, _array(`Follow the directions below to install Mint:`)), _createElement("ol", {
-      className: `install-list-media-0 install-list`
+      className: `pages-install-list-media-0 pages-install-list`
     }, [_createElement("li", {}, [`Download the binary for your operating system: `, this.content]), _createElement("li", {}, [`Move the binary to `, _createElement("code", {
-      className: `install-code`
+      className: `pages-install-code-media-0 pages-install-code`
     }, [`/usr/local/bin/mint`]), _createElement("pre", {
-      className: `install-code`
+      className: `pages-install-code-media-0 pages-install-code`
     }, [`sudo mv /path/to/binary /usr/local/bin/mint`])]), _createElement("li", {}, [`You invoke the CLI in your terminal by just typing `, _createElement("code", {
-      className: `install-code`
+      className: `pages-install-code-media-0 pages-install-code`
     }, [`mint`])])]), _createElement("div", {
-      className: `install-hint-icon-media-0 install-hint`
+      className: `pages-install-hint-media-0 pages-install-hint-icon-media-0 pages-install-hint`
     }, [_createElement("svg", {
       "xmlns": `http://www.w3.org/2000/svg`,
       "preserveAspectRatio": `xMidYMid meet`,
       "viewBox": `0 0 24 24`,
-      className: `install-hint-icon-media-0 install-hint-icon`
+      className: `pages-install-hint-icon-media-0 pages-install-hint-icon`
     }, [_createElement("g", {}, [_createElement("path", {
       "d": `M12.2 8.98c.06-.01.12-.03.18-.06.06-.02.12-.05.18-.09l.15-.12c.18-.19.29-.45.29-.71 0-.06-.01-.13-.02-.19a.603.603 0 0 0-.06-.19.757.757 0 0 0-.09-.18c-.03-.05-.08-.1-.12-.15-.28-.27-.72-.37-1.09-.21-.13.05-.23.12-.33.21-.04.05-.09.1-.12.15-.04.06-.07.12-.09.18-.03.06-.05.12-.06.19-.01.06-.02.13-.02.19 0 .26.11.52.29.71.1.09.2.16.33.21.12.05.25.08.38.08.06 0 .13-.01.2-.02M13 16v-4a1 1 0 1 0-2 0v4a1 1 0 1 0 2 0M12 3c-4.962 0-9 4.038-9 9 0 4.963 4.038 9 9 9 4.963 0 9-4.037 9-9 0-4.962-4.037-9-9-9m0 20C5.935 23 1 18.065 1 12S5.935 1 12 1c6.066 0 11 4.935 11 11s-4.934 11-11 11`,
       "fill-rule": `evenodd`
     })])]), `The Mac OSX the binary needs some dependencies, until there is a package you need to`, _createElement("a", {
       "href": `https://crystal-lang.org/docs/installation/on_mac_osx_using_homebrew.html`,
-      className: `install-link`
+      className: `pages-install-link`
     }, [`install Crystal`]), `to satisfy them.`]), _createElement("hr", {
-      className: `install-hr`
+      className: `pages-install-hr`
     }), _createElement($Title, {  }, _array(`Install with Nix`)), _createElement($SubTitle, {  }, _array(`You can install Mint using the `, _createElement("a", {
       "href": `https://nixos.org/nix/`,
-      className: `install-link`
+      className: `pages-install-link`
     }, [`Nix Package Manager`]), ` with these steps: `)), _createElement("ol", {
-      className: `install-list-media-0 install-list`
+      className: `pages-install-list-media-0 pages-install-list`
     }, [_createElement("li", {}, [`Install Nix if not installed using `, _createElement("a", {
       "href": `https://nixos.org/nix/download.html`,
-      className: `install-link`
+      className: `pages-install-link`
     }, [`these instructions.`])]), _createElement("li", {}, [`Run this command: `, _createElement("pre", {
-      className: `install-code`
+      className: `pages-install-code-media-0 pages-install-code`
     }, [`nix-env -f channel:nixpkgs-unstable -iA mint`])]), _createElement("li", {}, [`You invoke the CLI in your terminal by just typing `, _createElement("code", {
-      className: `install-code`
+      className: `pages-install-code-media-0 pages-install-code`
     }, [`mint`])])]), _createElement("hr", {
-      className: `install-hr`
+      className: `pages-install-hr`
+    }), _createElement($Title, {  }, _array(`Install on Arch Linux`)), _createElement($SubTitle, {  }, _array(`An aur package is available for Mint: `, _createElement("a", {
+      "href": `https://aur.archlinux.org/packages/mint/`,
+      className: `pages-install-link`
+    }, [`https://aur.archlinux.org/packages/mint/`]))), _createElement("hr", {
+      className: `pages-install-hr`
     }), _createElement($Title, {  }, _array(`Install from Source`)), _createElement($SubTitle, {  }, _array(`Follow the directions below to install Mint from source:`)), _createElement("ol", {
-      className: `install-list-media-0 install-list`
+      className: `pages-install-list-media-0 pages-install-list`
     }, [_createElement("li", {}, [`Install the `, _createElement("a", {
       "href": `https://crystal-lang.org/docs/installation/`,
       "target": `_blank`,
-      className: `install-link`
+      className: `pages-install-link`
     }, [`Crystal programming language`])]), _createElement("li", {}, [`Download and extract the source files from Github:`, _createElement("br", {}), _createElement("a", {
       "href": `https://github.com/mint-lang/mint`,
       "target": `_blank`,
-      className: `install-link`
+      className: `pages-install-link`
     }, [`https://github.com/mint-lang/mint`])]), _createElement("li", {}, [`In your terminal enter the folder you extracted the source code:`, _createElement("pre", {
-      className: `install-code`
+      className: `pages-install-code-media-0 pages-install-code`
     }, [`cd /path/to/source`])]), _createElement("li", {}, [`Install dependencies:`, _createElement("pre", {
-      className: `install-code`
+      className: `pages-install-code-media-0 pages-install-code`
     }, [`shards install`])]), _createElement("li", {}, [`Build the binary (might need to use sudo):`, _createElement("pre", {
-      className: `install-code`
+      className: `pages-install-code-media-0 pages-install-code`
     }, [`crystal build src/mint.cr -o /usr/local/bin/mint -p --release --no-debug`])]), _createElement("li", {}, [`You invoke the CLI in your terminal by just typing `, _createElement("code", {
-      className: `install-code`
+      className: `pages-install-code-media-0 pages-install-code`
     }, [`mint`])])]), _createElement("hr", {
-      className: `install-hr`
+      className: `pages-install-hr`
     }), _createElement($Title, {  }, _array(`Daily Binaries`)), _createElement($SubTitle, {  }, _array(_createElement("p", {}, [`A fresh binary is created everything something changes in the master branch.`]), _createElement("p", {}, [`You can download those binaries here:`]), _createElement("ul", {
-      className: `install-files`
+      className: `pages-install-files`
     }, [_createElement("li", {}, [_createElement("a", {
       "href": `https://bintray.com/mint-lang/mint/download_file?file_path=mint-latest-linux`,
-      className: `install-link`
+      className: `pages-install-link`
     }, [`mint-latest-linux`])]), _createElement("li", {}, [_createElement("a", {
       "href": `https://bintray.com/mint-lang/mint/download_file?file_path=mint-latest-osx`,
-      className: `install-link`
+      className: `pages-install-link`
     }, [`mint-latest-osx`])])])))))
   }
 }
 
-$Install.displayName = "Install"
+$Pages_Install.displayName = "Pages.Install"
 
-class $Home extends Component {
+class $Pages_Examples extends Component {
+  render() {
+    return _createElement($Page, {  }, _array(_createElement($Title, {  }, _array(`Examples`)), _createElement($SubTitle, {  }, _array(`Here you can find some examples that showcase the language features.`)), _createElement("hr", {
+      className: `pages-examples-hr`
+    }), _createElement("div", {
+      className: `pages-examples-grid`
+    }, [_createElement($Pages_Examples_Example, { "title": `Drag and Drop`, "href": `/examples/drag`, "description": `This example shows how to drag and drop an HTML element on the page.` }), _createElement($Pages_Examples_Example, { "href": `/examples/file-handling`, "title": `File Handling`, "description": `This example shows how to implement a component which loads and shows a file from the users computer and then uploads it to a server via HTTP.` }), _createElement($Pages_Examples_Example, { "href": `/examples/counter`, "title": `Counter`, "description": `This example shows a counter which stored in a store with two buttons one for incrementing th counter and one for decrementing it.` })])))
+  }
+}
+
+$Pages_Examples.displayName = "Pages.Examples"
+
+class $Pages_Examples_Example extends Component {
+  get description () {
+    if (this.props.description != undefined) {
+      return this.props.description
+    } else {
+      return ``
+    }
+  }
+
+  get title () {
+    if (this.props.title != undefined) {
+      return this.props.title
+    } else {
+      return ``
+    }
+  }
+
+  get href () {
+    if (this.props.href != undefined) {
+      return this.props.href
+    } else {
+      return ``
+    }
+  }
+
+  render() {
+    return _createElement("a", {
+      "href": this.href,
+      className: `pages-examples-example-base`
+    }, [_createElement("div", {
+      className: `pages-examples-example-title`
+    }, [this.title]), _createElement("div", {
+      className: `pages-examples-example-description`
+    }, [this.description])])
+  }
+}
+
+$Pages_Examples_Example.displayName = "Pages.Examples.Example"
+
+$Pages_Examples_Example.defaultProps = {
+  description: ``,title: ``,href: ``
+}
+
+class $Pages_Home extends Component {
+  componentDidMount() {
+    return $Showcase_Store.setActive(`store`)
+  }
+
   render() {
     return _createElement("div", {
-      className: `home-base`
+      className: `pages-home-base`
     }, [_createElement("div", {
-      className: `home-hero-media-0 home-hero`
+      className: `pages-home-hero-media-0 pages-home-hero`
     }, [_createElement("div", {
-      className: `home-logo`
-    }, [_createElement($Logo, { "size": 180, "mobileSize": 60 }), _createElement("h1", {
-      className: `home-h1`
+      className: `pages-home-logo`
+    }, [_createElement($Logo, { "mobileSize": 60, "size": 180 }), _createElement("h1", {
+      className: `pages-home-h1`
     }, [`MINT`])]), _createElement("h2", {
-      className: `home-slogan-media-0 home-slogan`
-    }, [`A refreshing language for the front-end web`]), _createElement("div", {
-      className: `home-compiles`
+      className: `pages-home-slogan-media-0 pages-home-slogan`
+    }, [`A refreshing language for the front-end web.`]), _createElement("div", {
+      className: `pages-home-compiles`
     }, [`Mint is a programming language that compiles to JavaScript.`]), _createElement("div", {
-      className: `home-buttons-media-0 home-buttons`
+      className: `pages-home-buttons-media-0 pages-home-buttons`
     }, [_createElement($Button, { "href": `/try` }, _array(`Try`)), _createElement("div", {
-      className: `home-separator-media-1 home-separator-media-0 home-separator`
+      className: `pages-home-separator-media-1 pages-home-separator-media-0 pages-home-separator`
     }), _createElement($Button, { "href": `/install` }, _array(`Install`)), _createElement("div", {
-      className: `home-separator-media-1 home-separator-media-0 home-separator`
+      className: `pages-home-separator-media-1 pages-home-separator-media-0 pages-home-separator`
     }), _createElement($Button, { "href": `https://guide.mint-lang.com`, "target": `_blank` }, _array(`Learn`))])]), _createElement($Showcase, {  }), _createElement($Features, {  }), _createElement($Github, {  })])
   }
 }
 
-$Home.displayName = "Home"
+$Pages_Home.displayName = "Pages.Home"
+
+class $Pages_Roadmap_Version extends Component {
+  get children () {
+    if (this.props.children != undefined) {
+      return this.props.children
+    } else {
+      return []
+    }
+  }
+
+  get name () {
+    if (this.props.name != undefined) {
+      return this.props.name
+    } else {
+      return ``
+    }
+  }
+
+  render() {
+    return _createElement("div", {}, [_createElement("div", {
+      className: `pages-roadmap-version-name`
+    }, [this.name]), _createElement("div", {
+      className: `pages-roadmap-version-features`
+    }, [this.children])])
+  }
+}
+
+$Pages_Roadmap_Version.displayName = "Pages.Roadmap.Version"
+
+$Pages_Roadmap_Version.defaultProps = {
+  children: [],name: ``
+}
 
 class $Pages_Roadmap_Feature extends Component {
   get children () {
@@ -4771,14 +3799,14 @@ class $Pages_Roadmap_Feature extends Component {
     return _createElement("div", {
       className: `pages-roadmap-feature-base`
     }, [_createElement("div", {
-      className: `pages-roadmap-feature-icon`
+      className: `pages-roadmap-feature-icon-media-0 pages-roadmap-feature-icon`
     }, [this.icon]), _createElement("div", {}, [_createElement("div", {
       className: `pages-roadmap-feature-title`
     }, [this.name]), _createElement("div", {
       className: `pages-roadmap-feature-description`
-    }, [this.description]), ($Array.isEmpty(this.children) ? $Html.empty() : _createElement("div", {
-      className: `pages-roadmap-feature-features`
-    }, [this.children]))])])
+    }, [this.description]), _createElement($Unless, { "condition": $Array.isEmpty(this.children) }, _array(_createElement("div", {
+      className: `pages-roadmap-feature-features-media-0 pages-roadmap-feature-features`
+    }, [this.children])))])])
   }
 }
 
@@ -4788,255 +3816,13 @@ $Pages_Roadmap_Feature.defaultProps = {
   children: [],icon: $Html.empty(),description: ``,name: ``
 }
 
-class $Roadmap_Version extends Component {
-  get children () {
-    if (this.props.children != undefined) {
-      return this.props.children
-    } else {
-      return []
-    }
-  }
-
-  get version () {
-    if (this.props.version != undefined) {
-      return this.props.version
-    } else {
-      return ``
-    }
-  }
-
+class $Pages_Roadmap extends Component {
   render() {
-    return _createElement("div", {}, [_createElement("div", {
-      className: `roadmap-version-title`
-    }, [this.version]), _createElement("div", {
-      className: `roadmap-version-features`
-    }, [this.children])])
+    return _createElement($Page, {  }, _array(_createElement($Title, {  }, _array(`Roadmap`)), _createElement($SubTitle, {  }, _array(`This page contains planned and shipped high level features up to the stable release (1.0.0).`)), _createElement($Pages_Roadmap_Version, { "name": `Planned Features` }, _array(_createElement($Pages_Roadmap_Feature, { "name": `CSS Type Checking`, "icon": $Icons.diamond(), "description": `Check the values of known CSS properties and warn the developer if it's not matches the available values.` }), _createElement($Pages_Roadmap_Feature, { "name": `HTML Attribute Checking`, "icon": $Icons.diamond(), "description": `Check the values of HTML attributes based on the tag they belong to (for example check alt attributes for <img> tags).` }), _createElement($Pages_Roadmap_Feature, { "name": `Progressive Web Application Support`, "icon": $Icons.diamond(), "description": `Automatically generate files for basic PWA features (service-worker, manifest, icons).` }), _createElement($Pages_Roadmap_Feature, { "description": `A package for monitoring the state of the application.`, "icon": $Icons.diamond(), "name": `Devtools` }), _createElement($Pages_Roadmap_Feature, { "name": `Selective Compilation`, "icon": $Icons.diamond(), "description": `Only compile the entities that are being used.` }), _createElement($Pages_Roadmap_Feature, { "name": `Hot Reloading`, "icon": $Icons.diamond(), "description": `In development mode replace entities that changed without losing state. ` }), _createElement($Pages_Roadmap_Feature, { "name": `Language Server Protocol`, "icon": $Icons.diamond(), "description": `Implement a language server to expose the AST for code editors.` }), _createElement($Pages_Roadmap_Feature, { "name": `Website for Packages`, "icon": $Icons.diamond(), "description": `A website to browse, find and rate community packages.` }), _createElement($Pages_Roadmap_Feature, { "name": `Image Optimization`, "icon": $Icons.diamond(), "description": `During the build process optimize images automatically.` }), _createElement($Pages_Roadmap_Feature, { "name": `Application Structure Diagram`, "icon": $Icons.diamond(), "description": `Construct an interactive diagram of application structure containing routes, stores, providers and components. ` }))), _createElement($Pages_Roadmap_Version, { "name": `0.1` }, _array(_createElement($Pages_Roadmap_Feature, { "description": `The language itself.`, "name": `Language Basics`, "icon": $Icons.checkmark() }, _array(_createElement($Pages_Roadmap_Feature, { "name": `Parser`, "description": `Converts source code to an AST.` }), _createElement($Pages_Roadmap_Feature, { "name": `Formatter`, "description": `Reproduces source code from an AST.` }), _createElement($Pages_Roadmap_Feature, { "name": `Type Checker`, "description": `Walks the AST and type checks the application.` }), _createElement($Pages_Roadmap_Feature, { "name": `Compiler`, "description": `Compiles an application to JavaScript.` }))), _createElement($Pages_Roadmap_Feature, { "description": `The features of the language.`, "name": `Language Features`, "icon": $Icons.checkmark() }, _array(_createElement($Pages_Roadmap_Feature, { "name": `Components`, "description": `Define components with type checked properties and state.` }), _createElement($Pages_Roadmap_Feature, { "name": `Styling`, "description": `Styling HTML tags in a dynamic way without conflicts.` }), _createElement($Pages_Roadmap_Feature, { "name": `Routing`, "description": `Define routes in a declarative way.` }), _createElement($Pages_Roadmap_Feature, { "name": `Computations`, "description": `Handle synchronous (JSON decoding) and asynchronous (HTTP Request) computations that might fail.` }), _createElement($Pages_Roadmap_Feature, { "name": `State`, "description": `Manage global state with Stores.` }), _createElement($Pages_Roadmap_Feature, { "name": `Subscriptions`, "description": `Subscribe to global events (mouse, window) using providers.` }), _createElement($Pages_Roadmap_Feature, { "name": `JavaScript Interopability`, "description": `Simply call out the JavaScript when you need to.` }))), _createElement($Pages_Roadmap_Feature, { "name": `Documentation Generator`, "icon": $Icons.checkmark(), "description": `Generate beautiful documentation for your project, including dependencies.` }), _createElement($Pages_Roadmap_Feature, { "name": `Production Builder`, "icon": $Icons.checkmark(), "description": `The process of building the production version of the application.` }, _array(_createElement($Pages_Roadmap_Feature, { "name": `Icon Generator`, "description": `Generate icons for most common use cases (favicon, application icons).` }), _createElement($Pages_Roadmap_Feature, { "name": `Bundling and Minification`, "description": `Compile and minify the application into a single JavaScript file.` }))), _createElement($Pages_Roadmap_Feature, { "name": `Development Server`, "icon": $Icons.checkmark(), "description": `A server that automatically formats code and reloads the application when any of the source files change.` }), _createElement($Pages_Roadmap_Feature, { "name": `Package Manager`, "icon": $Icons.checkmark(), "description": `Install external sources (packages) directly from Git repositories.` }), _createElement($Pages_Roadmap_Feature, { "name": `Testing`, "icon": $Icons.checkmark(), "description": `Language feature for easily testing modules, packages, components or the whole application.` }), _createElement($Pages_Roadmap_Feature, { "name": `Command Line Interface`, "icon": $Icons.checkmark(), "description": `A binary that allows to access the features of the language.` })))))
   }
 }
 
-$Roadmap_Version.displayName = "Roadmap.Version"
-
-$Roadmap_Version.defaultProps = {
-  children: [],version: ``
-}
-
-class $Roadmap extends Component {
-  get checkmark() {
-    return _createElement("svg", {
-      "xmlns": `http://www.w3.org/2000/svg`,
-      "width": `24`,
-      "height": `24`,
-      "viewBox": `0 0 24 24`
-    }, [_createElement("path", {
-      "d": `M20.285 2l-11.285 11.567-5.286-5.011-3.714 3.716 9 8.728 15-15.285z`
-    })])
-  }
-
-  get diamond() {
-    return _createElement("svg", {
-      "xmlns": `http://www.w3.org/2000/svg`,
-      "viewBox": `0 0 24 24`,
-      "fillRule": `evenodd`,
-      "clipRule": `evenodd`,
-      "height": `24`,
-      "width": `24`
-    }, [_createElement("path", {
-      "d": `M12 0l-12 12.001 12 11.999 12.001-11.999-12.001-12.001zm-9.171 12.001l9.171-9.172 9.172 9.172-9.172 9.172-9.171-9.172z`
-    })])
-  }
-
-  render() {
-    return _createElement($Page, {  }, _array(_createElement($Title, {  }, _array(`Roadmap`)), _createElement($SubTitle, {  }, _array(`This page contains planned and shipped high level features up to the stable release (1.0.0).`)), _createElement($Roadmap_Version, { "version": `Planned Features` }, _array(_createElement($Pages_Roadmap_Feature, { "name": `CSS Type Checking`, "icon": this.diamond, "description": `Check the values of known CSS properties and warn the developer if it's not matches the available values.` }), _createElement($Pages_Roadmap_Feature, { "name": `HTML Attribute Checking`, "icon": this.diamond, "description": `Check the values of HTML attributes based on the tag they belong to (for example check alt attributes for <img> tags).` }), _createElement($Pages_Roadmap_Feature, { "name": `Progressive Web Application Support`, "icon": this.diamond, "description": `Automatically generate files for basic PWA features (service-worker, manifest, icons).` }), _createElement($Pages_Roadmap_Feature, { "description": `A package for monitoring the state of the application.`, "name": `Devtools`, "icon": this.diamond }), _createElement($Pages_Roadmap_Feature, { "name": `Selective Compilation`, "icon": this.diamond, "description": `Only compile the entities that are being used.` }), _createElement($Pages_Roadmap_Feature, { "name": `Hot Reloading`, "icon": this.diamond, "description": `In development mode replace entities that changed without losing state. ` }), _createElement($Pages_Roadmap_Feature, { "name": `Language Server Protocol`, "icon": this.diamond, "description": `Implement a language server to expose the AST for code editors.` }), _createElement($Pages_Roadmap_Feature, { "name": `Website for Packages`, "icon": this.diamond, "description": `A website to browse, find and rate community packages.` }), _createElement($Pages_Roadmap_Feature, { "name": `Image Optimization`, "icon": this.diamond, "description": `During the build process optimize images automatically.` }), _createElement($Pages_Roadmap_Feature, { "name": `Application Structure Diagram`, "icon": this.diamond, "description": `Construct an interactive diagram of application structure containing routes, stores, providers and components. ` }))), _createElement($Roadmap_Version, { "version": `0.1` }, _array(_createElement($Pages_Roadmap_Feature, { "description": `The language itself.`, "name": `Language Basics`, "icon": this.checkmark }, _array(_createElement($Pages_Roadmap_Feature, { "name": `Parser`, "description": `Converts source code to an AST.` }), _createElement($Pages_Roadmap_Feature, { "name": `Formatter`, "description": `Reproduces source code from an AST.` }), _createElement($Pages_Roadmap_Feature, { "name": `Type Checker`, "description": `Walks the AST and type checks the application.` }), _createElement($Pages_Roadmap_Feature, { "name": `Compiler`, "description": `Compiles an application to JavaScript.` }))), _createElement($Pages_Roadmap_Feature, { "description": `The features of the language.`, "name": `Language Features`, "icon": this.checkmark }, _array(_createElement($Pages_Roadmap_Feature, { "name": `Components`, "description": `Define components with type checked properties and state.` }), _createElement($Pages_Roadmap_Feature, { "name": `Styling`, "description": `Styling HTML tags in a dynamic way without conflicts.` }), _createElement($Pages_Roadmap_Feature, { "name": `Routing`, "description": `Define routes in a declarative way.` }), _createElement($Pages_Roadmap_Feature, { "name": `Computations`, "description": `Handle synchronous (JSON decoding) and asynchronous (HTTP Request) computations that might fail.` }), _createElement($Pages_Roadmap_Feature, { "name": `State`, "description": `Manage global state with Stores.` }), _createElement($Pages_Roadmap_Feature, { "name": `Subscriptions`, "description": `Subscribe to global events (mouse, window) using providers.` }), _createElement($Pages_Roadmap_Feature, { "name": `JavaScript Interopability`, "description": `Simply call out the JavaScript when you need to.` }))), _createElement($Pages_Roadmap_Feature, { "name": `Documentation Generator`, "icon": this.checkmark, "description": `Generate beautiful documentation for your project, including dependencies.` }), _createElement($Pages_Roadmap_Feature, { "name": `Production Builder`, "icon": this.checkmark, "description": `The process of building the production version of the application.` }, _array(_createElement($Pages_Roadmap_Feature, { "name": `Icon Generator`, "description": `Generate icons for most common use cases (favicon, application icons).` }), _createElement($Pages_Roadmap_Feature, { "name": `Bundling and Minification`, "description": `Compile and minify the application into a single JavaScript file.` }))), _createElement($Pages_Roadmap_Feature, { "name": `Development Server`, "icon": this.checkmark, "description": `A server that automatically formats code and reloads the application when any of the source files change.` }), _createElement($Pages_Roadmap_Feature, { "name": `Package Manager`, "icon": this.checkmark, "description": `Install external sources (packages) directly from Git repositories.` }), _createElement($Pages_Roadmap_Feature, { "name": `Testing`, "icon": this.checkmark, "description": `Language feature for easily testing modules, packages, components or the whole application.` }), _createElement($Pages_Roadmap_Feature, { "name": `Command Line Interface`, "icon": this.checkmark, "description": `A binary that allows to access the features of the language.` })))))
-  }
-}
-
-$Roadmap.displayName = "Roadmap"
-
-class $UserForm extends Component {
-  constructor(props) {
-    super(props)
-    this.state = new Record({
-      saving: false
-    })
-  }
-
-  get buttonLabel() {
-    return (this.state.saving ? (this.isNew ? `Creating` : `Saving`) : (this.isNew ? `Create` : `Save`))
-  }
-
-  get disabled() {
-    return $String.isEmpty(this.user.firstName) || $String.isEmpty(this.user.lastName)
-  }
-
-  get title() {
-    return (this.isNew ? `Create User` : `Edit User`)
-  }
-
-  get deleteField() {
-    return (this.isNew ? [] : [_createElement($Ui_Form_Separator, {  }), _createElement($Ui_Button, { "onClick": ((event) => {
-    return this.handleDelete.bind(this)()
-    }), "type": `danger`, "label": `Delete` })])
-  }
-
-  get isNew () {
-    if (this.props.isNew != undefined) {
-      return this.props.isNew
-    } else {
-      return false
-    }
-  }
-
-  get theme () { return $Ui.theme }
-
-  get page () { return $Users_List.page }
-
-  refresh (...params) { return $Users_List.refresh(...params) }
-
-  get loading () { return $Users_List.loading }
-
-  get user () { return $Users_List.user }
-
-  saveUser (...params) { return $Users_List.saveUser(...params) }
-
-  setStatus (...params) { return $Users_List.setStatus(...params) }
-
-  setFirstName (...params) { return $Users_List.setFirstName(...params) }
-
-  setLastName (...params) { return $Users_List.setLastName(...params) }
-
-  get error () { return $Users_List.error }
-
-  createUser (...params) { return $Users_List.createUser(...params) }
-
-  deleteUser (...params) { return $Users_List.deleteUser(...params) }
-
-  componentWillUnmount () {
-    $Ui._unsubscribe(this);$Users_List._unsubscribe(this)
-  }
-
-  componentDidMount () {
-    $Ui._subscribe(this);$Users_List._subscribe(this)
-  }
-
-  create() {
-    return (async () => {
-      try {
-         await new Promise((_resolve) => {
-      this.setState(_update(this.state, { saving: true }), _resolve)
-    })
-
-     await this.createUser.bind(this)()
-
-     await new Promise((_resolve) => {
-      this.setState(_update(this.state, { saving: false }), _resolve)
-    })
-
-     await $Window.navigate(`/users`)
-      }
-      catch(_error) {
-        if (_error instanceof DoError) {
-        } else {
-          console.warn(`Unhandled error in do statement`)
-          console.log(_error)
-        }
-      } 
-    })()
-  }
-
-  save() {
-    return (async () => {
-      try {
-         await new Promise((_resolve) => {
-      this.setState(_update(this.state, { saving: true }), _resolve)
-    })
-
-     await this.saveUser.bind(this)()
-
-     await this.refresh.bind(this)()
-
-     await new Promise((_resolve) => {
-      this.setState(_update(this.state, { saving: false }), _resolve)
-    })
-
-     await $Window.navigate(`/users?page=` + $Number.toString(this.page))
-      }
-      catch(_error) {
-        if (_error instanceof DoError) {
-        } else {
-          console.warn(`Unhandled error in do statement`)
-          console.log(_error)
-        }
-      } 
-    })()
-  }
-
-  handleDelete() {
-    return (async () => {
-      try {
-         await this.deleteUser.bind(this)()
-
-     await $Window.navigate(`/users?page=` + $Number.toString(this.page))
-      }
-      catch(_error) {
-        if (_error instanceof DoError) {
-        } else {
-          console.warn(`Unhandled error in do statement`)
-          console.log(_error)
-        }
-      } 
-    })()
-  }
-
-  onClick(event) {
-    return (this.isNew ? this.create.bind(this)() : this.save.bind(this)())
-  }
-
-  onClearFirstName() {
-    return this.setFirstName.bind(this)(``)
-  }
-
-  onClearLastName() {
-    return this.setLastName.bind(this)(``)
-  }
-
-  render() {
-    return _createElement($Ui_Loader, { "shown": this.loading }, _array(_createElement("div", {
-      "key": $Number.toString(this.user.id)
-    }, [_createElement("div", {
-      className: `user-form-title`
-    }, [this.title]), _createElement("div", {
-      className: `user-form-form`
-    }, [_createElement($Ui_Form_Field, { "label": `First Name` }, _array(_createElement($Ui_Input, { "value": this.user.firstName, "onInput": this.setFirstName.bind(this), "onClear": this.onClearFirstName.bind(this), "placeholder": `John` }))), _createElement($Ui_Form_Field, { "label": `Last Name` }, _array(_createElement($Ui_Input, { "value": this.user.lastName, "onInput": this.setLastName.bind(this), "onClear": this.onClearLastName.bind(this), "placeholder": `Doe` }))), _createElement($Ui_Form_Field, { "label": `Status` }, _array(_createElement($Ui_Toggle, { "checked": _compare(this.user.status, `locked`), "onChange": this.setStatus.bind(this), "offLabel": `Locked`, "onLabel": `Active`, "width": 150 }))), _createElement($Ui_Button, { "label": this.buttonLabel, "onClick": this.onClick.bind(this), "disabled": this.disabled }), this.deleteField])])))
-  }
-}
-
-$UserForm.displayName = "UserForm"
-
-$UserForm.defaultProps = {
-  isNew: false
-}
-
-class $Page extends Component {
-  get children () {
-    if (this.props.children != undefined) {
-      return this.props.children
-    } else {
-      return []
-    }
-  }
-
-  render() {
-    return _createElement("div", {
-      className: `page-base-media-0 page-base`
-    }, [this.children])
-  }
-}
-
-$Page.displayName = "Page"
-
-$Page.defaultProps = {
-  children: []
-}
+$Pages_Roadmap.displayName = "Pages.Roadmap"
 
 class $Ui_Table_Th extends Component {
   get align () {
@@ -7498,39 +6284,6 @@ _insertStyles(`
     color: #222;
   }
 
-  .users-table-table {
-    border: var(--users-table-table-border);
-    color: var(--users-table-table-color);
-    font-family: var(--users-table-table-font-family);
-    border-collapse: collapse;
-    margin-bottom: 20px;
-    table-layout: fixed;
-    width: 100%;
-  }
-
-  .users-table-left {
-    text-align: left;
-  }
-
-  .users-table-header {
-    justify-content: space-between;
-    margin-bottom: 20px;
-    align-items: center;
-    display: flex;
-  }
-
-  .users-table-title {
-    font-weight: bold;
-    font-size: 24px;
-  }
-
-  .users-table-empty {
-    justify-content: center;
-    align-items: center;
-    min-height: 550px;
-    display: flex;
-  }
-
   .code-mirror-base {
     flex-direction: column;
     display: flex;
@@ -7543,53 +6296,6 @@ _insertStyles(`
 
   .sub-title-base {
     margin: 10px 0;
-  }
-
-  .example-frame {
-    border: 1px solid #DDD;
-    min-height: 500px;
-    background: #FFF;
-    margin-top: 20px;
-  }
-
-  .example-link {
-    text-decoration: none;
-    margin-top: 10px;
-    display: block;
-    color: #2f9e59;
-  }
-
-  .example-link:hover {
-    text-decoration: underline;
-  }
-
-  .feature-title {
-    border-bottom: 1px dashed #CCC;
-    padding-bottom: 10px;
-    align-items: center;
-    margin-bottom: 10px;
-    position: relative;
-    font-weight: bold;
-    display: flex;
-  }
-
-  .feature-text {
-    position: relative;
-    z-index: 1;
-  }
-
-  .feature-base {
-    position: relative;
-    background: #FFF;
-    overflow: hidden;
-    padding: 20px;
-  }
-
-  .feature-star {
-    margin-right: 10px;
-    fill: #2f9e59;
-    height: 14px;
-    width: 14px;
   }
 
   .features-base {
@@ -7628,22 +6334,6 @@ _insertStyles(`
     width: var(--logo-base-width);
   }
 
-  .user-row-tr {
-
-  }
-
-  .user-row-tr a {
-    text-decoration: var(--user-row-tr-a-text-decoration);
-  }
-
-  .user-row-tr:nth-child(odd) {
-    background: #f9f9f9;
-  }
-
-  .user-row-checkbox {
-    text-align: center;
-  }
-
   .footer-base {
     min-height: 200px;
     background: #222;
@@ -7678,26 +6368,6 @@ _insertStyles(`
     font-family: Amiko;
     font-weight: 600;
     color: #EEE;
-  }
-
-  .counter-base {
-    background: var(--counter-base-background);
-    border-radius: 5px;
-    transition: 320ms;
-    display: flex;
-    padding: 20px;
-    margin: 20px;
-  }
-
-  .counter-counter {
-    font-family: sans;
-    font-size: 20px;
-    padding: 0 20px;
-  }
-
-  .examples-file-handling-pre {
-    word-break: break-word;
-    white-space: pre-wrap;
   }
 
   .layout-base {
@@ -7738,47 +6408,22 @@ _insertStyles(`
     color: #FFF;
   }
 
-  .examples-example-base {
-    border: 1px solid #EEE;
-    background: #FFF;
-    cursor: pointer;
-    padding: 20px;
-    color: #444;
-  }
-
-  .examples-example-description {
-    line-height: 1.5;
-    font-size: 14px;
-  }
-
-  .examples-example-title {
-    border-bottom: 1px solid #EEE;
-    padding-bottom: 7px;
-    margin-bottom: 7px;
-    font-weight: bold;
-    font-size: 18px;
-  }
-
-  .examples-example-title > a {
-    color: inherit;
-  }
-
-  .examples-grid {
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    grid-gap: 20px 20px;
-    display: grid;
-  }
-
-  .examples-hr {
-    margin: 20px 0;
-    border: 0;
-    border-top: 1px solid #EEE;
-  }
-
   .header-base {
     border-bottom: 2px solid #29894e;
     background: #2f9e59;
+    position: relative;
     color: #FFF;
+    z-index: 1;
+  }
+
+  .header-spacer {
+    flex: 1;
+  }
+
+  .header-separator {
+    border-left: 1px solid rgba(255, 255, 255, 0.2);
+    margin: 0 15px;
+    height: 30px;
   }
 
   .header-wrapper {
@@ -7793,6 +6438,15 @@ _insertStyles(`
   .header-desktop {
     align-items: center;
     display: none;
+  }
+
+  .header-mobile {
+    display: none;
+    height: 24px;
+  }
+
+  .header-mobile svg {
+    fill: currentColor;
   }
 
   .header-brand {
@@ -7820,29 +6474,58 @@ _insertStyles(`
     height: 10px;
   }
 
-  .users-layout-wrapper {
-    max-width: 1040px;
-    padding: 0 20px;
-    margin: 0 auto;
-  }
-
-  .users-layout-content {
-    padding: 24px 0;
-  }
-
-  .drag-base {
-    transform: var(--drag-base-transform);
-    justify-content: center;
-    background: orangered;
-    align-items: center;
-    border-radius: 10px;
+  .header-mobile-menu {
+    box-shadow: 0 0 30px rgba(0,0,0,0.5);
+    border-bottom: 2px solid #29894e;
+    background: #2f9e59;
+    transform: var(--header-mobile-menu-transform);
     position: absolute;
-    display: flex;
-    height: 100px;
-    width: 100px;
-    cursor: move;
+    transition: 320ms;
+    padding: 0 20px;
+    top: 52px;
+    right: 0;
+    left: 0;
+  }
+
+  .header-mobile-link {
+    text-decoration: none;
+    font-size: 18px;
+    padding: 15px 0;
+    display: block;
     color: white;
-    z-index: 10;
+  }
+
+  .header-mobile-link + * {
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .feature-title {
+    border-bottom: 1px dashed #CCC;
+    padding-bottom: 10px;
+    align-items: center;
+    margin-bottom: 10px;
+    position: relative;
+    font-weight: bold;
+    display: flex;
+  }
+
+  .feature-title svg {
+    margin-right: 10px;
+    fill: #2f9e59;
+    height: 14px;
+    width: 14px;
+  }
+
+  .feature-text {
+    position: relative;
+    z-index: 1;
+  }
+
+  .feature-base {
+    position: relative;
+    background: #FFF;
+    overflow: hidden;
+    padding: 20px;
   }
 
   .showcase-highlight-base {
@@ -7994,6 +6677,18 @@ _insertStyles(`
     font-size: 22px;
   }
 
+  .page-base {
+    flex-direction: column;
+    display: flex;
+    flex: 1;
+    max-width: 1040px;
+    margin: 0 auto;
+    width: 100%;
+    color: #444;
+    padding: 50px 20px;
+    padding-bottom: 100px;
+  }
+
   .pages-try-base {
     min-height: 90vh;
     display: flex;
@@ -8054,13 +6749,33 @@ _insertStyles(`
     color: #FFF;
   }
 
-  .install-hr {
+  .pages-not-found-title {
+    font-family: Josefin Sans;
+    font-size: 100px;
+  }
+
+  .pages-not-found-text {
+    margin-bottom: 40px;
+    font-size: 20px;
+  }
+
+  .pages-not-found-base {
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    display: flex;
+    flex: 1;
+    padding: 100px 0;
+    padding-bottom: 75px;
+  }
+
+  .pages-install-hr {
     margin: 40px 0;
     border: 0;
     border-top: 1px solid #EEE;
   }
 
-  .install-code {
+  .pages-install-code {
     border: 1px solid #DDD;
     white-space: pre-wrap;
     font-size: inherit;
@@ -8068,32 +6783,34 @@ _insertStyles(`
     padding: 5px;
   }
 
-  .install-link {
+  .pages-install-link {
+    word-break: break-all;
     text-decoration: none;
     color: #2f9e59;
   }
 
-  .install-link:hover {
+  .pages-install-link:hover {
     text-decoration: underline;
   }
 
-  .install-list {
-
+  .pages-install-list {
+    margin: 0;
   }
 
-  .install-list li {
+  .pages-install-list li {
+    line-height: 1.5;
     margin-top: 15px;
   }
 
-  .install-files {
+  .pages-install-files {
 
   }
 
-  .install-files li {
+  .pages-install-files li {
     margin-top: 10px;
   }
 
-  .install-hint {
+  .pages-install-hint {
     border-left: 4px solid #00ccff;
     align-items: center;
     margin-top: 30px;
@@ -8102,11 +6819,11 @@ _insertStyles(`
     display: flex;
   }
 
-  .install-hint > a {
+  .pages-install-hint > a {
     margin: 0 5px;
   }
 
-  .install-hint-icon {
+  .pages-install-hint-icon {
     margin-right: 15px;
     flex: 0 0 24px;
     fill: #00ccff;
@@ -8114,7 +6831,45 @@ _insertStyles(`
     width: 24px;
   }
 
-  .home-hero {
+  .pages-examples-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-gap: 20px 20px;
+    display: grid;
+  }
+
+  .pages-examples-hr {
+    margin: 20px 0;
+    border: 0;
+    border-top: 1px solid #EEE;
+  }
+
+  .pages-examples-example-base {
+    border: 1px solid #EEE;
+    text-decoration: none;
+    background: #FFF;
+    cursor: pointer;
+    padding: 20px;
+    color: #444;
+  }
+
+  .pages-examples-example-description {
+    line-height: 1.5;
+    font-size: 14px;
+  }
+
+  .pages-examples-example-title {
+    border-bottom: 1px solid #EEE;
+    padding-bottom: 7px;
+    margin-bottom: 7px;
+    font-weight: bold;
+    font-size: 18px;
+  }
+
+  .pages-examples-example-title > a {
+    color: inherit;
+  }
+
+  .pages-home-hero {
     background: url(hero.png);
     justify-content: center;
     flex-direction: column;
@@ -8123,33 +6878,33 @@ _insertStyles(`
     height: 80vh;
   }
 
-  .home-slogan {
+  .pages-home-slogan {
     font-weight: normal;
     font-size: 18px;
     opacity: 0.75;
     margin: 0;
   }
 
-  .home-buttons {
+  .pages-home-buttons {
     margin-top: 30px;
     display: flex;
   }
 
-  .home-separator {
+  .pages-home-separator {
 
   }
 
-  .home-base {
+  .pages-home-base {
     color: #333;
   }
 
-  .home-logo {
+  .pages-home-logo {
     flex-direction: column;
     align-items: center;
     display: flex;
   }
 
-  .home-h1 {
+  .pages-home-h1 {
     font-family: Josefin Sans;
     font-weight: 300;
     font-size: 70px;
@@ -8158,11 +6913,30 @@ _insertStyles(`
     margin-top: 30px;
   }
 
-  .home-compiles {
+  .pages-home-compiles {
     margin-bottom: 20px;
+    text-align: center;
     font-style: italic;
     margin-top: 10px;
     opacity: 0.5;
+  }
+
+  .pages-roadmap-version-name {
+    border-bottom: 2px solid #EEE;
+    padding-bottom: 5px;
+    margin-bottom: 15px;
+    font-family: Amiko;
+    margin-top: 40px;
+    font-size: 24px;
+    color: #222;
+  }
+
+  .pages-roadmap-version-features {
+
+  }
+
+  .pages-roadmap-version-features > * + * {
+    margin-top: 20px;
   }
 
   .pages-roadmap-feature-base {
@@ -8202,50 +6976,6 @@ _insertStyles(`
 
   .pages-roadmap-feature-features > * + * {
     margin-top: 7px;
-  }
-
-  .roadmap-version-title {
-    border-bottom: 2px solid #EEE;
-    padding-bottom: 5px;
-    margin-bottom: 15px;
-    font-family: Amiko;
-    margin-top: 40px;
-    font-size: 24px;
-    color: #222;
-  }
-
-  .roadmap-version-features {
-
-  }
-
-  .roadmap-version-features > * + * {
-    margin-top: 20px;
-  }
-
-  .user-form-title {
-    border-bottom: 2px solid #CCC;
-    padding-bottom: 10px;
-    margin-bottom: 15px;
-    font-weight: bold;
-    font-size: 20px;
-    opacity: 0.8;
-  }
-
-  .user-form-form {
-
-  }
-
-  .user-form-form > * {
-    margin-bottom: 15px;
-  }
-
-  .page-base {
-    max-width: 1040px;
-    margin: 0 auto;
-    width: 100%;
-    color: #444;
-    padding: 50px 20px;
-    padding-bottom: 100px;
   }
 
   .ui-toolbar-base {
@@ -8926,36 +7656,57 @@ _insertStyles(`
       font-size: 18px;
     }
 
-    .install-list-media-0 {
+    .page-base-media-0 {
+      padding: 20px;
+      padding-top: 25px;
+      padding-bottom: 75px;
+    }
+
+    .pages-try-source-media-0 {
+      display: none;
+    }
+
+    .pages-install-code-media-0 {
+      padding: 3px 5px;
+    }
+
+    .pages-install-list-media-0 {
       padding-left: 15px;
       font-size: 14px;
     }
 
-    .install-hint-icon-media-0 {
-      align-self: flex-start;
+    .pages-install-hint-media-0 {
+      display: block;
     }
 
-    .home-hero-media-0 {
+    .pages-install-hint-icon-media-0 {
+      display: none;
+    }
+
+    .pages-home-hero-media-0 {
       padding: 50px 20px;
       height: auto;
     }
 
-    .home-slogan-media-0 {
+    .pages-home-slogan-media-0 {
       margin-top: 10px;
       font-size: 13px;
     }
 
-    .home-buttons-media-0 {
+    .pages-home-buttons-media-0 {
       flex-direction: column;
     }
 
-    .home-separator-media-1 {
+    .pages-home-separator-media-1 {
       margin-top: 15px;
     }
 
-    .page-base-media-0 {
-      padding: 20px;
-      padding-top: 25px;
+    .pages-roadmap-feature-icon-media-0 {
+      display: none;
+    }
+
+    .pages-roadmap-feature-features-media-0 {
+      margin-left: 3px;
     }}
 
   @media (max-width: 500px)  {
@@ -8969,8 +7720,13 @@ _insertStyles(`
       display: flex;
     }
 
-    .home-separator-media-0 {
+    .pages-home-separator-media-0 {
       margin-left: 30px;
+    }}
+
+  @media (max-width: 599px)  {
+    .header-mobile-media-0 {
+      display: block;
     }}
 `)
 _program.render($Main)
