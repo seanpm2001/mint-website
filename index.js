@@ -6365,7 +6365,6 @@ _insertStyles(`
     border-bottom: 1px dashed #444;
     padding-bottom: 5px;
     margin-bottom: 10px;
-    font-family: Amiko;
     font-weight: 600;
     color: #EEE;
   }
@@ -6925,7 +6924,6 @@ _insertStyles(`
     border-bottom: 2px solid #EEE;
     padding-bottom: 5px;
     margin-bottom: 15px;
-    font-family: Amiko;
     margin-top: 40px;
     font-size: 24px;
     color: #222;
