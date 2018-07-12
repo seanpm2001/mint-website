@@ -3647,11 +3647,11 @@ $Pages_Install.displayName = "Pages.Install"
 
 class $Pages_Examples extends Component {
   render() {
-    return _createElement($Page, {  }, _array(_createElement($Title, {  }, _array(`Examples`)), _createElement($SubTitle, {  }, _array(`Here you can find some examples that showcase the language features.`)), _createElement("hr", {
+    return _createElement($Page, {  }, _array(_createElement($Title, {  }, _array(`Examples`)), _createElement($SubTitle, {  }, _array(`Here you can find some examples that showcase the language's features.`)), _createElement("hr", {
       className: `pages-examples-hr`
     }), _createElement("div", {
       className: `pages-examples-grid`
-    }, [_createElement($Pages_Examples_Example, { "title": `Drag and Drop`, "href": `/examples/drag`, "description": `This example shows how to drag and drop an HTML element on the page.` }), _createElement($Pages_Examples_Example, { "href": `/examples/file-handling`, "title": `File Handling`, "description": `This example shows how to implement a component which loads and shows a file from the users computer and then uploads it to a server via HTTP.` }), _createElement($Pages_Examples_Example, { "href": `/examples/counter`, "title": `Counter`, "description": `This example shows a counter which stored in a store with two buttons one for incrementing th counter and one for decrementing it.` })])))
+    }, [_createElement($Pages_Examples_Example, { "title": `Drag and Drop`, "href": `/examples/drag`, "description": `This example shows how to drag and drop an HTML element on the page.` }), _createElement($Pages_Examples_Example, { "href": `/examples/file-handling`, "title": `File Handling`, "description": `This example shows how to implement a component which loads and shows a file from the user's computer and then uploads it to a server via HTTP.` }), _createElement($Pages_Examples_Example, { "href": `/examples/counter`, "title": `Counter`, "description": `This example shows a counter that is stored in a store with two buttons: one for incrementing the counter and one for decrementing it.` })])))
   }
 }
 
