@@ -3611,6 +3611,20 @@ class $Pages_Install extends Component {
       className: `pages-install-link`
     }, [`https://aur.archlinux.org/packages/mint/`]))), _createElement("hr", {
       className: `pages-install-hr`
+    }), _createElement($Title, {  }, _array(`Install on Windows 10`)), _createElement($SubTitle, {  }, _array(`For now you can use the Windows Subsystem for Linux to run Mint.`)), _createElement("ol", {
+      className: `pages-install-list-media-0 pages-install-list`
+    }, [_createElement("li", {}, [`Install the `, _createElement("a", {
+      "href": `https://docs.microsoft.com/en-us/windows/wsl/install-win10/`,
+      "target": `_blank`,
+      className: `pages-install-link`
+    }, [`Windows Subsystem for Linux`])]), _createElement("li", {}, [`Download the Linux binary from the top or the daily binaries.`]), _createElement("li", {}, [`Move the binary to `, _createElement("code", {
+      className: `pages-install-code-media-0 pages-install-code`
+    }, [`/usr/local/bin/mint`]), _createElement("pre", {
+      className: `pages-install-code-media-0 pages-install-code`
+    }, [`sudo mv /path/to/binary /usr/local/bin/mint`])]), _createElement("li", {}, [`You invoke the CLI in your terminal by just typing `, _createElement("code", {
+      className: `pages-install-code-media-0 pages-install-code`
+    }, [`mint`])])]), _createElement("hr", {
+      className: `pages-install-hr`
     }), _createElement($Title, {  }, _array(`Install from Source`)), _createElement($SubTitle, {  }, _array(`Follow the directions below to install Mint from source:`)), _createElement("ol", {
       className: `pages-install-list-media-0 pages-install-list`
     }, [_createElement("li", {}, [`Install the `, _createElement("a", {
