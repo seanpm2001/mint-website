@@ -144,11 +144,11 @@ class $$Asset extends Record {}
 
 $$Asset.mappings = {"url":"browser_download_url","name":null}
 
-$$Asset.decode = (input) => {
-  let url = Decoder.field(`browser_download_url`, Decoder.string)(input)
+$$Asset.decode = (_input) => {
+  let url = Decoder.field(`browser_download_url`, Decoder.string)(_input)
   if (url instanceof Err) { return url }
 
-  let name = Decoder.field(`name`, Decoder.string)(input)
+  let name = Decoder.field(`name`, Decoder.string)(_input)
   if (name instanceof Err) { return name }
 
   return new Ok(new $$Asset({
@@ -161,20 +161,20 @@ class $$Version extends Record {}
 
 $$Version.mappings = {"description":"body","version":"tag_name","date":"published_at","url":"html_url","assets":null}
 
-$$Version.decode = (input) => {
-  let description = Decoder.field(`body`, Decoder.string)(input)
+$$Version.decode = (_input) => {
+  let description = Decoder.field(`body`, Decoder.string)(_input)
   if (description instanceof Err) { return description }
 
-  let version = Decoder.field(`tag_name`, Decoder.string)(input)
+  let version = Decoder.field(`tag_name`, Decoder.string)(_input)
   if (version instanceof Err) { return version }
 
-  let date = Decoder.field(`published_at`, Decoder.time)(input)
+  let date = Decoder.field(`published_at`, Decoder.time)(_input)
   if (date instanceof Err) { return date }
 
-  let url = Decoder.field(`html_url`, Decoder.string)(input)
+  let url = Decoder.field(`html_url`, Decoder.string)(_input)
   if (url instanceof Err) { return url }
 
-  let assets = Decoder.field(`assets`, Decoder.array($$Asset.decode))(input)
+  let assets = Decoder.field(`assets`, Decoder.array($$Asset.decode))(_input)
   if (assets instanceof Err) { return assets }
 
   return new Ok(new $$Version({
@@ -196,20 +196,20 @@ class $$Regexp_Options extends Record {}
 
 $$Regexp_Options.mappings = {"caseInsensitive":null,"multiline":null,"unicode":null,"global":null,"sticky":null}
 
-$$Regexp_Options.decode = (input) => {
-  let caseInsensitive = Decoder.field(`caseInsensitive`, Decoder.boolean)(input)
+$$Regexp_Options.decode = (_input) => {
+  let caseInsensitive = Decoder.field(`caseInsensitive`, Decoder.boolean)(_input)
   if (caseInsensitive instanceof Err) { return caseInsensitive }
 
-  let multiline = Decoder.field(`multiline`, Decoder.boolean)(input)
+  let multiline = Decoder.field(`multiline`, Decoder.boolean)(_input)
   if (multiline instanceof Err) { return multiline }
 
-  let unicode = Decoder.field(`unicode`, Decoder.boolean)(input)
+  let unicode = Decoder.field(`unicode`, Decoder.boolean)(_input)
   if (unicode instanceof Err) { return unicode }
 
-  let global = Decoder.field(`global`, Decoder.boolean)(input)
+  let global = Decoder.field(`global`, Decoder.boolean)(_input)
   if (global instanceof Err) { return global }
 
-  let sticky = Decoder.field(`sticky`, Decoder.boolean)(input)
+  let sticky = Decoder.field(`sticky`, Decoder.boolean)(_input)
   if (sticky instanceof Err) { return sticky }
 
   return new Ok(new $$Regexp_Options({
@@ -225,14 +225,14 @@ class $$Regexp_Match extends Record {}
 
 $$Regexp_Match.mappings = {"submatches":null,"match":null,"index":null}
 
-$$Regexp_Match.decode = (input) => {
-  let submatches = Decoder.field(`submatches`, Decoder.array(Decoder.string))(input)
+$$Regexp_Match.decode = (_input) => {
+  let submatches = Decoder.field(`submatches`, Decoder.array(Decoder.string))(_input)
   if (submatches instanceof Err) { return submatches }
 
-  let match = Decoder.field(`match`, Decoder.string)(input)
+  let match = Decoder.field(`match`, Decoder.string)(_input)
   if (match instanceof Err) { return match }
 
-  let index = Decoder.field(`index`, Decoder.number)(input)
+  let index = Decoder.field(`index`, Decoder.number)(_input)
   if (index instanceof Err) { return index }
 
   return new Ok(new $$Regexp_Match({
@@ -270,29 +270,29 @@ class $$Url extends Record {}
 
 $$Url.mappings = {"hostname":null,"protocol":null,"origin":null,"search":null,"path":null,"hash":null,"host":null,"port":null}
 
-$$Url.decode = (input) => {
-  let hostname = Decoder.field(`hostname`, Decoder.string)(input)
+$$Url.decode = (_input) => {
+  let hostname = Decoder.field(`hostname`, Decoder.string)(_input)
   if (hostname instanceof Err) { return hostname }
 
-  let protocol = Decoder.field(`protocol`, Decoder.string)(input)
+  let protocol = Decoder.field(`protocol`, Decoder.string)(_input)
   if (protocol instanceof Err) { return protocol }
 
-  let origin = Decoder.field(`origin`, Decoder.string)(input)
+  let origin = Decoder.field(`origin`, Decoder.string)(_input)
   if (origin instanceof Err) { return origin }
 
-  let search = Decoder.field(`search`, Decoder.string)(input)
+  let search = Decoder.field(`search`, Decoder.string)(_input)
   if (search instanceof Err) { return search }
 
-  let path = Decoder.field(`path`, Decoder.string)(input)
+  let path = Decoder.field(`path`, Decoder.string)(_input)
   if (path instanceof Err) { return path }
 
-  let hash = Decoder.field(`hash`, Decoder.string)(input)
+  let hash = Decoder.field(`hash`, Decoder.string)(_input)
   if (hash instanceof Err) { return hash }
 
-  let host = Decoder.field(`host`, Decoder.string)(input)
+  let host = Decoder.field(`host`, Decoder.string)(_input)
   if (host instanceof Err) { return host }
 
-  let port = Decoder.field(`port`, Decoder.string)(input)
+  let port = Decoder.field(`port`, Decoder.string)(_input)
   if (port instanceof Err) { return port }
 
   return new Ok(new $$Url({
@@ -317,11 +317,11 @@ class $$Http_Response extends Record {}
 
 $$Http_Response.mappings = {"status":null,"body":null}
 
-$$Http_Response.decode = (input) => {
-  let status = Decoder.field(`status`, Decoder.number)(input)
+$$Http_Response.decode = (_input) => {
+  let status = Decoder.field(`status`, Decoder.number)(_input)
   if (status instanceof Err) { return status }
 
-  let body = Decoder.field(`body`, Decoder.string)(input)
+  let body = Decoder.field(`body`, Decoder.string)(_input)
   if (body instanceof Err) { return body }
 
   return new Ok(new $$Http_Response({
@@ -340,29 +340,29 @@ class $$Dom_Dimensions extends Record {}
 
 $$Dom_Dimensions.mappings = {"height":null,"bottom":null,"width":null,"right":null,"left":null,"top":null,"x":null,"y":null}
 
-$$Dom_Dimensions.decode = (input) => {
-  let height = Decoder.field(`height`, Decoder.number)(input)
+$$Dom_Dimensions.decode = (_input) => {
+  let height = Decoder.field(`height`, Decoder.number)(_input)
   if (height instanceof Err) { return height }
 
-  let bottom = Decoder.field(`bottom`, Decoder.number)(input)
+  let bottom = Decoder.field(`bottom`, Decoder.number)(_input)
   if (bottom instanceof Err) { return bottom }
 
-  let width = Decoder.field(`width`, Decoder.number)(input)
+  let width = Decoder.field(`width`, Decoder.number)(_input)
   if (width instanceof Err) { return width }
 
-  let right = Decoder.field(`right`, Decoder.number)(input)
+  let right = Decoder.field(`right`, Decoder.number)(_input)
   if (right instanceof Err) { return right }
 
-  let left = Decoder.field(`left`, Decoder.number)(input)
+  let left = Decoder.field(`left`, Decoder.number)(_input)
   if (left instanceof Err) { return left }
 
-  let top = Decoder.field(`top`, Decoder.number)(input)
+  let top = Decoder.field(`top`, Decoder.number)(_input)
   if (top instanceof Err) { return top }
 
-  let x = Decoder.field(`x`, Decoder.number)(input)
+  let x = Decoder.field(`x`, Decoder.number)(_input)
   if (x instanceof Err) { return x }
 
-  let y = Decoder.field(`y`, Decoder.number)(input)
+  let y = Decoder.field(`y`, Decoder.number)(_input)
   if (y instanceof Err) { return y }
 
   return new Ok(new $$Dom_Dimensions({
@@ -3566,7 +3566,9 @@ class $Pages_Install extends Component {
       className: `pages-install-code-media-0 pages-install-code`
     }, [`/usr/local/bin/mint`]), _createElement("pre", {
       className: `pages-install-code-media-0 pages-install-code`
-    }, [`sudo mv /path/to/binary /usr/local/bin/mint`])]), _createElement("li", {}, [`You invoke the CLI in your terminal by just typing `, _createElement("code", {
+    }, [`sudo mv /path/to/binary /usr/local/bin/mint`])]), _createElement("li", {}, [`Make the binary executable`, _createElement("pre", {
+      className: `pages-install-code-media-0 pages-install-code`
+    }, [`sudo chmod +x /usr/local/bin/mint`])]), _createElement("li", {}, [`You invoke the CLI in your terminal by just typing `, _createElement("code", {
       className: `pages-install-code-media-0 pages-install-code`
     }, [`mint`])])]), _createElement("div", {
       className: `pages-install-hint-media-0 pages-install-hint-icon-media-0 pages-install-hint`
@@ -3612,7 +3614,9 @@ class $Pages_Install extends Component {
       className: `pages-install-code-media-0 pages-install-code`
     }, [`/usr/local/bin/mint`]), _createElement("pre", {
       className: `pages-install-code-media-0 pages-install-code`
-    }, [`sudo mv /path/to/binary /usr/local/bin/mint`])]), _createElement("li", {}, [`You invoke the CLI in your terminal by just typing `, _createElement("code", {
+    }, [`sudo mv /path/to/binary /usr/local/bin/mint`])]), _createElement("li", {}, [`Make the binary executable`, _createElement("pre", {
+      className: `pages-install-code-media-0 pages-install-code`
+    }, [`sudo chmod +x /usr/local/bin/mint`])]), _createElement("li", {}, [`You invoke the CLI in your terminal by just typing `, _createElement("code", {
       className: `pages-install-code-media-0 pages-install-code`
     }, [`mint`])])]), _createElement("hr", {
       className: `pages-install-hr`
