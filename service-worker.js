@@ -1,4 +1,4 @@
-const CACHE = '7fa304f59f604448d6a0291350b31777ea35cedbb92ac220f1c129565b93b12b';
+const CACHE = '27037a6f9392d8aa38595e94e45477adccd64d7403b4a50e275ca7e0e0a1e765';
 const RUNTIME = 'runtime';
 const PRECACHE_URLS = ['/icon-167x167.png',
 '/icon-76x76.png',
@@ -32,6 +32,7 @@ self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE)
       .then(cache => cache.addAll(PRECACHE_URLS))
+      .catch(error => console.log(`Oops! ${error}`))
       .then(self.skipWaiting())
   );
 });
