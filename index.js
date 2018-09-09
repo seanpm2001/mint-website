@@ -3228,6 +3228,7 @@ class $Button extends Component {
     return _createElement("a", {
       "target": this.target,
       "href": this.href,
+      "rel": this.rel,
       className: `button-base_media_0 button-base`
     }, [this.children])
   }
