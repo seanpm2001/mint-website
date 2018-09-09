@@ -3136,10 +3136,12 @@ class $Footer extends Component {
       className: `footer-title`
     }, [`Source`]), _createElement("a", {
       "href": `https://github.com/mint-lang/mint`,
+      "rel": `noreferrer`,
       "target": `_blank`,
       className: `footer-link`
     }, [`Github Repository`]), _createElement("a", {
       "href": `https://github.com/mint-lang/mint/releases`,
+      "rel": `noreferrer`,
       "target": `_blank`,
       className: `footer-link`
     }, [`Releases / Changelog`])]), _createElement("div", {
@@ -3148,10 +3150,12 @@ class $Footer extends Component {
       className: `footer-title`
     }, [`Community`]), _createElement("a", {
       "href": `https://gitter.im/mint-lang/Lobby`,
+      "rel": `noreferrer`,
       "target": `_blank`,
       className: `footer-link`
     }, [`Gitter`]), _createElement("a", {
       "href": `https://spectrum.chat/mint-lang`,
+      "rel": `noreferrer`,
       "target": `_blank`,
       className: `footer-link`
     }, [`Spectrum`])]), _createElement("div", {
@@ -3160,6 +3164,7 @@ class $Footer extends Component {
       className: `footer-title`
     }, [`Social`]), _createElement("a", {
       "href": `https://twitter.com/mint_lang`,
+      "rel": `noreferrer`,
       "target": `_blank`,
       className: `footer-link`
     }, [`Twitter`])])])])
@@ -3206,6 +3211,14 @@ class $Button extends Component {
   get href () {
     if (this.props.href != undefined) {
       return this.props.href
+    } else {
+      return ``
+    }
+  }
+
+  get rel () {
+    if (this.props.rel != undefined) {
+      return this.props.rel
     } else {
       return ``
     }
@@ -3316,6 +3329,7 @@ class $Header extends Component {
       className: `header-mobile-link`
     }, [`Install`]), _createElement("a", {
       "href": `https://guide.mint-lang.com`,
+      "rel": `noreferrer`,
       "target": `_blank`,
       className: `header-mobile-link`
     }, [`Learn`]), _createElement("a", {
@@ -3662,7 +3676,7 @@ class $Github extends Component {
       className: `github-title`
     }, [`Fork the project on GitHub`]), _createElement("div", {
       className: `github-text`
-    }, [_createElement("b", {}, [`Mint`]), ` is open source! `, _createElement("br", {}), `It’s hosted, developed, and maintained on GitHub by folks like you.`]), _createElement($Button, { "href": `https://github.com/mint-lang/mint`, "target": `_blank` }, _array(`Contribute on Github`))])
+    }, [_createElement("b", {}, [`Mint`]), ` is open source! `, _createElement("br", {}), `It’s hosted, developed, and maintained on GitHub by folks like you.`]), _createElement($Button, { "href": `https://github.com/mint-lang/mint`, "rel": `noreferrer`, "target": `_blank` }, _array(`Contribute on Github`))])
   }
 }
 
@@ -3966,17 +3980,20 @@ class $Pages_Install extends Component {
       "d": `M12.2 8.98c.06-.01.12-.03.18-.06.06-.02.12-.05.18-.09l.15-.12c.18-.19.29-.45.29-.71 0-.06-.01-.13-.02-.19a.603.603 0 0 0-.06-.19.757.757 0 0 0-.09-.18c-.03-.05-.08-.1-.12-.15-.28-.27-.72-.37-1.09-.21-.13.05-.23.12-.33.21-.04.05-.09.1-.12.15-.04.06-.07.12-.09.18-.03.06-.05.12-.06.19-.01.06-.02.13-.02.19 0 .26.11.52.29.71.1.09.2.16.33.21.12.05.25.08.38.08.06 0 .13-.01.2-.02M13 16v-4a1 1 0 1 0-2 0v4a1 1 0 1 0 2 0M12 3c-4.962 0-9 4.038-9 9 0 4.963 4.038 9 9 9 4.963 0 9-4.037 9-9 0-4.962-4.037-9-9-9m0 20C5.935 23 1 18.065 1 12S5.935 1 12 1c6.066 0 11 4.935 11 11s-4.934 11-11 11`,
       "fill-rule": `evenodd`
     })])]), `The Mac OSX binary needs some dependencies, until there is a package you need to`, _createElement("a", {
+      "rel": `noreferrer`,
       "href": `https://crystal-lang.org/docs/installation/on_mac_osx_using_homebrew.html`,
       className: `pages_install-link`
     }, [`install Crystal`]), `to satisfy them.`]), _createElement("hr", {
       className: `pages_install-hr`
     }), _createElement($Title, {  }, _array(`Install with Nix`)), _createElement($SubTitle, {  }, _array(`You can install Mint using the `, _createElement("a", {
       "href": `https://nixos.org/nix/`,
+      "rel": `noreferrer`,
       className: `pages_install-link`
     }, [`Nix Package Manager`]), ` with these steps: `)), _createElement("ol", {
       className: `pages_install-list_media_0 pages_install-list`
     }, [_createElement("li", {}, [`Install Nix if not installed using `, _createElement("a", {
       "href": `https://nixos.org/nix/download.html`,
+      "rel": `noreferrer`,
       className: `pages_install-link`
     }, [`these instructions.`])]), _createElement("li", {}, [`Run this command: `, _createElement("pre", {
       className: `pages_install-code_media_0 pages_install-code`
@@ -3986,6 +4003,7 @@ class $Pages_Install extends Component {
       className: `pages_install-hr`
     }), _createElement($Title, {  }, _array(`Install on Arch Linux`)), _createElement($SubTitle, {  }, _array(`An aur package is available for Mint: `, _createElement("a", {
       "href": `https://aur.archlinux.org/packages/mint/`,
+      "rel": `noreferrer`,
       className: `pages_install-link`
     }, [`https://aur.archlinux.org/packages/mint/`]))), _createElement("hr", {
       className: `pages_install-hr`
@@ -3993,6 +4011,7 @@ class $Pages_Install extends Component {
       className: `pages_install-list_media_0 pages_install-list`
     }, [_createElement("li", {}, [`Install the `, _createElement("a", {
       "href": `https://docs.microsoft.com/en-us/windows/wsl/install-win10/`,
+      "rel": `noreferrer`,
       "target": `_blank`,
       className: `pages_install-link`
     }, [`Windows Subsystem for Linux`])]), _createElement("li", {}, [`Download the Linux binary from the top or the daily binaries.`]), _createElement("li", {}, [`Move the binary to `, _createElement("code", {
@@ -4009,10 +4028,12 @@ class $Pages_Install extends Component {
       className: `pages_install-list_media_0 pages_install-list`
     }, [_createElement("li", {}, [`Install the `, _createElement("a", {
       "href": `https://crystal-lang.org/docs/installation/`,
+      "rel": `noreferrer`,
       "target": `_blank`,
       className: `pages_install-link`
     }, [`Crystal programming language`])]), _createElement("li", {}, [`Download and extract the source files from Github:`, _createElement("br", {}), _createElement("a", {
       "href": `https://github.com/mint-lang/mint`,
+      "rel": `noreferrer`,
       "target": `_blank`,
       className: `pages_install-link`
     }, [`https://github.com/mint-lang/mint`])]), _createElement("li", {}, [`In your terminal enter the folder you extracted the source code:`, _createElement("pre", {
@@ -4028,9 +4049,11 @@ class $Pages_Install extends Component {
     }), _createElement($Title, {  }, _array(`Daily Binaries`)), _createElement($SubTitle, {  }, _array(_createElement("p", {}, [`A fresh binary is created everything something changes in the master branch.`]), _createElement("p", {}, [`You can download those binaries here:`]), _createElement("ul", {
       className: `pages_install-files`
     }, [_createElement("li", {}, [_createElement("a", {
+      "rel": `noreferrer`,
       "href": `https://bintray.com/mint-lang/mint/download_file?file_path=mint-latest-linux`,
       className: `pages_install-link`
     }, [`mint-latest-linux`])]), _createElement("li", {}, [_createElement("a", {
+      "rel": `noreferrer`,
       "href": `https://bintray.com/mint-lang/mint/download_file?file_path=mint-latest-osx`,
       className: `pages_install-link`
     }, [`mint-latest-osx`])])])))))
@@ -4114,7 +4137,7 @@ class $Pages_Home extends Component {
       className: `pages_home-separator_media_1 pages_home-separator_media_0 pages_home-separator`
     }), _createElement($Button, { "href": `/install` }, _array(`Install`)), _createElement("div", {
       className: `pages_home-separator_media_1 pages_home-separator_media_0 pages_home-separator`
-    }), _createElement($Button, { "href": `https://guide.mint-lang.com`, "target": `_blank` }, _array(`Learn`))])]), _createElement($Showcase, {  }), _createElement($Features, {  }), _createElement($Github, {  })])
+    }), _createElement($Button, { "href": `https://guide.mint-lang.com`, "rel": `noreferrer`, "target": `_blank` }, _array(`Learn`))])]), _createElement($Showcase, {  }), _createElement($Features, {  }), _createElement($Github, {  })])
   }
 }
 
