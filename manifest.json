@@ -1,10 +1,10 @@
 {
-  "name": "",
-  "short_name": "",
-  "background_color": "",
-  "theme_color": "",
-  "display": "",
-  "orientation": "",
+  "name": "Mint",
+  "short_name": "Mint",
+  "background_color": "#2f9e59",
+  "theme_color": "#2f9e59",
+  "display": "standalone",
+  "orientation": "landscape",
   "icons": [
     {
       "src": "dist/icon-16x16.png",
