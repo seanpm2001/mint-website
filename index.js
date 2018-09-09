@@ -3285,6 +3285,7 @@ class $Header extends Component {
       className: `header-separator`
     }), _createElement("a", {
       "href": `https://guide.mint-lang.com`,
+      "rel": `noreferrer`,
       "target": `_blank`,
       className: `header-link`
     }, [`Learn`]), _createElement("div", {
