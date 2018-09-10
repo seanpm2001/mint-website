@@ -1,10 +1,11 @@
-const CACHE = '771e5bf06dce89be6c076499f11278b0ac85d52019c83161da76f42c260917bf';
+const CACHE = '666664c3397e3187d1aa3e9c9599d740c861775f25b76b01144003c102859c8d';
 const RUNTIME = 'runtime';
 const PRECACHE_URLS = ['/icon-167x167.png',
 '/icon-76x76.png',
 '/icon-152x152.png',
 '/codemirror.min.js',
 '/index.html',
+'/icon-72x72.png',
 '/icon-57x57.png',
 '/icon-128x128.png',
 '/_redirects',
@@ -17,10 +18,12 @@ const PRECACHE_URLS = ['/icon-167x167.png',
 '/robots.txt',
 '/icon-16x16.png',
 '/icon-32x32.png',
+'/icon-48x48.png',
 '/index.js',
 '/codemirror.neo.min.css',
 '/manifest.json',
 '/icon-120x120.png',
+'/icon-192x192.png',
 '/hero.png',
 '/icon-144x144.png',
 '/sources/file-handling.mint',
@@ -28,17 +31,26 @@ const PRECACHE_URLS = ['/icon-167x167.png',
 '/sources/counter.mint',
 '/codemirror.min.css'];
 
-// The install handler takes care of precaching the resources we always need.
+// On install precache all static resources
 self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(CACHE)
-      .then(cache => cache.addAll(PRECACHE_URLS))
-      .catch(error => console.log(`Oops! ${error}`))
+    caches
+      .open(CACHE)
+      .then(cache =>  {
+        const promises =
+          PRECACHE_URLS.map((url) =>
+            cache
+              .add(url)
+              .catch(error => console.log(`Could not cache: ${url}!`))
+          )
+
+        return Promise.all(promises)
+      })
       .then(self.skipWaiting())
   );
 });
 
-// The activate handler takes removes old caches
+// On activate remove all unused caches
 self.addEventListener('activate', function(event) {
   event.waitUntil(
     caches.keys().then(cacheNames => {
@@ -51,20 +63,26 @@ self.addEventListener('activate', function(event) {
   );
 });
 
-// The fetch handler serves responses for same-origin resources from a cache.
-// If no response is found, it populates the runtime cache with the response
-// from the network before returning it to the page.
 self.addEventListener('fetch', event => {
-  // Skip cross-origin requests, like those for Google Analytics.
-  if (event.request.url.startsWith(self.location.origin)) {
-    event.respondWith(
-      caches.match(event.request).then(cachedResponse => {
-        if (cachedResponse) {
-          return cachedResponse;
-        } else {
-          return fetch(event.request)
-        }
-      })
-    );
+  const url = event.request.url
+  const origin = self.location.origin
+  const isSameOrigin = url.startsWith(origin)
+  let response = null
+
+  // If we are on the same origin
+  if (isSameOrigin) {
+    // resolve the path
+    const path = url.slice(origin.length)
+
+    // Try to get the response from the cache if not available fall back to
+    // the "index.html" file.
+    response =
+      caches
+        .match(event.request)
+        .then(cachedResponse => cachedResponse || caches.match("/index.html"))
+  } else {
+    response = fetch(event.request)
   }
+
+  event.respondWith(response)
 });
