@@ -1,4 +1,4 @@
-const CACHE = '090e106893a50535995252946ed85fbe6448115af9bb9ac054ff6d818f6b8529';
+const CACHE = '79b154f00575418ca9a8e8aa1bc42174871fd7064ae8a1e34714df588b82e3ca';
 const RUNTIME = 'runtime';
 const PRECACHE_URLS = ['/icon-167x167.png',
 '/icon-76x76.png',
@@ -10,6 +10,7 @@ const PRECACHE_URLS = ['/icon-167x167.png',
 '/icon-128x128.png',
 '/_redirects',
 '/icon-180x180.png',
+'/og.png',
 '/icon-36x36.png',
 '/icon-256x256.png',
 '/icon-196x196.png',
