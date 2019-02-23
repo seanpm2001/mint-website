@@ -1,4 +1,4 @@
-const CACHE = '79b154f00575418ca9a8e8aa1bc42174871fd7064ae8a1e34714df588b82e3ca';
+const CACHE = 'f96a80d196c9d51ad3dea1f9cea05095d5a5229cf95e52779c31b0a35b1c90d1';
 const RUNTIME = 'runtime';
 const PRECACHE_URLS = ['/icon-167x167.png',
 '/icon-76x76.png',
@@ -42,7 +42,7 @@ self.addEventListener('install', event => {
           PRECACHE_URLS.map((url) =>
             cache
               .add(url)
-              .catch(error => console.log(`Could not cache: ${url}!`))
+              .catch(error => console.log(`Could not cache: ${url} - ${error}!`))
           )
 
         return Promise.all(promises)
