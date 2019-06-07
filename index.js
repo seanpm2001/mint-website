@@ -254,10 +254,10 @@ const Assets = new (class Assets {
         }
       }
     })()}componentDidMount(){return (async()=>{let _ = null;try{await BH.ej(BH.ek, this.cr);await BH.ej(BH.el, this.cs);_ = await this.ef()}catch(_error){if(!(_error instanceof DoError)){console.warn(`Unhandled error in sequence expression:`);console.warn(_error)}};return _})()}ef(){return (() => {
-      if (!this._element) { return }
+      if (!this._element.value) { return }
       if (this.editor) { return }
 
-      this.editor = CodeMirror.fromTextArea(this._element, {
+      this.editor = CodeMirror.fromTextArea(this._element.value, {
         lineNumbers: this.eg,
         theme: this.cw,
         mode: this.eh,
