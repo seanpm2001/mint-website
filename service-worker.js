@@ -1,4 +1,4 @@
-const CACHE = '9cb609b408039ef302a3663544780b8e754cd315235d64aa45af8deb815db646';
+const CACHE = 'c163ddf3b600b1fc978c76559164414d79f98e39ee4a9e7892437e61d6f5ba91';
 const RUNTIME = 'runtime';
 const PRECACHE_URLS = ['/codemirror.neo.min.css',
 '/icon-128x128.png',
